@@ -1,0 +1,34 @@
+{
+  "version": 8,
+  "name": "Ireland OpenTopoMap",
+  "sources": {
+    "opentopo": {
+      "type": "raster",
+      "tiles": [
+        "https://tile.opentopomap.org/{z}/{x}/{y}.png"
+      ],
+      "tileSize": 256,
+      "minzoom": 0,
+      "maxzoom": 17,
+      "attribution": "© OpenStreetMap contributors, © OpenTopoMap"
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#dde6d5"
+      }
+    },
+    {
+      "id": "opentopo-layer",
+      "type": "raster",
+      "source": "opentopo",
+      "minzoom": 0,
+      "maxzoom": 17
+    }
+  ],
+  "center": [-8.1, 53.4],
+  "zoom": 6.8
+}

@@ -1,0 +1,604 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 100;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		954BDD442F752E90008093C3 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = 954BDD432F752E90008093C3 /* MapLibre */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		954BDD242F752842008093C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 954BDD052F75283F008093C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 954BDD0C2F75283F008093C3;
+			remoteInfo = MapHills;
+		};
+		954BDD2E2F752842008093C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 954BDD052F75283F008093C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 954BDD0C2F75283F008093C3;
+			remoteInfo = MapHills;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		954BDD0D2F75283F008093C3 /* BareGPS Ireland.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BareGPS Ireland.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		954BDD232F752842008093C3 /* MapHillsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapHillsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		954BDD2D2F752842008093C3 /* MapHillsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapHillsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		954BDD352F752842008093C3 /* Exceptions for "MapHills" folder in "MapHills" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Packaging/Info.plist,
+			);
+			target = 954BDD0C2F75283F008093C3 /* MapHills */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		954BDD0F2F75283F008093C3 /* MapHills */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				954BDD352F752842008093C3 /* Exceptions for "MapHills" folder in "MapHills" target */,
+			);
+			path = MapHills;
+			sourceTree = "<group>";
+		};
+		954BDD262F752842008093C3 /* MapHillsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MapHillsTests;
+			sourceTree = "<group>";
+		};
+		954BDD302F752842008093C3 /* MapHillsUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MapHillsUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		954BDD0A2F75283F008093C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				954BDD442F752E90008093C3 /* MapLibre in Frameworks */,
+			);
+		};
+		954BDD202F752842008093C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		954BDD2A2F752842008093C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		954BDD042F75283F008093C3 = {
+			isa = PBXGroup;
+			children = (
+				954BDD0F2F75283F008093C3 /* MapHills */,
+				954BDD262F752842008093C3 /* MapHillsTests */,
+				954BDD302F752842008093C3 /* MapHillsUITests */,
+				954BDD422F752E90008093C3 /* Frameworks */,
+				954BDD0E2F75283F008093C3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		954BDD0E2F75283F008093C3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				954BDD0D2F75283F008093C3 /* BareGPS Ireland.app */,
+				954BDD232F752842008093C3 /* MapHillsTests.xctest */,
+				954BDD2D2F752842008093C3 /* MapHillsUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		954BDD422F752E90008093C3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		954BDD0C2F75283F008093C3 /* MapHills */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 954BDD362F752842008093C3 /* Build configuration list for PBXNativeTarget "MapHills" */;
+			buildPhases = (
+				954BDD092F75283F008093C3 /* Sources */,
+				954BDD0A2F75283F008093C3 /* Frameworks */,
+				954BDD0B2F75283F008093C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				954BDD0F2F75283F008093C3 /* MapHills */,
+			);
+			name = MapHills;
+			packageProductDependencies = (
+				954BDD432F752E90008093C3 /* MapLibre */,
+			);
+			productName = MapHills;
+			productReference = 954BDD0D2F75283F008093C3 /* BareGPS Ireland.app */;
+			productType = "com.apple.product-type.application";
+		};
+		954BDD222F752842008093C3 /* MapHillsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 954BDD3B2F752842008093C3 /* Build configuration list for PBXNativeTarget "MapHillsTests" */;
+			buildPhases = (
+				954BDD1F2F752842008093C3 /* Sources */,
+				954BDD202F752842008093C3 /* Frameworks */,
+				954BDD212F752842008093C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				954BDD252F752842008093C3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				954BDD262F752842008093C3 /* MapHillsTests */,
+			);
+			name = MapHillsTests;
+			productName = MapHillsTests;
+			productReference = 954BDD232F752842008093C3 /* MapHillsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		954BDD2C2F752842008093C3 /* MapHillsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 954BDD3E2F752842008093C3 /* Build configuration list for PBXNativeTarget "MapHillsUITests" */;
+			buildPhases = (
+				954BDD292F752842008093C3 /* Sources */,
+				954BDD2A2F752842008093C3 /* Frameworks */,
+				954BDD2B2F752842008093C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				954BDD2F2F752842008093C3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				954BDD302F752842008093C3 /* MapHillsUITests */,
+			);
+			name = MapHillsUITests;
+			productName = MapHillsUITests;
+			productReference = 954BDD2D2F752842008093C3 /* MapHillsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		954BDD052F75283F008093C3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					954BDD0C2F75283F008093C3 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					954BDD222F752842008093C3 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 954BDD0C2F75283F008093C3;
+					};
+					954BDD2C2F752842008093C3 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 954BDD0C2F75283F008093C3;
+					};
+				};
+			};
+			buildConfigurationList = 954BDD082F75283F008093C3 /* Build configuration list for PBXProject "Maphills" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 954BDD042F75283F008093C3;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				954BDD412F75291F008093C3 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */,
+			);
+			preferredProjectObjectVersion = 100;
+			productRefGroup = 954BDD0E2F75283F008093C3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				954BDD0C2F75283F008093C3 /* MapHills */,
+				954BDD222F752842008093C3 /* MapHillsTests */,
+				954BDD2C2F752842008093C3 /* MapHillsUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		954BDD0B2F75283F008093C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		954BDD212F752842008093C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		954BDD2B2F752842008093C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		954BDD092F75283F008093C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		954BDD1F2F752842008093C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		954BDD292F752842008093C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		954BDD252F752842008093C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 954BDD0C2F75283F008093C3 /* MapHills */;
+			targetProxy = 954BDD242F752842008093C3 /* PBXContainerItemProxy */;
+		};
+		954BDD2F2F752842008093C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 954BDD0C2F75283F008093C3 /* MapHills */;
+			targetProxy = 954BDD2E2F752842008093C3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		954BDD372F752842008093C3 /* Debug configuration for PBXNativeTarget "MapHills" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 104;
+				DEVELOPMENT_TEAM = 6B9FH8ZKN3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MapHills/Packaging/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "BareGPS Ireland";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "BareGPS Ireland uses your location to show your position on the map, navigate to hills, and continue GPX recording during active walks.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BareGPS Ireland uses your location to show your position on the map, navigate to hills, and display live distance, bearing, and grid reference information.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.02.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DavidOwens1513.BareGPSIreland.MapHills;
+				PRODUCT_NAME = "BareGPS Ireland";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		954BDD382F752842008093C3 /* Release configuration for PBXNativeTarget "MapHills" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 104;
+				DEVELOPMENT_TEAM = 6B9FH8ZKN3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MapHills/Packaging/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "BareGPS Ireland";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "BareGPS Ireland uses your location to show your position on the map, navigate to hills, and continue GPX recording during active walks.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BareGPS Ireland uses your location to show your position on the map, navigate to hills, and display live distance, bearing, and grid reference information.";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.02.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DavidOwens1513.BareGPSIreland.MapHills;
+				PRODUCT_NAME = "BareGPS Ireland";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		954BDD392F752842008093C3 /* Debug configuration for PBXProject "Maphills" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6B9FH8ZKN3;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		954BDD3A2F752842008093C3 /* Release configuration for PBXProject "Maphills" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6B9FH8ZKN3;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		954BDD3C2F752842008093C3 /* Debug configuration for PBXNativeTarget "MapHillsTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.davidowens1513.MapHills.MapHillsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BareGPS Ireland.app/BareGPS Ireland";
+			};
+			name = Debug;
+		};
+		954BDD3D2F752842008093C3 /* Release configuration for PBXNativeTarget "MapHillsTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.davidowens1513.MapHills.MapHillsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BareGPS Ireland.app/BareGPS Ireland";
+			};
+			name = Release;
+		};
+		954BDD3F2F752842008093C3 /* Debug configuration for PBXNativeTarget "MapHillsUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.davidowens1513.MapHills.MapHillsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MapHills;
+			};
+			name = Debug;
+		};
+		954BDD402F752842008093C3 /* Release configuration for PBXNativeTarget "MapHillsUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.davidowens1513.MapHills.MapHillsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MapHills;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		954BDD082F75283F008093C3 /* Build configuration list for PBXProject "Maphills" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				954BDD392F752842008093C3 /* Debug configuration for PBXProject "Maphills" */,
+				954BDD3A2F752842008093C3 /* Release configuration for PBXProject "Maphills" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		954BDD362F752842008093C3 /* Build configuration list for PBXNativeTarget "MapHills" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				954BDD372F752842008093C3 /* Debug configuration for PBXNativeTarget "MapHills" */,
+				954BDD382F752842008093C3 /* Release configuration for PBXNativeTarget "MapHills" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		954BDD3B2F752842008093C3 /* Build configuration list for PBXNativeTarget "MapHillsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				954BDD3C2F752842008093C3 /* Debug configuration for PBXNativeTarget "MapHillsTests" */,
+				954BDD3D2F752842008093C3 /* Release configuration for PBXNativeTarget "MapHillsTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		954BDD3E2F752842008093C3 /* Build configuration list for PBXNativeTarget "MapHillsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				954BDD3F2F752842008093C3 /* Debug configuration for PBXNativeTarget "MapHillsUITests" */,
+				954BDD402F752842008093C3 /* Release configuration for PBXNativeTarget "MapHillsUITests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		954BDD412F75291F008093C3 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/maplibre/maplibre-gl-native-distribution";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.24.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		954BDD432F752E90008093C3 /* MapLibre */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 954BDD412F75291F008093C3 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
+			productName = MapLibre;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 954BDD052F75283F008093C3 /* Project object */;
+}
