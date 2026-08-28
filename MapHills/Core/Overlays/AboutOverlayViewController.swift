@@ -256,7 +256,7 @@ final class AboutOverlayViewController: UIViewController {
             AboutMenuItem(symbolName: "internaldrive.fill", title: "Cache", detail: "Save visible map areas for offline use and manage saved cached areas."),
             AboutMenuItem(symbolName: "play.fill", title: "GPX Recording", detail: "Record, import, reopen, save, export and manage GPX tracks and waypoints."),
             AboutMenuItem(symbolName: "cloud.sun.fill", title: "Weather", detail: "Open a 24 hour forecast for the vicinity of the selected hill or the closest visible hill."),
-            AboutMenuItem(symbolName: "square.2.layers.3d.top.filled", title: "Map Layer", detail: "Switch between OpenTopo, OpenStreetMap and satellite map layers."),
+            AboutMenuItem(symbolName: "square.2.layers.3d.top.filled", title: "Map Layer", detail: "Switch between OpenTopo, OpenOnzyMap, OpenStreetMap and satellite map layers."),
             AboutMenuItem(symbolName: "location.north.line.fill", title: "Orientation", detail: "Reset the map to north-up; heads-up mode is changed in Settings."),
             AboutMenuItem(symbolName: "scope", title: "Recenter", detail: "Return the map to your current location.")
         ]
@@ -312,7 +312,7 @@ final class AboutOverlayViewController: UIViewController {
             .paragraphStyle: paragraphStyle
         ]
 
-        let headingLines: Set<String> = ["Overview", "Features", "Recording a GPX", "Menus", "Support", "Credits", "Credits:", "Location Permissions and Data", "Safety", "Private Land", "Additional Providers", "Coillte", "Sport Ireland", ActiveRegion.current.externalDataProviderName]
+        let headingLines: Set<String> = ["Overview", "Features", "Recording a GPX", "Menus", "Support", "Credits", "Credits:", "Location Permissions and Data", "Safety", "Private Land", "Additional Providers", "OpenOnzyMap", "Coillte", "Sport Ireland", ActiveRegion.current.externalDataProviderName]
         let subheadingLines: Set<String> = ["Recording using full on-map grid", "Recording using compact on-map grid", "Using Recording Controls", "Metrics Grids"]
 
         for rawLine in text.components(separatedBy: .newlines) {
@@ -454,6 +454,7 @@ final class AboutOverlayViewController: UIViewController {
             "Safety",
             "Private Land",
             "Additional Providers",
+            "OpenOnzyMap",
             "Coillte",
             "Sport Ireland",
             ActiveRegion.current.externalDataProviderName

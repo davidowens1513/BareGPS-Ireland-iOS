@@ -1,0 +1,24 @@
+{
+  "name": "MapData",
+  "product": "Ireland map package",
+  "version": "0.6.0",
+  "created": "2026-08-28",
+  "source": {
+    "basemap": "ireland.mbtiles",
+    "contours": "contours.mbtiles",
+    "environment": "environment.mbtiles",
+    "hillshade": "hillshade.mbtiles",
+    "hiking": "hiking.mbtiles",
+    "dem": "SRTM 1 Arc-Second Global, Version 3"
+  },
+  "folders": {
+    "style": "style",
+    "fonts": "fonts",
+    "sprites": "sprites"
+  },
+  "glyph_ranges": ["0-255", "256-511", "8192-8447"],
+  "checksums": "SHA256SUMS.txt",
+  "attribution": "ATTRIBUTION.txt",
+  "notice": "NOTICE.txt",
+  "notes": "Offline topographic data bundle for Ireland. Includes strengthened hillshade, roads and contours; greener woodland; rock, scree, shingle and cliff features; revised labels; and named hiking POIs. The style uses local MBTiles and local Open Sans glyphs. No sprite sheet is required by this style."
+}

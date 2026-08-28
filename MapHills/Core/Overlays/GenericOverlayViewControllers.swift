@@ -350,14 +350,16 @@ final class ActionOverlayViewController: UIViewController {
     private let dialogTitle: String
     private let messageText: String?
     private let actions: [Action]
+    private let preferredActionTitle: String?
 
     private let dimmingView = UIView()
     private let cardView = UIView()
 
-    init(title: String, message: String? = nil, actions: [Action]) {
+    init(title: String, message: String? = nil, preferredActionTitle: String? = nil, actions: [Action]) {
         self.dialogTitle = title
         self.messageText = message
         self.actions = actions
+        self.preferredActionTitle = preferredActionTitle
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
@@ -412,10 +414,16 @@ final class ActionOverlayViewController: UIViewController {
             let button = UIButton(type: .system)
             let foregroundColor: UIColor
             let backgroundColor: UIColor
+            let isPreferredAction = action.title == preferredActionTitle
             switch action.style {
             case .normal:
-                foregroundColor = .systemBlue
-                backgroundColor = .secondarySystemBackground
+                if isPreferredAction {
+                    foregroundColor = .white
+                    backgroundColor = .systemBlue
+                } else {
+                    foregroundColor = .systemBlue
+                    backgroundColor = .secondarySystemBackground
+                }
             case .destructive:
                 foregroundColor = .white
                 backgroundColor = .systemRed

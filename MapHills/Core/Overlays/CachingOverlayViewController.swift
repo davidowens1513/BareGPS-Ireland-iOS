@@ -84,7 +84,7 @@ final class CachingOverlayViewController: UIViewController {
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let descriptionLabel = UILabel()
-        descriptionLabel.text = "Save the currently visible map area for offline use. Saved areas are named, reloaded on launch, and outlined on the map. Cached map coverage is indicated by the green marker on the caching button."
+        descriptionLabel.text = "Save the currently visible map area for offline use. Saved areas are named, reloaded on launch, and outlined on the map. Cached map coverage is indicated by the green marker on the caching button. Caching is only available for OpenTopo and Satellite layers."
         descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.textColor = .secondaryLabel
         descriptionLabel.numberOfLines = 0

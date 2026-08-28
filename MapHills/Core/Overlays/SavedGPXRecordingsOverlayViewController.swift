@@ -152,6 +152,7 @@ final class SavedGPXRecordingsOverlayViewController: UIViewController {
     private func showActions(for item: SavedGPXRecordingItem) {
         let overlay = ActionOverlayViewController(
             title: item.fileURL.deletingPathExtension().lastPathComponent,
+            preferredActionTitle: "Open",
             actions: [
                 .init(title: "Open", style: .normal) { [weak self] in
                     self?.dismiss(animated: true) {

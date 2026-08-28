@@ -1,0 +1,17 @@
+NOTICE
+
+This is an offline map-data bundle, not a standalone phone application. A
+compatible MapLibre-based application or tile server must read the MBTiles,
+serve the glyph PBF files, and load style/baregps-style.json.
+
+Required visible attribution in a browsable map:
+  Copyright OpenStreetMap contributors
+
+The OpenStreetMap-derived databases remain subject to ODbL 1.0. SRTM-derived
+terrain is public-domain US government data. The bundled Open Sans glyphs are
+covered by Apache License 2.0. See ATTRIBUTION.txt and
+LICENSE-APACHE-2.0.txt.
+
+Source date recorded for the environmental, coastline and hiking overlays:
+2026-08-25. The original basemap archive does not contain a source-date field,
+so no more specific date is asserted for ireland.mbtiles.

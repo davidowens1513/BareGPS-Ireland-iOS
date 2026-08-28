@@ -353,6 +353,62 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         return nil
     }()
 
+    lazy var openOnzyMapStyleURL: URL? = {
+        guard let bundleResourceURL = Bundle.main.resourceURL else {
+            print("Missing bundle resource directory for OpenOnzyMap")
+            return nil
+        }
+
+        let styleSourceURL = bundleResourceURL
+            .appendingPathComponent("OpenOnzyMap.bundle", isDirectory: true)
+            .appendingPathComponent("style", isDirectory: true)
+            .appendingPathComponent("baregps-style.json")
+
+        guard FileManager.default.fileExists(atPath: styleSourceURL.path) else {
+            print("Missing OpenOnzyMap style bundle at \(styleSourceURL.path)")
+            return nil
+        }
+
+        do {
+            var styleJSON = try String(contentsOf: styleSourceURL, encoding: .utf8)
+            let bundleURL = bundleResourceURL.appendingPathComponent("OpenOnzyMap.bundle", isDirectory: true)
+            let fontsURL = bundleURL.appendingPathComponent("fonts", isDirectory: true)
+            let glyphTemplate = "file://\(fontsURL.path)/{fontstack}/{range}.pbf"
+            let sourceNames = [
+                "ireland.mbtiles",
+                "contours.mbtiles",
+                "environment.mbtiles",
+                "hillshade.mbtiles",
+                "hiking.mbtiles"
+            ]
+
+            for sourceName in sourceNames {
+                let absoluteSourceURL = "mbtiles://\(bundleURL.path)/\(sourceName)"
+                styleJSON = styleJSON.replacingOccurrences(
+                    of: "mbtiles://\(sourceName)",
+                    with: absoluteSourceURL
+                )
+            }
+
+            styleJSON = styleJSON.replacingOccurrences(
+                of: "\"glyphs\": \"./fonts/{fontstack}/{range}.pbf\"",
+                with: "\"glyphs\": \"\(glyphTemplate)\""
+            )
+            styleJSON = styleJSON.replacingOccurrences(
+                of: "\"glyphs\": \"../{fontstack}-{range}.pbf\"",
+                with: "\"glyphs\": \"\(glyphTemplate)\""
+            )
+
+            let resolvedStyleURL = FileManager.default.temporaryDirectory
+                .appendingPathComponent("OpenOnzyMap-resolved-style.json")
+            try styleJSON.write(to: resolvedStyleURL, atomically: true, encoding: .utf8)
+            return resolvedStyleURL
+        } catch {
+            print("Failed to prepare OpenOnzyMap style: \(error.localizedDescription)")
+            return nil
+        }
+    }()
+
     lazy var satelliteStyleURL: URL? = {
         let styleJSON = """
         {
@@ -439,6 +495,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         switch selectedMapBaseLayer {
         case .topographic:
             return topographicStyleURL
+        case .openOnzyMap:
+            return openOnzyMapStyleURL ?? topographicStyleURL
         case .standard:
             return standardStyleURL
         case .satellite:
@@ -1398,6 +1456,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         cachingButton.accessibilityLabel = "Caching"
 
         cachingButton.addTarget(self, action: #selector(showCaching), for: .touchUpInside)
+        updateCachingButtonAppearance()
 
         view.addSubview(cachingButton)
         cachingStatusIndicatorView.translatesAutoresizingMaskIntoConstraints = false
@@ -1627,6 +1686,23 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         button.clipsToBounds = false
     }
 
+    func canCacheCurrentMapLayer() -> Bool {
+        switch selectedMapBaseLayer {
+        case .topographic, .satellite:
+            return true
+        case .openOnzyMap, .standard:
+            return false
+        }
+    }
+
+    func updateCachingButtonAppearance() {
+        let canCache = canCacheCurrentMapLayer()
+        cachingButton.isEnabled = canCache
+        cachingButton.alpha = canCache ? 1.0 : 0.38
+        cachingButton.tintColor = canCache ? .systemBlue : .secondaryLabel
+        cachingButton.accessibilityLabel = canCache ? "Caching" : "Caching unavailable for this map layer"
+    }
+
     func updateAttributionLabel() {
         attributionLabel.text = selectedMapBaseLayer.attributionText
     }
@@ -1635,6 +1711,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         switch selectedMapBaseLayer {
         case .topographic:
             layerButton.tintColor = .systemBlue
+        case .openOnzyMap:
+            layerButton.tintColor = .systemOrange
         case .standard:
             layerButton.tintColor = .systemTeal
         case .satellite:
@@ -1997,7 +2075,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     func updateCachingIndicatorAppearance() {
-        cachingStatusIndicatorView.isHidden = !isVisibleAreaCoveredByCachedOfflineArea()
+        cachingStatusIndicatorView.isHidden = !canCacheCurrentMapLayer() || !isVisibleAreaCoveredByCachedOfflineArea()
     }
 
     func isVisibleAreaCoveredByCachedOfflineArea() -> Bool {

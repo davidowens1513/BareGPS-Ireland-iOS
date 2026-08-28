@@ -4,27 +4,44 @@ enum IrelandAboutText {
 Overview
 \(AppBranding.displayName) helps you explore and log hills across Ireland. The app uses hill data and hill lists provided by MountainViews.ie, with start-place and trail information from MountainViews.ie, Coillte, Sport Ireland and Outdoor Recreation NI / Outscape.
 
-The app provides full GPX recording, importing, Go-To and saving and exporting/sharing facilities as well as allowing caching prior to a walk to ensure coverage in areas of reduced cellular signal.
+The app provides full GPX recording, importing, Go-To and saving and exporting/sharing facilities. It provides a bespoke bundled hiking-focused layer (OpenOnzyMap) to ensure coverage in areas of reduced cellular signal, as well as providing caching to allow offline access to OpenTopo Map or Satellite layers.
 
 This is free software. Comments and requests are welcome.
 
 Features
 The app allows you to:
 - import, record, save, reopen, and share GPX tracks, with selectable recording detail levels.
-- cache the visible map area for offline use, with saved cache sizes, statuses, retry/resume support, and reusable named cached areas.
+
+- Access a bundled offline-safe Hiking map (OpenOnzyMap).
+
+- cache the visible map area (OpenTopoMap or Satellite) for offline use, with saved cache sizes, statuses, retry/resume support, and reusable named cached areas.
+
 - switch between north-up and heads-up map orientation, with a live position and heading indicator on the map.
+
 - customise hill marker colours and recorded and imported track colours.
+
 - show hills on a live map using simple filters, based on hill categories or height. 
+
 - use either metric or imperial units.
+
 - search the map for hills, known starting/parking points, and Irish places such as towns, villages, and cities. Search only applies to currently filtered and displayed hills and starting points. You can also search the full hill database from the Log Register.
+
 - show known starting/parking points for walks within a defined distance from the hills.
+
 - tap a hill (triangle within a circle - customisable colour) on the map to view its name, height, range, prominence, grid reference, and distance from your location. You can also tap the MountainViews.ie (MV) logo to visit the corresponding hill page. Where there are starting places nearby, they will also be indicated on the card. These are tappable to display the starting point details.
+
 - tap a starting point (walking man icon - customisable colour) to view its name, grid reference and height, as well as parking details where available. Where there are close hills, you can also view a list of the nearest, together with their distance and height differential. These are tappable to open the relevant hill card. A link for directions via Apple and Google Maps is also provided, as is a link to the appropriate page on MountainViews.ie.
+
 - use Go To for a selected hill to open a live compass with distance, direction, heading, and key hill metrics, while also showing a persistent guidance line on the map. Go To is also operable to a randomly chosen location by using a long press on the map. 
+
 - a long press on the map also offers the option of creating a personal waypoint. These can be saved, and are displayed on map using a user defined colour. Tapping them offers the choice of Go To, rename, delete or cancel.
+
 - mark hills as logged, review your logged total in the Log Register and export your logs.
+
 - search the Log Register and quickly log or unlog hills.
+
 - tap the weather icon to launch a 24 hour weather forecast for the selected hill, or, if no hill is currently selected, for the visible hill closest to the centre of the screen. If no hills qualify, the app will use the centre of the screen and return a Grid Reference. 
+
 - in settings, turn on additional start-point datasets from Coillte, Sport Ireland and Outscape and display these on the map. Tapping these points gives details of any routes to or from the point, which can then be displayed on the map. These routes include all the major National Trails and Looped walks throughout the country, together with Northern Ireland off-road trails from Outscape. Given the primary purpose of this app is to facilitate climbing hills, these datasets are toggled off by default. However they do provide additional starting points to access the hills, and they are also of interest to the general walker.
 
 Recording a GPX
@@ -66,6 +83,11 @@ Sport Ireland provides 1,466 start points and 1,013 route records in the current
 
 Outdoor Recreation NI / Outscape provides 129 start points and 129 route records in the current app data. This is a curated subset of Northern Ireland off-road trail data, reduced from a larger source inventory to avoid showing large numbers of short fragments, rights of way and utility paths that are less useful as walking-route markers.
 
+OpenOnzyMap
+OpenOnzyMap is an hiking-focused offline-safe map, which is bundled with the app and thus can function in areas without cellular coverage. It includes local MBTiles, local Open Sans glyphs, and a custom cartographic style. The Map was built with OpenStreetMap, Tilemaker, QGIS, GDAL and SQLite.
+
+OpenOnzyMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
+
 Safety
 Note that, for your own safety, you should not rely solely on this app, or any app, for your navigation and safety in the hills.  Possession of a map and compass and/or a dedicated GPS unit, and the ability to use them correctly, is an essential precaution. While phones have improved immeasurably in recent years, shortcomings in battery life, waterproofing and signal mean they are not yet suitable as a sole navigation device in the hills. 
 
@@ -86,6 +108,7 @@ Sport Ireland Start Points & Trail Data: Get Ireland Active - Sport Ireland 2023
 Outdoor Recreation NI / Outscape Trail Data: NI Off Road Trails Layer from the GreenspaceNI Map, created by Outscape for DAERA and DFI on behalf of the Strategic Outdoor Recreation Group (SORG), using data harmonised, combined and enhanced from Ordnance Survey of Northern Ireland, Northern Ireland Environment Agency, Outdoor Recreation Northern Ireland, DAERA, councils and other providers. Product currency stated by source: June 2024, annual update cycle. Attribution: © Crown copyright and database right Land & Property Services (2024) NIMA MOU577.2.
 Weather Data: Met Éireann
 Map Rendering: MapLibre
+OpenOnzyMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
 Basemap data: © OpenStreetMap contributors
 Topographic map data: © OpenStreetMap contributors, SRTM
 Topographic map style: © OpenTopoMap (CC-BY-SA)

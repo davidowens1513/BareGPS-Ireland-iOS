@@ -84,21 +84,15 @@ extension ViewController {
     }
 
     @objc func showMapLayerChooser(_ sender: UIButton) {
-        let currentLayerName: String
-        switch selectedMapBaseLayer {
-        case .topographic:
-            currentLayerName = "OpenTopo"
-        case .standard:
-            currentLayerName = "Map"
-        case .satellite:
-            currentLayerName = "Satellite"
-        }
         let overlay = SelectionOverlayViewController(
             title: "Map Layer",
-            message: "Current: \(currentLayerName)",
+            message: "Current: \(selectedMapBaseLayer.displayName)",
             options: [
                 .init(title: "OpenTopo", isSelected: selectedMapBaseLayer == .topographic) { [weak self] in
                     self?.setMapBaseLayer(.topographic)
+                },
+                .init(title: "OpenOnzyMap", isSelected: selectedMapBaseLayer == .openOnzyMap) { [weak self] in
+                    self?.setMapBaseLayer(.openOnzyMap)
                 },
                 .init(title: "OpenStreetMap", isSelected: selectedMapBaseLayer == .standard) { [weak self] in
                     self?.setMapBaseLayer(.standard)
@@ -126,16 +120,18 @@ extension ViewController {
         mapView.setCenter(center, zoomLevel: zoomLevel, direction: direction, animated: false)
         updateAttributionLabel()
         updateLayerButtonAppearance()
+        updateCachingButtonAppearance()
+        updateCachingIndicatorAppearance()
         updateDownloadButtonForExistingPack()
         reloadPeakAnnotations()
         refreshCachedAreaOverlays()
     }
 
     @objc func downloadOffline() {
-        if selectedMapBaseLayer == .standard {
+        if !canCacheCurrentMapLayer() {
             presentInfoOverlay(
                 title: "Caching Not Available",
-                message: "The Map layer uses public OpenStreetMap tiles, so offline area saving is only available for OpenTopo and Satellite."
+                message: "Offline area saving is only available for OpenTopo and Satellite."
             )
             return
         }

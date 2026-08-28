@@ -359,8 +359,8 @@ extension ViewController {
                 if self.offlinePack != nil {
                     return "Downloading…"
                 }
-                if self.selectedMapBaseLayer == .standard {
-                    return "Offline Save Unavailable for Standard"
+                if !self.canCacheCurrentMapLayer() {
+                    return "Offline Save Unavailable"
                 }
                 return "Save Visible Area for Offline Use"
             },
