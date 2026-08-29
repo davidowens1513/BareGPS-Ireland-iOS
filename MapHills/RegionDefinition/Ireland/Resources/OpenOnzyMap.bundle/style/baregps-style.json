@@ -3,7 +3,7 @@
   "name": "BareGPS Ireland Topographic",
   "center": [-8.15412, 53.4],
   "zoom": 7,
-  "sprite": "./sprites/baregps-bog24",
+  "sprite": "./sprites/baregps-bog27",
   "sources": {
     "ireland": {
       "type": "vector",
@@ -137,6 +137,30 @@
         "raster-brightness-max": 0.42,
         "raster-resampling": "linear",
         "raster-fade-duration": 0
+      }
+    },
+    {
+      "id": "bare-rock-stipple",
+      "type": "fill",
+      "source": "environment",
+      "source-layer": "terrain",
+      "minzoom": 10,
+      "filter": ["==", ["get", "class"], "bare_rock"],
+      "paint": {
+        "fill-pattern": "bare-rock-stipple",
+        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.28, 13, 0.42, 16, 0.5]
+      }
+    },
+    {
+      "id": "scree-stipple",
+      "type": "fill",
+      "source": "environment",
+      "source-layer": "terrain",
+      "minzoom": 12,
+      "filter": ["in", ["get", "class"], ["literal", ["scree", "shingle"]]],
+      "paint": {
+        "fill-pattern": "scree-stipple",
+        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0.37, 14, 0.53, 16, 0.62]
       }
     },
     {
@@ -276,8 +300,8 @@
       "source-layer": "building",
       "minzoom": 13,
       "paint": {
-        "fill-color": "#ddd3c5",
-        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 13, 0.5, 14, 0.72]
+        "fill-color": "#595d5f",
+        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 13, 0.78, 14, 0.9, 16, 0.94]
       }
     },
     {

@@ -86,6 +86,8 @@ Outdoor Recreation NI / Outscape provides 129 start points and 129 route records
 OpenOnzyMap
 OpenOnzyMap is an hiking-focused offline-safe map, which is bundled with the app and thus can function in areas without cellular coverage. It includes local MBTiles, local Open Sans glyphs, and a custom cartographic style. The Map was built with OpenStreetMap, Tilemaker, QGIS, GDAL and SQLite.
 
+[[openonzy-map-legend]]
+
 OpenOnzyMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
 
 Safety

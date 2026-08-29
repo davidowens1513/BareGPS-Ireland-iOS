@@ -22,6 +22,7 @@ private struct AboutMenuItem {
 final class AboutOverlayViewController: UIViewController {
     private let aboutText: String
     private let aboutSections: [AboutSection]
+    private let openOnzyMapLegendToken = "[[openonzy-map-legend]]"
 
     private let dimmingView = UIView()
     private let cardView = UIView()
@@ -322,6 +323,11 @@ final class AboutOverlayViewController: UIViewController {
                 continue
             }
 
+            if line == openOnzyMapLegendToken {
+                result.append(openOnzyMapLegendAttributedText())
+                continue
+            }
+
             if headingLines.contains(line) {
                 if line == ActiveRegion.current.externalDataProviderName {
                     result.append(dataProviderHeaderAttributedText())
@@ -439,6 +445,37 @@ final class AboutOverlayViewController: UIViewController {
             guard foundRange.location != NSNotFound else { break }
             attributedString.replaceCharacters(in: foundRange, with: replacement)
         }
+    }
+
+    private func openOnzyMapLegendAttributedText() -> NSAttributedString {
+        guard let bundleResourceURL = Bundle.main.resourceURL else {
+            return NSAttributedString(string: "")
+        }
+
+        let imageURL = bundleResourceURL
+            .appendingPathComponent("OpenOnzyMap.bundle", isDirectory: true)
+            .appendingPathComponent("OpenOnzyMap-Legend.png")
+
+        guard let image = UIImage(contentsOfFile: imageURL.path) else {
+            return NSAttributedString(string: "")
+        }
+
+        let maxWidth = max(180, min(320, UIScreen.main.bounds.width - 96))
+        let scaledHeight = maxWidth * image.size.height / image.size.width
+
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        attachment.bounds = CGRect(x: 0, y: 4, width: maxWidth, height: scaledHeight)
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        paragraphStyle.paragraphSpacingBefore = 8
+        paragraphStyle.paragraphSpacing = 8
+
+        let result = NSMutableAttributedString(attachment: attachment)
+        result.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: result.length))
+        result.append(NSAttributedString(string: "\n", attributes: [.paragraphStyle: paragraphStyle]))
+        return result
     }
 
     private static func makeSections(from text: String) -> [AboutSection] {

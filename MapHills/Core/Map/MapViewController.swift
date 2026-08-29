@@ -841,7 +841,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         hillSearchInfoView.isHidden = true
 
         hillSearchInfoLabel.translatesAutoresizingMaskIntoConstraints = false
-        hillSearchInfoLabel.text = "Only Displayed Hills and Starts will be shown"
+        hillSearchInfoLabel.text = "Only filtered Hills and Starts will be shown"
         hillSearchInfoLabel.font = .systemFont(ofSize: 10, weight: .medium)
         hillSearchInfoLabel.textColor = .secondaryLabel
         hillSearchInfoLabel.textAlignment = .center
