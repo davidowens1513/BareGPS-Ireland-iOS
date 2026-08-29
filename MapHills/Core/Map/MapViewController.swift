@@ -45,7 +45,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     let attributionLabel = UILabel()
     let zoomSliderGuideView = DashedSliderGuideView()
     let zoomSlider = UISlider()
-    let minimumMapZoomLevel = 6.0
+    let minimumMapZoomLevel = 7.0
     let maximumMapZoomLevel = 17.0
 
     // Button to show app information.
