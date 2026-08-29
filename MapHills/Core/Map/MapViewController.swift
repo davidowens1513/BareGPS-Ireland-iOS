@@ -45,7 +45,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     let attributionLabel = UILabel()
     let zoomSliderGuideView = DashedSliderGuideView()
     let zoomSlider = UISlider()
-    let minimumMapZoomLevel = 7.0
+    let minimumMapZoomLevel = 6.0
     let maximumMapZoomLevel = 17.0
 
     // Button to show app information.
@@ -156,7 +156,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     var cachedAreaPolygons: [CachedAreaPolygon] = []
     var cachedAreaBorders: [CachedAreaBorderPolyline] = []
     var selectedCacheDetailLevel: CachedAreaDetailLevel = .standard
-    var selectedMapBaseLayer: MapBaseLayer = .topographic
+    var selectedMapBaseLayer: MapBaseLayer = .openOnzyMap
     var selectedFilterSchema: MenuFilterSchema = .classification
     var selectedHillFilterMode: HillFilterMode = .simple
     var selectedDisplayUnitSystem: DisplayUnitSystem = .metric
@@ -373,13 +373,16 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             var styleJSON = try String(contentsOf: styleSourceURL, encoding: .utf8)
             let bundleURL = bundleResourceURL.appendingPathComponent("OpenOnzyMap.bundle", isDirectory: true)
             let fontsURL = bundleURL.appendingPathComponent("fonts", isDirectory: true)
+            let spritesURL = bundleURL.appendingPathComponent("sprites", isDirectory: true)
             let glyphTemplate = "file://\(fontsURL.path)/{fontstack}/{range}.pbf"
+            let spriteTemplate = "file://\(spritesURL.path)/baregps-bog24"
             let sourceNames = [
                 "ireland.mbtiles",
                 "contours.mbtiles",
                 "environment.mbtiles",
                 "hillshade.mbtiles",
-                "hiking.mbtiles"
+                "hiking.mbtiles",
+                "grid.mbtiles"
             ]
 
             for sourceName in sourceNames {
@@ -397,6 +400,12 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             styleJSON = styleJSON.replacingOccurrences(
                 of: "\"glyphs\": \"../{fontstack}-{range}.pbf\"",
                 with: "\"glyphs\": \"\(glyphTemplate)\""
+            )
+            styleJSON = styleJSON.replacingOccurrences(
+                of: #""sprite":\s*"[^"]+""#,
+                with: "\"sprite\": \"\(spriteTemplate)\""
+                ,
+                options: .regularExpression
             )
 
             let resolvedStyleURL = FileManager.default.temporaryDirectory

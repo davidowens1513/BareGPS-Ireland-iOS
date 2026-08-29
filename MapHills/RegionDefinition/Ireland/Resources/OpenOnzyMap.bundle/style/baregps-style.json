@@ -3,6 +3,7 @@
   "name": "BareGPS Ireland Topographic",
   "center": [-8.15412, 53.4],
   "zoom": 7,
+  "sprite": "./sprites/baregps-bog24",
   "sources": {
     "ireland": {
       "type": "vector",
@@ -29,6 +30,11 @@
       "type": "vector",
       "url": "mbtiles://hiking.mbtiles",
       "attribution": "© OpenStreetMap contributors"
+    },
+    "irish-grid": {
+      "type": "vector",
+      "url": "mbtiles://grid.mbtiles",
+      "attribution": "Irish Grid (EPSG:29903)"
     }
   },
   "glyphs": "./fonts/{fontstack}/{range}.pbf",
@@ -79,8 +85,8 @@
       "minzoom": 7,
       "filter": ["==", ["get", "class"], "bog"],
       "paint": {
-        "fill-color": "#cfbea9",
-        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 7, 0.52, 12, 0.76]
+        "fill-color": "#f2d96f",
+        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 7, 0.5, 12, 0.74]
       }
     },
     {
@@ -127,10 +133,22 @@
       "minzoom": 6,
       "paint": {
         "raster-opacity": ["interpolate", ["linear"], ["zoom"], 6, 1.0, 11.8, 1.0, 12.5, 0.96, 14, 0.9],
-        "raster-contrast": 0.62,
-        "raster-brightness-max": 0.62,
+        "raster-contrast": 0.8,
+        "raster-brightness-max": 0.42,
         "raster-resampling": "linear",
         "raster-fade-duration": 0
+      }
+    },
+    {
+      "id": "bog-tufts",
+      "type": "fill",
+      "source": "environment",
+      "source-layer": "landcover",
+      "minzoom": 9,
+      "filter": ["==", ["get", "class"], "bog"],
+      "paint": {
+        "fill-pattern": ["step", ["zoom"], "bog-tuft-low", 11, "bog-tuft-mid", 13, "bog-tuft-high"],
+        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 9, 0.64, 12, 0.64, 15, 0.68]
       }
     },
     {
@@ -141,10 +159,9 @@
       "minzoom": 11,
       "filter": ["==", ["get", "class"], "cliff"],
       "paint": {
-        "line-color": "#625e55",
-        "line-opacity": ["interpolate", ["linear"], ["zoom"], 11, 0.62, 14, 0.86],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 0.55, 14, 1.15],
-        "line-dasharray": [1.4, 0.7]
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 11, 0.78, 14, 0.96],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 11, 3.8, 14, 6],
+        "line-pattern": "cliff-teeth"
       }
     },
     {
@@ -159,6 +176,30 @@
         "line-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0.34, 15, 0.48],
         "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.24, 15, 0.52],
         "line-dasharray": [2, 2.5]
+      }
+    },
+    {
+      "id": "irish-grid-1km",
+      "type": "line",
+      "source": "irish-grid",
+      "source-layer": "grid_1km",
+      "minzoom": 12,
+      "paint": {
+        "line-color": "#477d91",
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0.38, 14, 0.5, 16, 0.54],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.58, 14, 0.78, 16, 0.9]
+      }
+    },
+    {
+      "id": "irish-grid-10km",
+      "type": "line",
+      "source": "irish-grid",
+      "source-layer": "grid_10km",
+      "minzoom": 10,
+      "paint": {
+        "line-color": "#386d82",
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.34, 12, 0.5, 15, 0.58],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.72, 12, 1, 15, 1.2]
       }
     },
     {
@@ -407,6 +448,28 @@
         "text-allow-overlap": false
       },
       "paint": {"text-color": "#403d38", "text-opacity": 0.92, "text-halo-color": "#f3efe6", "text-halo-width": 0.9, "text-halo-blur": 0.04}
+    },
+    {
+      "id": "irish-grid-labels",
+      "type": "symbol",
+      "source": "irish-grid",
+      "source-layer": "grid_10km",
+      "minzoom": 12,
+      "layout": {
+        "symbol-placement": "line",
+        "symbol-spacing": 420,
+        "text-field": ["get", "label"],
+        "text-font": ["Open Sans Semibold"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 12, 8, 15, 9.5],
+        "text-max-angle": 5,
+        "text-allow-overlap": false
+      },
+      "paint": {
+        "text-color": "#315f72",
+        "text-opacity": 0.86,
+        "text-halo-color": "#f3efe6",
+        "text-halo-width": 1
+      }
     },
     {
       "id": "trail-labels",

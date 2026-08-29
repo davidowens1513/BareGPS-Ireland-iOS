@@ -9,6 +9,7 @@
     "environment": "environment.mbtiles",
     "hillshade": "hillshade.mbtiles",
     "hiking": "hiking.mbtiles",
+    "irish_grid": "grid.mbtiles",
     "dem": "SRTM 1 Arc-Second Global, Version 3"
   },
   "folders": {
@@ -20,5 +21,5 @@
   "checksums": "SHA256SUMS.txt",
   "attribution": "ATTRIBUTION.txt",
   "notice": "NOTICE.txt",
-  "notes": "Offline topographic data bundle for Ireland. Includes strengthened hillshade, roads and contours; greener woodland; rock, scree, shingle and cliff features; revised labels; and named hiking POIs. The style uses local MBTiles and local Open Sans glyphs. No sprite sheet is required by this style."
+  "notes": "Offline topographic data bundle for Ireland. Includes strengthened hillshade, roads and contours; woodland and patterned bog landcover; rock, scree, shingle and direction-neutral crag features; an all-island Irish Grid overlay; revised labels; and named hiking POIs. The style uses local MBTiles, local Open Sans glyphs and a bundled sprite sheet."
 }

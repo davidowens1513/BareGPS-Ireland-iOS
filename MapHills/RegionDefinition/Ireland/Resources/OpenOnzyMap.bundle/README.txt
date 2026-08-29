@@ -6,9 +6,10 @@ Contents
   environment.mbtiles   Coastline, woodland, bog and wetland
   hillshade.mbtiles     Light terrain shading
   hiking.mbtiles        Walking-relevant points of interest
+  grid.mbtiles          Traditional all-island Irish Grid overlay
   style/                 MapLibre style
   fonts/                 Local Open Sans glyphs
-  sprites/               Empty; the current style does not require sprites
+  sprites/               Bundled bog and crag pattern sprites
 
 This bundle is ready to be embedded in an offline MapLibre-compatible map
 application. It is not itself an installable phone app. The host application
