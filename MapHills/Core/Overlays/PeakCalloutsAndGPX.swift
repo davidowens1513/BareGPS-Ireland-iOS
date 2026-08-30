@@ -10,7 +10,7 @@ import CoreLocation
 import MapLibre
 
 private enum CalloutLayoutMetrics {
-    static let belowAnchorGap: CGFloat = 28
+    static let belowAnchorGap: CGFloat = 12
     static let automaticVerticalGap: CGFloat = 56
     static let leftRailReservedWidth: CGFloat = 72
     static let rightRailReservedWidth: CGFloat = 84
@@ -92,7 +92,7 @@ final class HillCalloutView: UIView, MLNCalloutView {
         addSubview(containerView)
 
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.alwaysBounceVertical = false
+        scrollView.alwaysBounceVertical = true
         scrollView.showsVerticalScrollIndicator = true
         scrollView.showsHorizontalScrollIndicator = false
         containerView.addSubview(scrollView)
@@ -499,16 +499,18 @@ final class HillCalloutView: UIView, MLNCalloutView {
 
         case .belowAnchor:
             let verticalGap: CGFloat = CalloutLayoutMetrics.belowAnchorGap
-            let fixedTop = max(rect.maxY + verticalGap, constrainedRect.minY + 8)
-            let maximumAvailableHeight = max(180, constrainedRect.maxY - fixedTop - 8)
+            let targetTop = constrainedRect.minY + (constrainedRect.height * 0.40)
+            let fixedTop = max(rect.maxY + verticalGap, targetTop)
+            let maximumAvailableHeight = max(180, constrainedRect.height * 0.55)
             let fittedHeight = min(maximumAvailableHeight, fittedContentHeight + 24 + 2)
             let centeredClampedLeadingX = min(max(centeredLeadingX, minimumLeading), maximumLeading)
+            let verticalConstraint = topAnchor.constraint(equalTo: view.topAnchor, constant: fixedTop)
 
             NSLayoutConstraint.activate([
                 widthAnchor.constraint(equalToConstant: preferredWidth),
                 heightAnchor.constraint(equalToConstant: fittedHeight),
                 leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: centeredClampedLeadingX),
-                topAnchor.constraint(equalTo: view.topAnchor, constant: fixedTop)
+                verticalConstraint
             ])
         }
 
@@ -639,7 +641,7 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
         addSubview(containerView)
 
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.alwaysBounceVertical = false
+        scrollView.alwaysBounceVertical = true
         containerView.addSubview(scrollView)
 
         let titleLabel = UILabel()
@@ -776,6 +778,7 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
                 button.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
                     var outgoing = incoming
                     outgoing.font = .systemFont(ofSize: 12, weight: .bold)
+                    outgoing.foregroundColor = UIColor.label
                     return outgoing
                 }
                 button.titleLabel?.numberOfLines = 1
@@ -790,14 +793,19 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
                 nearbyHillButtons.append(button)
 
                 let metricsLabel = makeDetailLabel(action.metrics, weight: .regular)
-                metricsLabel.font = .systemFont(ofSize: 12, weight: .regular)
+                metricsLabel.font = .monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
+                metricsLabel.textColor = .secondaryLabel
+                metricsLabel.numberOfLines = 1
+                metricsLabel.adjustsFontSizeToFitWidth = true
+                metricsLabel.minimumScaleFactor = 0.85
                 metricsLabel.setContentHuggingPriority(.required, for: .horizontal)
                 metricsLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
                 let row = UIStackView(arrangedSubviews: [button, metricsLabel])
                 row.axis = .horizontal
                 row.alignment = .center
-                row.spacing = 8
+                row.distribution = .fillEqually
+                row.spacing = 6
                 contentStack.addArrangedSubview(row)
             }
         }
@@ -973,9 +981,6 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         ).height)
-        let maximumAvailableHeight = constrainedRect.height - 16
-        let fittedHeight = min(maximumAvailableHeight, fittedContentHeight + 24)
-        let availableBelow = constrainedRect.maxY - rect.maxY
         let verticalGap: CGFloat = CalloutLayoutMetrics.automaticVerticalGap
         let minimumLeading = constrainedRect.minX + CalloutLayoutMetrics.leftRailReservedWidth
         let maximumLeading = constrainedRect.maxX - preferredWidth - CalloutLayoutMetrics.rightRailReservedWidth
@@ -985,23 +990,17 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
         let centeredLeadingX = rect.midX - (preferredWidth / 2)
         let clampedSideLeadingX = min(max(sidePreferredLeadingX, minimumLeading), maximumLeading)
         let clampedCenteredLeadingX = min(max(centeredLeadingX, minimumLeading), maximumLeading)
-        let requiredVerticalSpace = fittedHeight + verticalGap + 8
-        let opensAboveAnnotation = rect.minY >= requiredVerticalSpace || availableBelow < requiredVerticalSpace
         let leadingX = placementMode == .belowAnchor ? clampedCenteredLeadingX : clampedSideLeadingX
-        let verticalConstraint: NSLayoutConstraint = placementMode == .belowAnchor
-            ? topAnchor.constraint(equalTo: view.topAnchor, constant: max(rect.maxY + CalloutLayoutMetrics.belowAnchorGap, constrainedRect.minY + 8))
-            : (
-                opensAboveAnnotation
-                ? bottomAnchor.constraint(equalTo: view.topAnchor, constant: rect.minY - verticalGap)
-                : topAnchor.constraint(equalTo: view.topAnchor, constant: rect.maxY + verticalGap)
-            )
+        let targetTop = constrainedRect.minY + (constrainedRect.height * 0.40)
+        let fixedTop = max(rect.maxY + verticalGap, targetTop)
+        let maximumAvailableHeight = max(180, constrainedRect.height * 0.55)
+        let fittedHeight = min(maximumAvailableHeight, fittedContentHeight + 24)
+        let verticalConstraint: NSLayoutConstraint = topAnchor.constraint(equalTo: view.topAnchor, constant: fixedTop)
 
         NSLayoutConstraint.activate([
             widthAnchor.constraint(equalToConstant: preferredWidth),
             heightAnchor.constraint(equalToConstant: fittedHeight),
             leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leadingX),
-            topAnchor.constraint(greaterThanOrEqualTo: view.topAnchor, constant: constrainedRect.minY + 8),
-            bottomAnchor.constraint(lessThanOrEqualTo: view.topAnchor, constant: constrainedRect.maxY - 8),
             verticalConstraint
         ])
 

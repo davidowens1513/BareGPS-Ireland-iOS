@@ -64,11 +64,13 @@ extension ViewController {
             }
             isRefreshingStartPlaceSelectionState = false
 
-            guard let refreshedAnnotation else { return }
-            showSelectedStartPlaceHalo(for: refreshedAnnotation)
-            let placementMode = pendingStartPlaceCalloutPlacementMode ?? .automatic
+            let activeAnnotation = refreshedAnnotation ?? startPlaceAnnotation
+            guard let startPlaceForHalo = activeAnnotation.startPlace else { return }
+            showSelectedStartPlaceHalo(for: activeAnnotation)
+            let placementMode = pendingStartPlaceCalloutPlacementMode ?? .belowAnchor
             pendingStartPlaceCalloutPlacementMode = nil
-            showStartPlaceCallout(for: refreshedAnnotation, placementMode: placementMode)
+            positionCoordinateForCallout(startPlaceForHalo.coordinate)
+            showStartPlaceCallout(for: activeAnnotation, placementMode: placementMode)
             return
         }
 
@@ -92,6 +94,12 @@ extension ViewController {
         isRefreshingSelectionState = false
 
         guard let calloutPeakID = transition.calloutPeakID else { return }
+        if let peakAnnotation = annotation as? PeakAnnotation,
+           let peak = peakAnnotation.peak {
+            positionCoordinateForCallout(peak.coordinate)
+            presentHillCalloutWhenReady(for: peak, placementMode: .belowAnchor, selectionToken: pendingPeakCalloutSelectionToken)
+            return
+        }
         presentHillCalloutWhenReady(forPeakID: calloutPeakID)
     }
 

@@ -1881,7 +1881,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     func focusOnPeak(
         _ peak: Peak,
-        placementMode: HillCalloutView.PlacementMode,
+        placementMode: HillCalloutView.PlacementMode = .belowAnchor,
         positionsPeakForCallout: Bool,
         invocationSource: CalloutInvocationSource = .other,
         animated: Bool = true
@@ -1903,19 +1903,24 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         } else {
             mapView.setCenter(peak.coordinate, zoomLevel: mapView.zoomLevel, animated: animated)
         }
-        if invocationSource == .search && positionsPeakForCallout {
-            positionCoordinateForCallout(peak.coordinate)
-        }
+        positionCoordinateForCallout(peak.coordinate)
 
         pendingPeakCalloutSelectionToken += 1
         let selectionToken = pendingPeakCalloutSelectionToken
+
+        let fallbackAnnotation = PeakAnnotation()
+        fallbackAnnotation.coordinate = peak.coordinate
+        fallbackAnnotation.title = peak.name
+        fallbackAnnotation.subtitle = subtitle(for: peak)
+        fallbackAnnotation.peak = peak
 
         presentHillCalloutWhenReady(
             forPeakID: peak.id,
             delay: 0.3,
             remainingAttempts: 8,
             placementMode: placementMode,
-            selectionToken: selectionToken
+            selectionToken: selectionToken,
+            fallbackAnnotation: fallbackAnnotation
         )
     }
 
@@ -1959,8 +1964,9 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         forPeakID peakID: String,
         delay: TimeInterval = 0,
         remainingAttempts: Int = 4,
-        placementMode: HillCalloutView.PlacementMode = .automatic,
-        selectionToken: Int? = nil
+        placementMode: HillCalloutView.PlacementMode = .belowAnchor,
+        selectionToken: Int? = nil,
+        fallbackAnnotation: PeakAnnotation? = nil
     ) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
             guard let self else { return }
@@ -1968,20 +1974,47 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                 return
             }
             guard let annotation = self.peakAnnotation(for: peakID) else {
-                guard remainingAttempts > 0 else { return }
-                self.presentHillCalloutWhenReady(
-                    forPeakID: peakID,
-                    delay: 0.12,
-                    remainingAttempts: remainingAttempts - 1,
-                    placementMode: placementMode,
-                    selectionToken: selectionToken
-                )
+                if remainingAttempts > 0 {
+                    self.presentHillCalloutWhenReady(
+                        forPeakID: peakID,
+                        delay: 0.12,
+                        remainingAttempts: remainingAttempts - 1,
+                        placementMode: placementMode,
+                        selectionToken: selectionToken,
+                        fallbackAnnotation: fallbackAnnotation
+                    )
+                    return
+                }
+
+                guard let fallbackAnnotation else { return }
+                self.showHillCallout(for: fallbackAnnotation, placementMode: placementMode)
                 return
             }
 
             self.mapView.selectAnnotation(annotation, animated: false, completionHandler: nil)
             self.showHillCallout(for: annotation, placementMode: placementMode)
         }
+    }
+
+    func presentHillCalloutWhenReady(
+        for peak: Peak,
+        placementMode: HillCalloutView.PlacementMode = .belowAnchor,
+        selectionToken: Int? = nil
+    ) {
+        let fallbackAnnotation = PeakAnnotation()
+        fallbackAnnotation.coordinate = peak.coordinate
+        fallbackAnnotation.title = peak.name
+        fallbackAnnotation.subtitle = subtitle(for: peak)
+        fallbackAnnotation.peak = peak
+
+        presentHillCalloutWhenReady(
+            forPeakID: peak.id,
+            delay: 0,
+            remainingAttempts: 4,
+            placementMode: placementMode,
+            selectionToken: selectionToken,
+            fallbackAnnotation: fallbackAnnotation
+        )
     }
 
     func matchedPeaks(for query: String, limit: Int? = nil) -> [Peak] {
@@ -2423,7 +2456,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     func showHillCallout(
         for peakAnnotation: PeakAnnotation,
-        placementMode: HillCalloutView.PlacementMode = .automatic
+        placementMode: HillCalloutView.PlacementMode = .belowAnchor
     ) {
         // Hills use a custom overlay view instead of MapLibre's callout cycle so we
         // can control placement and avoid the framework re-centering over the marker.
@@ -2502,7 +2535,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     func showStartPlaceCallout(
         for startPlaceAnnotation: StartPlaceAnnotation,
-        placementMode: StartPlaceCalloutView.PlacementMode = .automatic
+        placementMode: StartPlaceCalloutView.PlacementMode = .belowAnchor
     ) {
         dismissActiveHillCallout(animated: false)
         dismissActiveStartPlaceCallout(animated: false)
@@ -2913,7 +2946,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     func focusOnStartPlace(
         _ startPlace: StartPlace,
-        placementMode: StartPlaceCalloutView.PlacementMode = .automatic,
+        placementMode: StartPlaceCalloutView.PlacementMode = .belowAnchor,
         invocationSource: CalloutInvocationSource = .other,
         animated: Bool = true
     ) {
@@ -2929,6 +2962,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             positionCoordinateForCallout(startPlace.coordinate)
         } else {
             mapView.setCenter(startPlace.coordinate, zoomLevel: mapView.zoomLevel, animated: animated)
+            positionCoordinateForCallout(startPlace.coordinate)
         }
 
         guard let annotation = startPlaceAnnotation(for: startPlace) else {
@@ -3015,14 +3049,19 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         .prefix(6)
         .map { candidate in
             let peak = candidate.peak
-            let distanceText = formattedDistance(candidate.distanceMeters)
+            let distanceText = formattedDistance(candidate.distanceMeters).replacingOccurrences(of: " ", with: "")
+            let bearingDegrees = goToSessionStore.bearing(
+                from: startPlace.coordinate,
+                to: peak.coordinate
+            )
             let metricsText: String
 
             if let startHeight = startPlace.heightM {
                 let heightDifference = peak.heightM - startHeight
-                metricsText = "\(distanceText), \(formattedElevation(heightDifference))↑"
+                let gainText = formattedElevation(heightDifference).replacingOccurrences(of: " ", with: "")
+                metricsText = "\(distanceText), \(gainText)↑, \(MapFormatting.formattedDegrees(bearingDegrees))"
             } else {
-                metricsText = distanceText
+                metricsText = "\(distanceText), \(MapFormatting.formattedDegrees(bearingDegrees))"
             }
 
             return StartPlaceNearbyHillAction(
@@ -3031,8 +3070,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                 handler: { [weak self] in
                     self?.focusOnPeak(
                         peak,
-                        placementMode: .automatic,
-                        positionsPeakForCallout: false,
+                        placementMode: .belowAnchor,
+                        positionsPeakForCallout: true,
                         invocationSource: .other
                     )
                 }

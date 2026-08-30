@@ -45,6 +45,10 @@ enum MapFormatting {
         }
     }
 
+    static func formattedDegrees(_ degrees: CLLocationDirection) -> String {
+        String(format: "%03d°", Int(degrees.rounded()))
+    }
+
     static func formattedLiveGPXDuration(_ duration: TimeInterval) -> String {
         let totalSeconds = max(0, Int(duration.rounded()))
         return formattedDuration(totalSeconds: totalSeconds, padsHours: false)
