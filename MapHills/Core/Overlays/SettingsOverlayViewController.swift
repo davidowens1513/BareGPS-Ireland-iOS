@@ -168,13 +168,12 @@ final class SettingsOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissSettings)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
@@ -182,11 +181,7 @@ final class SettingsOverlayViewController: UIViewController {
         contentScrollView.alwaysBounceVertical = true
         cardView.addSubview(contentScrollView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "Settings"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("Settings")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let unitsSection = makeSectionView(
@@ -199,7 +194,7 @@ final class SettingsOverlayViewController: UIViewController {
 
             let unitsNoteLabel = UILabel()
             unitsNoteLabel.text = "Height classifications are unaffected."
-            unitsNoteLabel.font = .systemFont(ofSize: 13, weight: .regular)
+            unitsNoteLabel.font = OverlayChromeStyle.bodyFont
             unitsNoteLabel.textColor = .secondaryLabel
             unitsNoteLabel.numberOfLines = 0
 
@@ -217,7 +212,7 @@ final class SettingsOverlayViewController: UIViewController {
             ])
         }
 
-        mapOrientationModeLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        mapOrientationModeLabel.font = OverlayChromeStyle.bodyFont
         mapOrientationModeLabel.textColor = .secondaryLabel
         mapOrientationModeLabel.numberOfLines = 0
         mapOrientationModeLabel.text = selectedMapOrientationMode.descriptionText
@@ -256,7 +251,7 @@ final class SettingsOverlayViewController: UIViewController {
             ])
         }
 
-        trackRecordingModeLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        trackRecordingModeLabel.font = OverlayChromeStyle.bodyFont
         trackRecordingModeLabel.textColor = .secondaryLabel
         trackRecordingModeLabel.numberOfLines = 0
         trackRecordingModeLabel.text = selectedTrackRecordingQuality.descriptionText
@@ -293,7 +288,7 @@ final class SettingsOverlayViewController: UIViewController {
 
             let compactRecordingGridLabel = UILabel()
             compactRecordingGridLabel.text = "Use Compact Grid"
-            compactRecordingGridLabel.font = .systemFont(ofSize: 14, weight: .medium)
+            compactRecordingGridLabel.font = OverlayChromeStyle.bodyFont
             compactRecordingGridLabel.textColor = .label
 
             let row = UIStackView(arrangedSubviews: [compactRecordingGridLabel, compactRecordingGridSwitch])
@@ -321,7 +316,7 @@ final class SettingsOverlayViewController: UIViewController {
 
             let snailTrailLabel = UILabel()
             snailTrailLabel.text = "Show Snail Trail"
-            snailTrailLabel.font = .systemFont(ofSize: 14, weight: .medium)
+            snailTrailLabel.font = OverlayChromeStyle.bodyFont
             snailTrailLabel.textColor = .label
 
             let snailTrailRow = UIStackView(arrangedSubviews: [snailTrailLabel, snailTrailSwitch])
@@ -405,7 +400,7 @@ final class SettingsOverlayViewController: UIViewController {
 
             let startPointsLabel = UILabel()
             startPointsLabel.text = "Start Points"
-            startPointsLabel.font = .systemFont(ofSize: 14, weight: .bold)
+            startPointsLabel.font = OverlayChromeStyle.sectionTitleFont
             startPointsLabel.textColor = .label
 
             let stack = UIStackView(arrangedSubviews: generalRows + [startPointsLabel] + startPointRows)
@@ -492,7 +487,7 @@ final class SettingsOverlayViewController: UIViewController {
         nearestHundredStatusButton.titleLabel?.numberOfLines = 0
         nearestHundredStatusButton.titleLabel?.textAlignment = .center
 
-        nearestHundredCurrentPositionLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        nearestHundredCurrentPositionLabel.font = OverlayChromeStyle.bodyFont
         nearestHundredCurrentPositionLabel.textColor = .secondaryLabel
         nearestHundredCurrentPositionLabel.numberOfLines = 0
 
@@ -517,7 +512,7 @@ final class SettingsOverlayViewController: UIViewController {
         useCurrentPositionButton.configuration?.attributedTitle = AttributedString(
             "Set from Current Position",
             attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+                .font: OverlayChromeStyle.supportingFont,
                 .foregroundColor: UIColor.white
             ])
         )
@@ -590,9 +585,7 @@ final class SettingsOverlayViewController: UIViewController {
         }
 
         let closeButton = UIButton(type: .system)
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissSettings), for: .touchUpInside)
 
         let contentStack = UIStackView(arrangedSubviews: [
@@ -667,12 +660,12 @@ final class SettingsOverlayViewController: UIViewController {
     ) -> UIView {
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        titleLabel.font = OverlayChromeStyle.sectionTitleFont
         titleLabel.textColor = .label
 
         let descriptionLabel = UILabel()
         descriptionLabel.text = description
-        descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        descriptionLabel.font = OverlayChromeStyle.bodyFont
         descriptionLabel.textColor = .secondaryLabel
         descriptionLabel.numberOfLines = 0
 
@@ -686,7 +679,7 @@ final class SettingsOverlayViewController: UIViewController {
 
         let containerView = UIView()
         containerView.backgroundColor = UIColor.secondarySystemBackground
-        containerView.layer.cornerRadius = 12
+        containerView.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         containerView.layer.borderWidth = 1
         containerView.layer.borderColor = UIColor.separator.cgColor
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -710,7 +703,7 @@ final class SettingsOverlayViewController: UIViewController {
     ) -> UIView {
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        titleLabel.font = OverlayChromeStyle.sectionTitleFont
         titleLabel.textColor = .label
 
         let descriptionLabel = UILabel()
@@ -727,7 +720,7 @@ final class SettingsOverlayViewController: UIViewController {
 
         let containerView = UIView()
         containerView.backgroundColor = UIColor.secondarySystemBackground
-        containerView.layer.cornerRadius = 12
+        containerView.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         containerView.layer.borderWidth = 1
         containerView.layer.borderColor = UIColor.separator.cgColor
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -748,18 +741,18 @@ final class SettingsOverlayViewController: UIViewController {
         control.selectedSegmentTintColor = .systemBlue
         control.backgroundColor = UIColor.secondarySystemBackground
         control.setTitleTextAttributes([
-            .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+            .font: OverlayChromeStyle.supportingFont,
             .foregroundColor: UIColor.label
         ], for: .normal)
         control.setTitleTextAttributes([
-            .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+            .font: OverlayChromeStyle.supportingFont,
             .foregroundColor: UIColor.white
         ], for: .selected)
     }
 
     private func recordingDisplayDescription() -> NSAttributedString {
         let baseAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 13, weight: .regular),
+            .font: OverlayChromeStyle.bodyFont,
             .foregroundColor: UIColor.secondaryLabel
         ]
 
@@ -784,7 +777,7 @@ final class SettingsOverlayViewController: UIViewController {
     private func makeColorWellRow(title: String, colorWell: UIColorWell) -> UIStackView {
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        titleLabel.font = OverlayChromeStyle.bodyFont
         titleLabel.textColor = .label
 
         let row = UIStackView(arrangedSubviews: [titleLabel, colorWell])
@@ -797,7 +790,7 @@ final class SettingsOverlayViewController: UIViewController {
     private func makeSwitchRow(title: String, toggle: UISwitch) -> UIStackView {
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        titleLabel.font = OverlayChromeStyle.bodyFont
         titleLabel.textColor = .label
 
         let row = UIStackView(arrangedSubviews: [titleLabel, toggle])
@@ -810,7 +803,7 @@ final class SettingsOverlayViewController: UIViewController {
     private func makeProviderSwitchRow(for provider: StartPlaceProvider, toggle: UISwitch) -> UIStackView {
         let titleLabel = UILabel()
         titleLabel.text = provider.title
-        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        titleLabel.font = OverlayChromeStyle.bodyFont
         titleLabel.textColor = .label
         titleLabel.numberOfLines = 1
 
@@ -844,7 +837,7 @@ final class SettingsOverlayViewController: UIViewController {
     private func makeInlineSectionLabel(_ title: String) -> UILabel {
         let label = UILabel()
         label.text = title
-        label.font = .systemFont(ofSize: 13, weight: .semibold)
+        label.font = OverlayChromeStyle.supportingFont
         label.textColor = .secondaryLabel
         return label
     }
@@ -860,7 +853,7 @@ final class SettingsOverlayViewController: UIViewController {
     private func makeButtonRow(title: String, button: UIButton) -> UIStackView {
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        titleLabel.font = OverlayChromeStyle.bodyFont
         titleLabel.textColor = .label
         titleLabel.numberOfLines = 0
 
@@ -931,7 +924,7 @@ final class SettingsOverlayViewController: UIViewController {
         configuration.attributedTitle = AttributedString(
             title,
             attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+                .font: OverlayChromeStyle.sectionTitleFont,
                 .foregroundColor: UIColor.white
             ])
         )
@@ -947,7 +940,7 @@ final class SettingsOverlayViewController: UIViewController {
         configuration.attributedTitle = AttributedString(
             title,
             attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+                .font: OverlayChromeStyle.supportingFont,
                 .foregroundColor: UIColor.white
             ])
         )
@@ -961,7 +954,7 @@ final class SettingsOverlayViewController: UIViewController {
             configuration.attributedTitle = AttributedString(
                 "Nearest 100 active via \(sourceTitle)\nReference: \(nearestHundredConfiguration.gridReference)",
                 attributes: AttributeContainer([
-                    .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+                    .font: OverlayChromeStyle.supportingFont,
                     .foregroundColor: UIColor.white
                 ])
             )
@@ -971,7 +964,7 @@ final class SettingsOverlayViewController: UIViewController {
             configuration.attributedTitle = AttributedString(
                 "Current setup: Not set",
                 attributes: AttributeContainer([
-                    .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+                    .font: OverlayChromeStyle.supportingFont,
                     .foregroundColor: UIColor.white
                 ])
             )

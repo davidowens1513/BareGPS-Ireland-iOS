@@ -61,13 +61,12 @@ final class AdvancedFilterOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissOverlay)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
@@ -75,11 +74,7 @@ final class AdvancedFilterOverlayViewController: UIViewController {
         contentScrollView.alwaysBounceVertical = true
         cardView.addSubview(contentScrollView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "Advanced Filter"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("Advanced Filter")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let logicHeaderLabel = sectionHeaderLabel(text: "Logic")
@@ -107,7 +102,7 @@ final class AdvancedFilterOverlayViewController: UIViewController {
         presetsStackView.spacing = 10
 
         let savePresetButton = UIButton(type: .system)
-        savePresetButton.configuration = buttonConfiguration(title: "Save Scheme", color: .systemBlue)
+        savePresetButton.configuration = makeOverlayPlainButtonConfiguration(title: "Save Scheme")
         savePresetButton.contentHorizontalAlignment = .leading
         savePresetButton.addTarget(self, action: #selector(promptToSavePreset), for: .touchUpInside)
 
@@ -116,10 +111,10 @@ final class AdvancedFilterOverlayViewController: UIViewController {
         applyButton.addTarget(self, action: #selector(applyAdvancedFilter), for: .touchUpInside)
 
         let doneButton = UIButton(type: .system)
-        doneButton.configuration = buttonConfiguration(title: "Done", color: .systemBlue)
+        doneButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         doneButton.addTarget(self, action: #selector(dismissOverlay), for: .touchUpInside)
 
-        summaryLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        summaryLabel.font = OverlayChromeStyle.bodyFont
         summaryLabel.textColor = .secondaryLabel
         summaryLabel.numberOfLines = 0
 
@@ -262,7 +257,7 @@ final class AdvancedFilterOverlayViewController: UIViewController {
         guard !savedPresets.isEmpty else {
             let emptyLabel = UILabel()
             emptyLabel.text = "No saved schemes yet."
-            emptyLabel.font = .systemFont(ofSize: 13, weight: .regular)
+            emptyLabel.font = OverlayChromeStyle.bodyFont
             emptyLabel.textColor = .secondaryLabel
             presetsStackView.addArrangedSubview(emptyLabel)
             return
@@ -271,12 +266,12 @@ final class AdvancedFilterOverlayViewController: UIViewController {
         for preset in savedPresets {
             let nameLabel = UILabel()
             nameLabel.text = preset.name
-            nameLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+            nameLabel.font = OverlayChromeStyle.sectionTitleFont
             nameLabel.textColor = .label
 
             let summaryLabel = UILabel()
             summaryLabel.text = summaryText(for: preset.filter)
-            summaryLabel.font = .systemFont(ofSize: 12, weight: .regular)
+            summaryLabel.font = OverlayChromeStyle.supportingFont
             summaryLabel.textColor = .secondaryLabel
             summaryLabel.numberOfLines = 0
 
@@ -391,11 +386,7 @@ final class AdvancedFilterOverlayViewController: UIViewController {
     }
 
     private func sectionHeaderLabel(text: String) -> UILabel {
-        let label = UILabel()
-        label.text = text
-        label.font = .systemFont(ofSize: 17, weight: .bold)
-        label.textColor = .label
-        return label
+        return makeOverlaySectionTitleLabel(text)
     }
 
     private func makeSectionContainer(arrangedSubviews: [UIView]) -> UIView {
@@ -406,7 +397,7 @@ final class AdvancedFilterOverlayViewController: UIViewController {
 
         let container = UIView()
         container.backgroundColor = UIColor.secondarySystemBackground
-        container.layer.cornerRadius = 12
+        container.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         container.layer.borderWidth = 1
         container.layer.borderColor = UIColor.separator.cgColor
         container.translatesAutoresizingMaskIntoConstraints = false
@@ -464,32 +455,10 @@ final class AdvancedFilterOverlayViewController: UIViewController {
     }
 
     private func buttonConfiguration(title: String, color: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.plain()
-        configuration.baseForegroundColor = color
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0)
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: color
-            ])
-        )
-        return configuration
+        makeOverlayPlainButtonConfiguration(title: title, foregroundColor: color)
     }
 
     private func prominentButtonConfiguration(title: String, color: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseBackgroundColor = color
-        configuration.baseForegroundColor = .white
-        configuration.cornerStyle = .medium
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: UIColor.white
-            ])
-        )
-        return configuration
+        makeOverlayButtonConfiguration(title: title, foregroundColor: .white, backgroundColor: color)
     }
 }
-

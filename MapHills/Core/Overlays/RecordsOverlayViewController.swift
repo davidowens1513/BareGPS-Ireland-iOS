@@ -79,13 +79,12 @@ final class RecordsOverlayViewController: UIViewController {
         view.addGestureRecognizer(dismissKeyboardTapRecognizer)
         observeKeyboardChanges()
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissRecords)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.accessibilityIdentifier = "recordsOverlayCard"
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
@@ -96,7 +95,7 @@ final class RecordsOverlayViewController: UIViewController {
 
         titleLabel.text = AppBranding.loggedPeaksTitle
         titleLabel.accessibilityIdentifier = "recordsTitleLabel"
-        titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        titleLabel.font = OverlayChromeStyle.titleFont
         titleLabel.textColor = .label
         titleLabel.textAlignment = .center
         titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
@@ -104,7 +103,7 @@ final class RecordsOverlayViewController: UIViewController {
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         summaryHeaderLabel.text = "Summary"
-        summaryHeaderLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        summaryHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         summaryHeaderLabel.textColor = .label
         summaryHeaderLabel.textAlignment = .center
         summaryHeaderLabel.setContentCompressionResistancePriority(.required, for: .vertical)
@@ -127,7 +126,7 @@ final class RecordsOverlayViewController: UIViewController {
         subtitleLabel.text = displayMode == .search
             ? "Search hills, start points, and Ireland places by name, region, status, parking, or grid reference. Tap a hill to log it, or a place to open it on the map."
             : "Search Hills. Tap a hill to log it or unlog it."
-        subtitleLabel.font = .systemFont(ofSize: 10, weight: .semibold)
+        subtitleLabel.font = OverlayChromeStyle.supportingFont
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.numberOfLines = 0
         subtitleLabel.textAlignment = .center
@@ -147,22 +146,18 @@ final class RecordsOverlayViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = UIColor.secondarySystemBackground
-        tableView.layer.cornerRadius = 10
+        tableView.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "RecordsCell")
         tableView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
 
         let closeButton = UIButton(type: .system)
         closeButton.accessibilityIdentifier = "recordsDoneButton"
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissRecords), for: .touchUpInside)
 
         shareButton.accessibilityIdentifier = "recordsShareButton"
-        shareButton.configuration = .plain()
-        shareButton.configuration?.title = "Save/Share..."
-        shareButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        shareButton.configuration = makeOverlayPlainButtonConfiguration(title: "Save/Share...")
         shareButton.addTarget(self, action: #selector(shareRecords), for: .touchUpInside)
 
         buttonStack.addArrangedSubview(shareButton)
@@ -177,7 +172,7 @@ final class RecordsOverlayViewController: UIViewController {
 
         overallSummaryContainer.translatesAutoresizingMaskIntoConstraints = false
         overallSummaryContainer.backgroundColor = UIColor.secondarySystemBackground
-        overallSummaryContainer.layer.cornerRadius = 10
+        overallSummaryContainer.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         overallSummaryContainer.layer.borderWidth = 1
         overallSummaryContainer.layer.borderColor = UIColor.separator.cgColor
         overallSummaryContainer.clipsToBounds = true
@@ -192,7 +187,7 @@ final class RecordsOverlayViewController: UIViewController {
         summarySection.addArrangedSubview(overallSummaryContainer)
 
         searchHeaderLabel.text = "Search Hills"
-        searchHeaderLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        searchHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         searchHeaderLabel.textColor = .label
         searchHeaderLabel.textAlignment = .center
         searchHeaderLabel.setContentCompressionResistancePriority(.required, for: .vertical)

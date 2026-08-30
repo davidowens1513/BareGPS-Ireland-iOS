@@ -42,7 +42,7 @@ final class CachedAreaCalloutView: UIView, MLNCalloutView {
         backgroundColor = .clear
 
         containerView.backgroundColor = .systemBackground
-        containerView.layer.cornerRadius = 14
+        containerView.layer.cornerRadius = OverlayChromeStyle.cardCornerRadius
         containerView.layer.shadowColor = UIColor.black.cgColor
         containerView.layer.shadowOpacity = 0.18
         containerView.layer.shadowRadius = 10
@@ -50,19 +50,19 @@ final class CachedAreaCalloutView: UIView, MLNCalloutView {
         containerView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(containerView)
 
-        titleLabel.font = .systemFont(ofSize: 18, weight: .semibold)
+        titleLabel.font = OverlayChromeStyle.sectionTitleFont
         titleLabel.textColor = .label
         titleLabel.numberOfLines = 0
         titleLabel.text = title
 
-        cacheTagLabel.font = .systemFont(ofSize: 13, weight: .bold)
+        cacheTagLabel.font = OverlayChromeStyle.supportingFont
         cacheTagLabel.textColor = .secondaryLabel
         cacheTagLabel.textAlignment = .right
         cacheTagLabel.text = "Cached"
         cacheTagLabel.setContentHuggingPriority(.required, for: .horizontal)
         cacheTagLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        metricsLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        metricsLabel.font = OverlayChromeStyle.bodyFont
         metricsLabel.textColor = .secondaryLabel
         metricsLabel.numberOfLines = 0
         metricsLabel.text = metrics
@@ -133,12 +133,11 @@ final class CachedAreaCalloutView: UIView, MLNCalloutView {
         configuration.background.backgroundColor = backgroundColor
         configuration.background.cornerRadius = 10
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
-        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-            var outgoing = incoming
-            outgoing.font = .systemFont(ofSize: 14, weight: .semibold)
-            return outgoing
-        }
-        return configuration
+        return makeOverlayButtonConfiguration(
+            title: title,
+            foregroundColor: foregroundColor,
+            backgroundColor: backgroundColor
+        )
     }
 
     func presentCallout(

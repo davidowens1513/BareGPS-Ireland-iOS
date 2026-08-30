@@ -91,8 +91,8 @@ extension ViewController {
                 .init(title: "OpenTopo", isSelected: selectedMapBaseLayer == .topographic) { [weak self] in
                     self?.setMapBaseLayer(.topographic)
                 },
-                .init(title: "OpenOnzyMap", isSelected: selectedMapBaseLayer == .openOnzyMap) { [weak self] in
-                    self?.setMapBaseLayer(.openOnzyMap)
+                .init(title: "OpenBareMap", isSelected: selectedMapBaseLayer == .openBareMap) { [weak self] in
+                    self?.setMapBaseLayer(.openBareMap)
                 },
                 .init(title: "OpenStreetMap", isSelected: selectedMapBaseLayer == .standard) { [weak self] in
                     self?.setMapBaseLayer(.standard)

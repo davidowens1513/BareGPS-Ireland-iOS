@@ -110,13 +110,12 @@ final class GPXOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissOverlay)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
@@ -124,22 +123,18 @@ final class GPXOverlayViewController: UIViewController {
         contentScrollView.alwaysBounceVertical = true
         cardView.addSubview(contentScrollView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "GPS Handling"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("GPS Handling")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let subtitleLabel = UILabel()
         subtitleLabel.text = "Manage imported tracks, live recording, and saved GPX files."
-        subtitleLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        subtitleLabel.font = OverlayChromeStyle.bodyFont
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
 
         statusContainerView.backgroundColor = UIColor.systemGray6
-        statusContainerView.layer.cornerRadius = 14
+        statusContainerView.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         statusContainerView.layer.borderWidth = 1
         statusContainerView.layer.borderColor = UIColor.separator.cgColor
         statusContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -148,12 +143,12 @@ final class GPXOverlayViewController: UIViewController {
         statusIconView.contentMode = .scaleAspectFit
         statusIconView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 18, weight: .semibold)
 
-        statusTitleLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        statusTitleLabel.font = OverlayChromeStyle.supportingFont
         statusTitleLabel.textColor = .secondaryLabel
         statusTitleLabel.text = "Recording Status"
         statusTitleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        statusLabel.font = .systemFont(ofSize: 16, weight: .heavy)
+        statusLabel.font = OverlayChromeStyle.sectionTitleFont
         statusLabel.textColor = .label
         statusLabel.textAlignment = .left
         statusLabel.numberOfLines = 0
@@ -161,18 +156,18 @@ final class GPXOverlayViewController: UIViewController {
 
         let fileHeaderLabel = UILabel()
         fileHeaderLabel.text = "Files"
-        fileHeaderLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        fileHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         fileHeaderLabel.textColor = .label
         fileHeaderLabel.textAlignment = .left
 
         let fileDescriptionLabel = UILabel()
         fileDescriptionLabel.text = "Import tracks, reopen saved recordings, or clear the track currently shown on the map."
-        fileDescriptionLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        fileDescriptionLabel.font = OverlayChromeStyle.bodyFont
         fileDescriptionLabel.textColor = .secondaryLabel
         fileDescriptionLabel.numberOfLines = 0
 
         mapInteractionLockContainerView.backgroundColor = UIColor.secondarySystemBackground
-        mapInteractionLockContainerView.layer.cornerRadius = 12
+        mapInteractionLockContainerView.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         mapInteractionLockContainerView.layer.borderWidth = 1
         mapInteractionLockContainerView.layer.borderColor = UIColor.separator.cgColor
         mapInteractionLockContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -242,7 +237,7 @@ final class GPXOverlayViewController: UIViewController {
         statsStack.translatesAutoresizingMaskIntoConstraints = false
         let statsHeaderLabel = UILabel()
         statsHeaderLabel.text = "Live Stats"
-        statsHeaderLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        statsHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         statsHeaderLabel.textColor = .label
         statsHeaderLabel.textAlignment = .left
         statsStack.addArrangedSubview(statsHeaderLabel)
@@ -299,9 +294,7 @@ final class GPXOverlayViewController: UIViewController {
         fileStack.translatesAutoresizingMaskIntoConstraints = false
 
         let closeButton = UIButton(type: .system)
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissOverlay), for: .touchUpInside)
 
         statusContainerView.addSubview(statusIconView)
@@ -584,7 +577,7 @@ final class GPXOverlayViewController: UIViewController {
     private func sectionContainerView() -> UIView {
         let containerView = UIView()
         containerView.backgroundColor = UIColor.secondarySystemBackground
-        containerView.layer.cornerRadius = 12
+        containerView.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         containerView.layer.borderWidth = 1
         containerView.layer.borderColor = UIColor.separator.cgColor
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -655,33 +648,15 @@ final class GPXOverlayViewController: UIViewController {
     }
 
     private func buttonConfiguration(title: String, color: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.plain()
-        configuration.baseForegroundColor = color
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0)
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: color
-            ])
-        )
-        return configuration
+        makeOverlayPlainButtonConfiguration(title: title, foregroundColor: color)
     }
 
     private func prominentButtonConfiguration(title: String, color: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseBackgroundColor = color
-        configuration.baseForegroundColor = .white
-        configuration.cornerStyle = .large
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: UIColor.white
-            ])
+        makeOverlayButtonConfiguration(
+            title: title,
+            foregroundColor: .white,
+            backgroundColor: color
         )
-        return configuration
     }
 
     @objc private func dismissOverlay() {

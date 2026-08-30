@@ -156,7 +156,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     var cachedAreaPolygons: [CachedAreaPolygon] = []
     var cachedAreaBorders: [CachedAreaBorderPolyline] = []
     var selectedCacheDetailLevel: CachedAreaDetailLevel = .standard
-    var selectedMapBaseLayer: MapBaseLayer = .openOnzyMap
+    var selectedMapBaseLayer: MapBaseLayer = .openBareMap
     var selectedFilterSchema: MenuFilterSchema = .classification
     var selectedHillFilterMode: HillFilterMode = .simple
     var selectedDisplayUnitSystem: DisplayUnitSystem = .metric
@@ -353,25 +353,25 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         return nil
     }()
 
-    lazy var openOnzyMapStyleURL: URL? = {
+    lazy var openBareMapStyleURL: URL? = {
         guard let bundleResourceURL = Bundle.main.resourceURL else {
-            print("Missing bundle resource directory for OpenOnzyMap")
+            print("Missing bundle resource directory for OpenBareMap")
             return nil
         }
 
         let styleSourceURL = bundleResourceURL
-            .appendingPathComponent("OpenOnzyMap.bundle", isDirectory: true)
+            .appendingPathComponent("OpenBareMap.bundle", isDirectory: true)
             .appendingPathComponent("style", isDirectory: true)
             .appendingPathComponent("baregps-style.json")
 
         guard FileManager.default.fileExists(atPath: styleSourceURL.path) else {
-            print("Missing OpenOnzyMap style bundle at \(styleSourceURL.path)")
+            print("Missing OpenBareMap style bundle at \(styleSourceURL.path)")
             return nil
         }
 
         do {
             var styleJSON = try String(contentsOf: styleSourceURL, encoding: .utf8)
-            let bundleURL = bundleResourceURL.appendingPathComponent("OpenOnzyMap.bundle", isDirectory: true)
+            let bundleURL = bundleResourceURL.appendingPathComponent("OpenBareMap.bundle", isDirectory: true)
             let fontsURL = bundleURL.appendingPathComponent("fonts", isDirectory: true)
             let spritesURL = bundleURL.appendingPathComponent("sprites", isDirectory: true)
             let glyphTemplate = "file://\(fontsURL.path)/{fontstack}/{range}.pbf"
@@ -409,11 +409,11 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             )
 
             let resolvedStyleURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent("OpenOnzyMap-resolved-style.json")
+                .appendingPathComponent("OpenBareMap-resolved-style.json")
             try styleJSON.write(to: resolvedStyleURL, atomically: true, encoding: .utf8)
             return resolvedStyleURL
         } catch {
-            print("Failed to prepare OpenOnzyMap style: \(error.localizedDescription)")
+            print("Failed to prepare OpenBareMap style: \(error.localizedDescription)")
             return nil
         }
     }()
@@ -504,8 +504,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         switch selectedMapBaseLayer {
         case .topographic:
             return topographicStyleURL
-        case .openOnzyMap:
-            return openOnzyMapStyleURL ?? topographicStyleURL
+        case .openBareMap:
+            return openBareMapStyleURL ?? topographicStyleURL
         case .standard:
             return standardStyleURL
         case .satellite:
@@ -1699,7 +1699,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         switch selectedMapBaseLayer {
         case .topographic, .satellite:
             return true
-        case .openOnzyMap, .standard:
+        case .openBareMap, .standard:
             return false
         }
     }
@@ -1720,7 +1720,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         switch selectedMapBaseLayer {
         case .topographic:
             layerButton.tintColor = .systemBlue
-        case .openOnzyMap:
+        case .openBareMap:
             layerButton.tintColor = .systemOrange
         case .standard:
             layerButton.tintColor = .systemTeal

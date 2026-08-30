@@ -49,32 +49,27 @@ final class SavedGPXRecordingsOverlayViewController: UIViewController {
         view.backgroundColor = .clear
 
         // Keep the underlying map readable so the live Go To line remains visible.
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.08)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissOverlay)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "Saved GPX Files"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("Saved GPX Files")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let subtitleLabel = UILabel()
         subtitleLabel.text = "Open, share, rename, or delete previously saved GPX files."
-        subtitleLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        subtitleLabel.font = OverlayChromeStyle.bodyFont
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.numberOfLines = 0
         subtitleLabel.textAlignment = .center
 
         totalSizeLabel.translatesAutoresizingMaskIntoConstraints = false
-        totalSizeLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        totalSizeLabel.font = OverlayChromeStyle.supportingFont
         totalSizeLabel.textColor = .secondaryLabel
         totalSizeLabel.textAlignment = .center
         totalSizeLabel.numberOfLines = 1
@@ -88,16 +83,14 @@ final class SavedGPXRecordingsOverlayViewController: UIViewController {
 
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
         emptyLabel.text = "No saved GPX files yet."
-        emptyLabel.font = .systemFont(ofSize: 15, weight: .regular)
+        emptyLabel.font = OverlayChromeStyle.bodyFont
         emptyLabel.textColor = .secondaryLabel
         emptyLabel.textAlignment = .center
         emptyLabel.numberOfLines = 0
         emptyLabel.isHidden = !items.isEmpty
 
         let closeButton = UIButton(type: .system)
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissOverlay), for: .touchUpInside)
 
         let headerStack = UIStackView(arrangedSubviews: [titleRow, subtitleLabel, totalSizeLabel])

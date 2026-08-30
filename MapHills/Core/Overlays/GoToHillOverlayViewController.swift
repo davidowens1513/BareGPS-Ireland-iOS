@@ -50,45 +50,40 @@ final class GoToHillOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissOverlay)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "Go To"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("Go To")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let hillNameLabel = UILabel()
         hillNameLabel.text = target.title
-        hillNameLabel.font = .systemFont(ofSize: 18, weight: .black)
+        hillNameLabel.font = OverlayChromeStyle.titleFont
         hillNameLabel.textColor = .label
         hillNameLabel.textAlignment = .center
         hillNameLabel.numberOfLines = 0
 
         let metaLabel = UILabel()
         metaLabel.text = target.subtitle
-        metaLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        metaLabel.font = OverlayChromeStyle.bodyFont
         metaLabel.textColor = .secondaryLabel
         metaLabel.textAlignment = .center
         metaLabel.numberOfLines = 0
         metaLabel.isHidden = (metaLabel.text ?? "").isEmpty
 
         directionHeaderLabel.text = "Bearing"
-        directionHeaderLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        directionHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         directionHeaderLabel.textColor = goToLineColor
         directionHeaderLabel.textAlignment = .center
 
         directionValueLabel.text = "Waiting for heading…"
-        directionValueLabel.font = .systemFont(ofSize: 36, weight: .black)
+        directionValueLabel.font = UIFont.systemFont(ofSize: 36, weight: .semibold)
         directionValueLabel.textColor = goToLineColor
         directionValueLabel.textAlignment = .center
         directionValueLabel.numberOfLines = 1
@@ -96,12 +91,12 @@ final class GoToHillOverlayViewController: UIViewController {
 
         let headingHeaderLabel = UILabel()
         headingHeaderLabel.text = "Heading"
-        headingHeaderLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        headingHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         headingHeaderLabel.textColor = .systemGreen
         headingHeaderLabel.textAlignment = .center
 
         headingValueLabel.text = "Waiting for heading…"
-        headingValueLabel.font = .systemFont(ofSize: 36, weight: .black)
+        headingValueLabel.font = UIFont.systemFont(ofSize: 36, weight: .semibold)
         headingValueLabel.textColor = .systemGreen
         headingValueLabel.textAlignment = .center
         headingValueLabel.numberOfLines = 1
@@ -109,12 +104,12 @@ final class GoToHillOverlayViewController: UIViewController {
 
         let distanceHeaderLabel = UILabel()
         distanceHeaderLabel.text = "Distance"
-        distanceHeaderLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        distanceHeaderLabel.font = OverlayChromeStyle.supportingFont
         distanceHeaderLabel.textColor = .secondaryLabel
         distanceHeaderLabel.textAlignment = .center
 
         distanceValueLabel.text = "Waiting for GPS…"
-        distanceValueLabel.font = .systemFont(ofSize: 26, weight: .bold)
+        distanceValueLabel.font = UIFont.systemFont(ofSize: 26, weight: .semibold)
         distanceValueLabel.textColor = .black
         distanceValueLabel.textAlignment = .center
         distanceValueLabel.numberOfLines = 1
@@ -153,9 +148,7 @@ final class GoToHillOverlayViewController: UIViewController {
         compassRoseView.updateGoToLineColor(goToLineColor)
 
         let closeButton = UIButton(type: .system)
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.titleLabel?.numberOfLines = 1
         closeButton.titleLabel?.adjustsFontSizeToFitWidth = true
         closeButton.titleLabel?.minimumScaleFactor = 0.8

@@ -46,32 +46,27 @@ final class WeatherOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.24)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissOverlay)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "Weather"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("Weather")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let subtitleLabel = UILabel()
         subtitleLabel.text = "Vicinity of \(locationTitle)"
-        subtitleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        subtitleLabel.font = OverlayChromeStyle.bodyFont
         subtitleLabel.textColor = .label
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        statusLabel.font = .systemFont(ofSize: 15, weight: .medium)
+        statusLabel.font = OverlayChromeStyle.supportingFont
         statusLabel.textColor = .secondaryLabel
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 0
@@ -88,9 +83,7 @@ final class WeatherOverlayViewController: UIViewController {
         gridScrollView.showsHorizontalScrollIndicator = true
         gridScrollView.alwaysBounceHorizontal = true
 
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissOverlay), for: .touchUpInside)
 
         contentStack.axis = .vertical
@@ -195,7 +188,7 @@ final class WeatherOverlayViewController: UIViewController {
         conditionLabel.text = current.conditionDescription
 
         let detailLabel = UILabel()
-        detailLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        detailLabel.font = OverlayChromeStyle.bodyFont
         detailLabel.textColor = .secondaryLabel
         detailLabel.numberOfLines = 0
         let detailText = NSMutableAttributedString(

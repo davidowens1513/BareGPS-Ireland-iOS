@@ -22,7 +22,7 @@ private struct AboutMenuItem {
 final class AboutOverlayViewController: UIViewController {
     private let aboutText: String
     private let aboutSections: [AboutSection]
-    private let openOnzyMapLegendToken = "[[openonzy-map-legend]]"
+    private let openBareMapLegendToken = "[[openbaremap-legend]]"
 
     private let dimmingView = UIView()
     private let cardView = UIView()
@@ -47,26 +47,21 @@ final class AboutOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.28)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissOverlay)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = AppBranding.aboutTitle
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel(AppBranding.aboutTitle)
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let subtitleLabel = UILabel()
         subtitleLabel.text = "Hill data, tracking, logging, and offline mapping for \(ActiveRegion.current.displayName)."
-        subtitleLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        subtitleLabel.font = OverlayChromeStyle.bodyFont
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.numberOfLines = 0
         subtitleLabel.textAlignment = .center
@@ -86,9 +81,7 @@ final class AboutOverlayViewController: UIViewController {
         reloadSectionViews()
 
         let closeButton = UIButton(type: .system)
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissOverlay), for: .touchUpInside)
 
         let contentStack = UIStackView(arrangedSubviews: [titleRow, subtitleLabel, sectionsScrollView, closeButton])
@@ -162,9 +155,9 @@ final class AboutOverlayViewController: UIViewController {
         button.configuration?.imagePadding = 8
         button.configuration?.baseForegroundColor = .label
         button.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
-        button.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        button.titleLabel?.font = OverlayChromeStyle.sectionTitleFont
         button.backgroundColor = .tertiarySystemBackground
-        button.layer.cornerRadius = 8
+        button.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         button.addTarget(self, action: #selector(toggleSection(_:)), for: .touchUpInside)
         container.addArrangedSubview(button)
 
@@ -180,7 +173,7 @@ final class AboutOverlayViewController: UIViewController {
                 textView.textContainerInset = UIEdgeInsets(top: 6, left: 4, bottom: 8, right: 4)
                 textView.textContainer.lineFragmentPadding = 0
                 textView.linkTextAttributes = [
-                    .font: UIFont.systemFont(ofSize: 14, weight: .regular),
+                    .font: OverlayChromeStyle.bodyFont,
                     .foregroundColor: UIColor.systemBlue
                 ]
                 textView.attributedText = formattedAboutText(section.body)
@@ -221,13 +214,13 @@ final class AboutOverlayViewController: UIViewController {
         ])
 
         let titleLabel = UILabel()
-        titleLabel.font = .systemFont(ofSize: 14, weight: .bold)
+        titleLabel.font = OverlayChromeStyle.sectionTitleFont
         titleLabel.textColor = .label
         titleLabel.numberOfLines = 1
         titleLabel.text = item.title
 
         let detailLabel = UILabel()
-        detailLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        detailLabel.font = OverlayChromeStyle.bodyFont
         detailLabel.textColor = .secondaryLabel
         detailLabel.numberOfLines = 0
         detailLabel.text = item.detail
@@ -257,7 +250,7 @@ final class AboutOverlayViewController: UIViewController {
             AboutMenuItem(symbolName: "internaldrive.fill", title: "Cache", detail: "Save visible map areas for offline use and manage saved cached areas."),
             AboutMenuItem(symbolName: "play.fill", title: "GPX Recording", detail: "Record, import, reopen, save, export and manage GPX tracks and waypoints."),
             AboutMenuItem(symbolName: "cloud.sun.fill", title: "Weather", detail: "Open a 24 hour forecast for the vicinity of the selected hill or the closest visible hill."),
-            AboutMenuItem(symbolName: "square.2.layers.3d.top.filled", title: "Map Layer", detail: "Switch between OpenTopo, OpenOnzyMap, OpenStreetMap and satellite map layers."),
+            AboutMenuItem(symbolName: "square.2.layers.3d.top.filled", title: "Map Layer", detail: "Switch between OpenTopo, OpenBareMap, OpenStreetMap and satellite map layers."),
             AboutMenuItem(symbolName: "location.north.line.fill", title: "Orientation", detail: "Reset the map to north-up; heads-up mode is changed in Settings."),
             AboutMenuItem(symbolName: "scope", title: "Recenter", detail: "Return the map to your current location.")
         ]
@@ -287,7 +280,7 @@ final class AboutOverlayViewController: UIViewController {
             .paragraphStyle: paragraphStyle
         ]
         let headingAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+            .font: OverlayChromeStyle.sectionTitleFont,
             .foregroundColor: UIColor.label,
             .paragraphStyle: headingStyle
         ]
@@ -313,7 +306,7 @@ final class AboutOverlayViewController: UIViewController {
             .paragraphStyle: paragraphStyle
         ]
 
-        let headingLines: Set<String> = ["Overview", "Features", "Recording a GPX", "Menus", "Support", "Credits", "Credits:", "Location Permissions and Data", "Safety", "Private Land", "Additional Providers", "OpenOnzyMap", "Coillte", "Sport Ireland", ActiveRegion.current.externalDataProviderName]
+        let headingLines: Set<String> = ["Overview", "Features", "Recording a GPX", "Menus", "Support", "Credits", "Credits:", "Location Permissions and Data", "Safety", "Private Land", "Additional Providers", "OpenBareMap", "Coillte", "Sport Ireland", ActiveRegion.current.externalDataProviderName]
         let subheadingLines: Set<String> = ["Recording using full on-map grid", "Recording using compact on-map grid", "Using Recording Controls", "Metrics Grids"]
 
         for rawLine in text.components(separatedBy: .newlines) {
@@ -323,8 +316,8 @@ final class AboutOverlayViewController: UIViewController {
                 continue
             }
 
-            if line == openOnzyMapLegendToken {
-                result.append(openOnzyMapLegendAttributedText())
+            if line == openBareMapLegendToken {
+                result.append(openBareMapLegendAttributedText())
                 continue
             }
 
@@ -447,14 +440,14 @@ final class AboutOverlayViewController: UIViewController {
         }
     }
 
-    private func openOnzyMapLegendAttributedText() -> NSAttributedString {
+    private func openBareMapLegendAttributedText() -> NSAttributedString {
         guard let bundleResourceURL = Bundle.main.resourceURL else {
             return NSAttributedString(string: "")
         }
 
         let imageURL = bundleResourceURL
-            .appendingPathComponent("OpenOnzyMap.bundle", isDirectory: true)
-            .appendingPathComponent("OpenOnzyMap-Legend.png")
+            .appendingPathComponent("OpenBareMap.bundle", isDirectory: true)
+            .appendingPathComponent("OpenBareMap-Legend.png")
 
         guard let image = UIImage(contentsOfFile: imageURL.path) else {
             return NSAttributedString(string: "")
@@ -491,7 +484,7 @@ final class AboutOverlayViewController: UIViewController {
             "Safety",
             "Private Land",
             "Additional Providers",
-            "OpenOnzyMap",
+            "OpenBareMap",
             "Coillte",
             "Sport Ireland",
             ActiveRegion.current.externalDataProviderName
@@ -539,7 +532,7 @@ final class AboutOverlayViewController: UIViewController {
                 NSAttributedString(
                     string: "\(ActiveRegion.current.externalDataProviderName)  ",
                     attributes: [
-                        .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+                        .font: OverlayChromeStyle.sectionTitleFont,
                         .foregroundColor: UIColor.label,
                         .paragraphStyle: headingParagraphStyle
                     ]
@@ -558,7 +551,7 @@ final class AboutOverlayViewController: UIViewController {
                 NSAttributedString(
                     string: "\(ActiveRegion.current.externalDataProviderName)\n",
                     attributes: [
-                        .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+                        .font: OverlayChromeStyle.sectionTitleFont,
                         .foregroundColor: UIColor.label,
                         .paragraphStyle: headingParagraphStyle
                     ]

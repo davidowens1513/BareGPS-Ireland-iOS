@@ -128,13 +128,12 @@ final class MenuOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissMenu)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
@@ -142,19 +141,15 @@ final class MenuOverlayViewController: UIViewController {
         contentScrollView.alwaysBounceVertical = true
         cardView.addSubview(contentScrollView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "Hill Filters"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("Hill Filters")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         filterHeaderLabel.text = selectedSchema.headerTitle
-        filterHeaderLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        filterHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         filterHeaderLabel.textColor = .label
 
         filterDescriptionLabel.text = selectedSchema.descriptionText(visibleHillCount: visibleHillCount)
-        filterDescriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        filterDescriptionLabel.font = OverlayChromeStyle.bodyFont
         filterDescriptionLabel.textColor = .secondaryLabel
         filterDescriptionLabel.numberOfLines = 0
 
@@ -171,11 +166,11 @@ final class MenuOverlayViewController: UIViewController {
 
         let markerColorsHeaderLabel = UILabel()
         markerColorsHeaderLabel.text = "Marker Colours"
-        markerColorsHeaderLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        markerColorsHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         markerColorsHeaderLabel.textColor = .label
 
         markerColorsDescriptionLabel.text = markerColorDescriptionText(for: selectedMarkerColorSchema)
-        markerColorsDescriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        markerColorsDescriptionLabel.font = OverlayChromeStyle.bodyFont
         markerColorsDescriptionLabel.textColor = .secondaryLabel
         markerColorsDescriptionLabel.numberOfLines = 0
 
@@ -220,7 +215,7 @@ final class MenuOverlayViewController: UIViewController {
 
         let filterContainerView = UIView()
         filterContainerView.backgroundColor = UIColor.secondarySystemBackground
-        filterContainerView.layer.cornerRadius = 12
+        filterContainerView.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         filterContainerView.layer.borderWidth = 1
         filterContainerView.layer.borderColor = UIColor.separator.cgColor
         filterContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -228,32 +223,34 @@ final class MenuOverlayViewController: UIViewController {
 
         let markerColorsContainerView = UIView()
         markerColorsContainerView.backgroundColor = UIColor.secondarySystemBackground
-        markerColorsContainerView.layer.cornerRadius = 12
+        markerColorsContainerView.layer.cornerRadius = OverlayChromeStyle.sectionCornerRadius
         markerColorsContainerView.layer.borderWidth = 1
         markerColorsContainerView.layer.borderColor = UIColor.separator.cgColor
         markerColorsContainerView.translatesAutoresizingMaskIntoConstraints = false
         markerColorsContainerView.addSubview(markerColorsContainerStack)
 
         let closeButton = UIButton(type: .system)
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissMenu), for: .touchUpInside)
 
         let shareFilteredHeaderLabel = UILabel()
         shareFilteredHeaderLabel.text = "Share Current Filtered List"
-        shareFilteredHeaderLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        shareFilteredHeaderLabel.font = OverlayChromeStyle.sectionTitleFont
         shareFilteredHeaderLabel.textColor = .label
 
         let shareFilteredDescriptionLabel = UILabel()
         shareFilteredDescriptionLabel.tag = 9101
-        shareFilteredDescriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        shareFilteredDescriptionLabel.font = OverlayChromeStyle.bodyFont
         shareFilteredDescriptionLabel.textColor = .secondaryLabel
         shareFilteredDescriptionLabel.numberOfLines = 0
         shareFilteredDescriptionLabel.text = shareFilteredDescriptionText()
 
         let shareFilteredButton = UIButton(type: .system)
-        shareFilteredButton.configuration = buttonConfiguration(title: "Save/Share...", color: .systemBlue)
+        shareFilteredButton.configuration = makeOverlayButtonConfiguration(
+            title: "Save/Share...",
+            foregroundColor: .systemBlue,
+            backgroundColor: .secondarySystemBackground
+        )
         shareFilteredButton.contentHorizontalAlignment = .leading
         shareFilteredButton.addTarget(self, action: #selector(shareFilteredPeaks(_:)), for: .touchUpInside)
 
@@ -756,16 +753,6 @@ final class MenuOverlayViewController: UIViewController {
     }
 
     private func buttonConfiguration(title: String, color: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.plain()
-        configuration.baseForegroundColor = color
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0)
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: color
-            ])
-        )
-        return configuration
+        makeOverlayPlainButtonConfiguration(title: title, foregroundColor: color)
     }
 }

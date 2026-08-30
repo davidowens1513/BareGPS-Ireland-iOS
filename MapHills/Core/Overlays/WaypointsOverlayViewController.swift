@@ -50,27 +50,22 @@ final class WaypointsOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.08)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissOverlay)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "Waypoints"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("Waypoints")
         titleLabel.accessibilityIdentifier = "waypointsTitleLabel"
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let subtitleLabel = UILabel()
         subtitleLabel.text = "Saved waypoints. Open them on the map, use Go To, rename, or delete."
-        subtitleLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        subtitleLabel.font = OverlayChromeStyle.bodyFont
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.numberOfLines = 0
         subtitleLabel.textAlignment = .center
@@ -84,7 +79,7 @@ final class WaypointsOverlayViewController: UIViewController {
 
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
         emptyLabel.text = "No saved waypoints yet."
-        emptyLabel.font = .systemFont(ofSize: 15, weight: .regular)
+        emptyLabel.font = OverlayChromeStyle.bodyFont
         emptyLabel.textColor = .secondaryLabel
         emptyLabel.textAlignment = .center
         emptyLabel.numberOfLines = 0
@@ -92,9 +87,7 @@ final class WaypointsOverlayViewController: UIViewController {
         emptyLabel.accessibilityIdentifier = "waypointsEmptyLabel"
 
         let closeButton = UIButton(type: .system)
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissOverlay), for: .touchUpInside)
 
         let contentStack = UIStackView(arrangedSubviews: [titleRow, subtitleLabel, tableView, emptyLabel, closeButton])

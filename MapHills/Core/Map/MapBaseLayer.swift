@@ -1,6 +1,6 @@
 enum MapBaseLayer: String {
     case topographic
-    case openOnzyMap
+    case openBareMap
     case standard
     case satellite
 
@@ -8,8 +8,8 @@ enum MapBaseLayer: String {
         switch self {
         case .topographic:
             return "OpenTopo"
-        case .openOnzyMap:
-            return "OpenOnzyMap"
+        case .openBareMap:
+            return "OpenBareMap"
         case .standard:
             return "OpenStreetMap"
         case .satellite:
@@ -21,8 +21,8 @@ enum MapBaseLayer: String {
         switch self {
         case .topographic:
             return "Map data: © OpenStreetMap contributors, SRTM | Map style: © OpenTopoMap (CC-BY-SA)"
-        case .openOnzyMap:
-            return "Map data: © OpenStreetMap contributors, SRTM | OpenOnzyMap offline bundle"
+        case .openBareMap:
+            return "Map data: © OpenStreetMap contributors, SRTM | OpenBareMap offline bundle"
         case .standard:
             return "© OpenStreetMap contributors"
         case .satellite:

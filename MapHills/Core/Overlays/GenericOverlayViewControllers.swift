@@ -76,35 +76,25 @@ final class ConfirmationOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cancelTapped)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.isAccessibilityElement = true
         cardView.accessibilityIdentifier = "recordsOverlayCard"
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = dialogTitle
-        titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
-        titleLabel.numberOfLines = 0
+        let titleLabel = makeOverlayTitleLabel(dialogTitle)
+        let titleRow = makeOverlayTitleRow(with: titleLabel)
 
-        let messageLabel = UILabel()
-        messageLabel.text = messageText
-        messageLabel.font = .systemFont(ofSize: 14, weight: .regular)
-        messageLabel.textColor = .secondaryLabel
-        messageLabel.textAlignment = .center
-        messageLabel.numberOfLines = 0
+        let messageLabel = makeOverlayBodyLabel(messageText, color: .secondaryLabel)
 
         let cancelButton = UIButton(type: .system)
         cancelButton.accessibilityIdentifier = "confirmationCancelButton"
-        cancelButton.configuration = actionButtonConfiguration(
+        cancelButton.configuration = makeOverlayButtonConfiguration(
             title: "Cancel",
             foregroundColor: .systemBlue,
             backgroundColor: UIColor.secondarySystemBackground
@@ -113,7 +103,7 @@ final class ConfirmationOverlayViewController: UIViewController {
 
         let confirmButton = UIButton(type: .system)
         confirmButton.accessibilityIdentifier = "confirmationConfirmButton"
-        confirmButton.configuration = actionButtonConfiguration(
+        confirmButton.configuration = makeOverlayButtonConfiguration(
             title: confirmTitle,
             foregroundColor: .white,
             backgroundColor: confirmTintColor
@@ -125,7 +115,7 @@ final class ConfirmationOverlayViewController: UIViewController {
         buttonStack.spacing = 10
         buttonStack.distribution = .fillEqually
 
-        let contentStack = UIStackView(arrangedSubviews: [titleLabel, messageLabel, buttonStack])
+        let contentStack = UIStackView(arrangedSubviews: [titleRow, messageLabel, buttonStack])
         contentStack.axis = .vertical
         contentStack.spacing = 16
         contentStack.translatesAutoresizingMaskIntoConstraints = false
@@ -147,24 +137,13 @@ final class ConfirmationOverlayViewController: UIViewController {
             contentStack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 20),
             contentStack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -20),
 
-            cancelButton.heightAnchor.constraint(equalToConstant: 42),
-            confirmButton.heightAnchor.constraint(equalToConstant: 42)
+            cancelButton.heightAnchor.constraint(equalToConstant: OverlayChromeStyle.buttonHeight),
+            confirmButton.heightAnchor.constraint(equalToConstant: OverlayChromeStyle.buttonHeight)
         ])
     }
 
     private func actionButtonConfiguration(title: String, foregroundColor: UIColor, backgroundColor: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseForegroundColor = foregroundColor
-        configuration.baseBackgroundColor = backgroundColor
-        configuration.cornerStyle = .medium
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: foregroundColor
-            ])
-        )
-        return configuration
+        makeOverlayButtonConfiguration(title: title, foregroundColor: foregroundColor, backgroundColor: backgroundColor)
     }
 
     @objc private func cancelTapped() {
@@ -213,22 +192,17 @@ final class SelectionOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cancelTapped)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = dialogTitle
-        titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
-        titleLabel.numberOfLines = 0
+        let titleLabel = makeOverlayTitleLabel(dialogTitle)
+        let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let contentStack = UIStackView()
         contentStack.axis = .vertical
@@ -236,15 +210,10 @@ final class SelectionOverlayViewController: UIViewController {
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         cardView.addSubview(contentStack)
 
-        contentStack.addArrangedSubview(titleLabel)
+        contentStack.addArrangedSubview(titleRow)
 
         if let messageText, !messageText.isEmpty {
-            let messageLabel = UILabel()
-            messageLabel.text = messageText
-            messageLabel.font = .systemFont(ofSize: 14, weight: .regular)
-            messageLabel.textColor = .secondaryLabel
-            messageLabel.textAlignment = .center
-            messageLabel.numberOfLines = 0
+            let messageLabel = makeOverlayBodyLabel(messageText, color: .secondaryLabel)
             contentStack.addArrangedSubview(messageLabel)
         }
 
@@ -261,7 +230,7 @@ final class SelectionOverlayViewController: UIViewController {
                 }
             }, for: .touchUpInside)
             optionsStack.addArrangedSubview(button)
-            button.heightAnchor.constraint(equalToConstant: 42).isActive = true
+            button.heightAnchor.constraint(equalToConstant: OverlayChromeStyle.buttonHeight).isActive = true
         }
 
         contentStack.addArrangedSubview(optionsStack)
@@ -271,9 +240,7 @@ final class SelectionOverlayViewController: UIViewController {
         cardView.addSubview(footerContainerView)
 
         let doneButton = UIButton(type: .system)
-        doneButton.configuration = .plain()
-        doneButton.configuration?.title = "Done"
-        doneButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        doneButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         doneButton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         footerContainerView.addSubview(doneButton)
@@ -307,7 +274,7 @@ final class SelectionOverlayViewController: UIViewController {
     private func optionButtonConfiguration(title: String, isSelected: Bool) -> UIButton.Configuration {
         let foregroundColor: UIColor = isSelected ? .white : .systemBlue
         let backgroundColor: UIColor = isSelected ? .systemBlue : .secondarySystemBackground
-        return actionButtonConfiguration(
+        return makeOverlayButtonConfiguration(
             title: isSelected ? "\(title)  ✓" : title,
             foregroundColor: foregroundColor,
             backgroundColor: backgroundColor
@@ -315,18 +282,7 @@ final class SelectionOverlayViewController: UIViewController {
     }
 
     private func actionButtonConfiguration(title: String, foregroundColor: UIColor, backgroundColor: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseForegroundColor = foregroundColor
-        configuration.baseBackgroundColor = backgroundColor
-        configuration.cornerStyle = .medium
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: foregroundColor
-            ])
-        )
-        return configuration
+        makeOverlayButtonConfiguration(title: title, foregroundColor: foregroundColor, backgroundColor: backgroundColor)
     }
 
     @objc private func cancelTapped() {
@@ -375,22 +331,16 @@ final class ActionOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cancelTapped)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = dialogTitle
-        titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
-        titleLabel.numberOfLines = 0
+        let titleLabel = makeOverlayTitleLabel(dialogTitle)
 
         let contentStack = UIStackView()
         contentStack.axis = .vertical
@@ -401,12 +351,7 @@ final class ActionOverlayViewController: UIViewController {
         contentStack.addArrangedSubview(titleLabel)
 
         if let messageText, !messageText.isEmpty {
-            let messageLabel = UILabel()
-            messageLabel.text = messageText
-            messageLabel.font = .systemFont(ofSize: 14, weight: .regular)
-            messageLabel.textColor = .secondaryLabel
-            messageLabel.textAlignment = .center
-            messageLabel.numberOfLines = 0
+            let messageLabel = makeOverlayBodyLabel(messageText, color: .secondaryLabel)
             contentStack.addArrangedSubview(messageLabel)
         }
 
@@ -432,7 +377,7 @@ final class ActionOverlayViewController: UIViewController {
                 backgroundColor = UIColor.secondarySystemBackground
             }
 
-            button.configuration = actionButtonConfiguration(
+            button.configuration = makeOverlayButtonConfiguration(
                 title: action.title,
                 foregroundColor: foregroundColor,
                 backgroundColor: backgroundColor
@@ -442,7 +387,7 @@ final class ActionOverlayViewController: UIViewController {
                     action.handler()
                 }
             }, for: .touchUpInside)
-            button.heightAnchor.constraint(equalToConstant: 42).isActive = true
+            button.heightAnchor.constraint(equalToConstant: OverlayChromeStyle.buttonHeight).isActive = true
             contentStack.addArrangedSubview(button)
         }
 
@@ -465,18 +410,7 @@ final class ActionOverlayViewController: UIViewController {
     }
 
     private func actionButtonConfiguration(title: String, foregroundColor: UIColor, backgroundColor: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseForegroundColor = foregroundColor
-        configuration.baseBackgroundColor = backgroundColor
-        configuration.cornerStyle = .medium
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: foregroundColor
-            ])
-        )
-        return configuration
+        makeOverlayButtonConfiguration(title: title, foregroundColor: foregroundColor, backgroundColor: backgroundColor)
     }
 
     @objc private func cancelTapped() {
@@ -534,22 +468,16 @@ final class TextInputOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cancelTapped)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = dialogTitle
-        titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
-        titleLabel.numberOfLines = 0
+        let titleLabel = makeOverlayTitleLabel(dialogTitle)
 
         let contentStack = UIStackView()
         contentStack.axis = .vertical
@@ -560,12 +488,7 @@ final class TextInputOverlayViewController: UIViewController {
         contentStack.addArrangedSubview(titleLabel)
 
         if let messageText, !messageText.isEmpty {
-            let messageLabel = UILabel()
-            messageLabel.text = messageText
-            messageLabel.font = .systemFont(ofSize: 14, weight: .regular)
-            messageLabel.textColor = .secondaryLabel
-            messageLabel.textAlignment = .center
-            messageLabel.numberOfLines = 0
+            let messageLabel = makeOverlayBodyLabel(messageText, color: .secondaryLabel)
             contentStack.addArrangedSubview(messageLabel)
         }
 
@@ -578,7 +501,7 @@ final class TextInputOverlayViewController: UIViewController {
         contentStack.addArrangedSubview(textField)
 
         let cancelButton = UIButton(type: .system)
-        cancelButton.configuration = actionButtonConfiguration(
+        cancelButton.configuration = makeOverlayButtonConfiguration(
             title: "Cancel",
             foregroundColor: .systemBlue,
             backgroundColor: UIColor.secondarySystemBackground
@@ -587,7 +510,7 @@ final class TextInputOverlayViewController: UIViewController {
         cancelButton.addTarget(self, action: #selector(cancelTapped), for: .touchUpInside)
 
         let confirmButton = UIButton(type: .system)
-        confirmButton.configuration = actionButtonConfiguration(
+        confirmButton.configuration = makeOverlayButtonConfiguration(
             title: confirmTitle,
             foregroundColor: .white,
             backgroundColor: .systemBlue
@@ -617,8 +540,8 @@ final class TextInputOverlayViewController: UIViewController {
             contentStack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 20),
             contentStack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -20),
 
-            cancelButton.heightAnchor.constraint(equalToConstant: 42),
-            confirmButton.heightAnchor.constraint(equalToConstant: 42)
+            cancelButton.heightAnchor.constraint(equalToConstant: OverlayChromeStyle.buttonHeight),
+            confirmButton.heightAnchor.constraint(equalToConstant: OverlayChromeStyle.buttonHeight)
         ])
     }
 
@@ -628,18 +551,7 @@ final class TextInputOverlayViewController: UIViewController {
     }
 
     private func actionButtonConfiguration(title: String, foregroundColor: UIColor, backgroundColor: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseForegroundColor = foregroundColor
-        configuration.baseBackgroundColor = backgroundColor
-        configuration.cornerStyle = .medium
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: foregroundColor
-            ])
-        )
-        return configuration
+        makeOverlayButtonConfiguration(title: title, foregroundColor: foregroundColor, backgroundColor: backgroundColor)
     }
 
     @objc private func cancelTapped() {

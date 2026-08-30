@@ -66,33 +66,28 @@ final class CachingOverlayViewController: UIViewController {
 
         view.backgroundColor = .clear
 
-        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        dimmingView.backgroundColor = UIColor.black.withAlphaComponent(OverlayChromeStyle.dimmingAlpha)
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissOverlay)))
         view.addSubview(dimmingView)
 
-        cardView.backgroundColor = .systemBackground
-        cardView.layer.cornerRadius = 16
+        configureOverlayCardChrome(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(cardView)
 
-        let titleLabel = UILabel()
-        titleLabel.text = "Caching"
-        titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        let titleLabel = makeOverlayTitleLabel("Caching")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
 
         let descriptionLabel = UILabel()
         descriptionLabel.text = "Save the currently visible map area for offline use. Saved areas are named, reloaded on launch, and outlined on the map. Cached map coverage is indicated by the green marker on the caching button. Caching is only available for OpenTopo and Satellite layers."
-        descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        descriptionLabel.font = OverlayChromeStyle.bodyFont
         descriptionLabel.textColor = .secondaryLabel
         descriptionLabel.numberOfLines = 0
         descriptionLabel.textAlignment = .center
 
         let detailTitleLabel = UILabel()
         detailTitleLabel.text = "Cache Level"
-        detailTitleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        detailTitleLabel.font = OverlayChromeStyle.sectionTitleFont
         detailTitleLabel.textColor = .label
         detailTitleLabel.textAlignment = .left
 
@@ -102,7 +97,7 @@ final class CachingOverlayViewController: UIViewController {
         detailLevelControl.setTitleTextAttributes(
             [
                 .foregroundColor: UIColor.systemBlue,
-                .font: UIFont.systemFont(ofSize: 13, weight: .semibold)
+                .font: OverlayChromeStyle.supportingFont
             ],
             for: .normal
         )
@@ -117,7 +112,7 @@ final class CachingOverlayViewController: UIViewController {
 
         let detailSubtitleLabel = UILabel()
         detailSubtitleLabel.text = "Light uses fewer tiles. Deep caching uses more tiles and takes longer, but gives higher zoom detail."
-        detailSubtitleLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        detailSubtitleLabel.font = OverlayChromeStyle.supportingFont
         detailSubtitleLabel.textColor = .secondaryLabel
         detailSubtitleLabel.numberOfLines = 0
         detailSubtitleLabel.textAlignment = .left
@@ -128,7 +123,7 @@ final class CachingOverlayViewController: UIViewController {
 
         let cachedAreasTitleLabel = UILabel()
         cachedAreasTitleLabel.text = "Saved Cached Areas"
-        cachedAreasTitleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        cachedAreasTitleLabel.font = OverlayChromeStyle.sectionTitleFont
         cachedAreasTitleLabel.textColor = .label
         cachedAreasTitleLabel.textAlignment = .left
 
@@ -140,13 +135,13 @@ final class CachingOverlayViewController: UIViewController {
 
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
         emptyLabel.text = "No offline areas saved yet."
-        emptyLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        emptyLabel.font = OverlayChromeStyle.bodyFont
         emptyLabel.textColor = .secondaryLabel
         emptyLabel.numberOfLines = 0
         emptyLabel.textAlignment = .left
         emptyLabel.isHidden = !cachedAreas.isEmpty
 
-        totalSizeLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        totalSizeLabel.font = OverlayChromeStyle.supportingFont
         totalSizeLabel.textColor = .secondaryLabel
         totalSizeLabel.numberOfLines = 1
         totalSizeLabel.textAlignment = .left
@@ -155,20 +150,15 @@ final class CachingOverlayViewController: UIViewController {
         cachedAreasStack.axis = .vertical
         cachedAreasStack.spacing = 6
 
-        actionButton.configuration = cachingActionButtonConfiguration(title: actionTitleProvider())
+        actionButton.configuration = makeOverlayButtonConfiguration(title: actionTitleProvider(), foregroundColor: .white, backgroundColor: .systemBlue)
         actionButton.addTarget(self, action: #selector(runCachingAction), for: .touchUpInside)
 
-        deleteAllButton.configuration = .plain()
-        deleteAllButton.configuration?.title = "Delete All Caches"
-        deleteAllButton.setTitleColor(.systemRed, for: .normal)
-        deleteAllButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        deleteAllButton.configuration = makeOverlayPlainButtonConfiguration(title: "Delete All Caches", foregroundColor: .systemRed, font: OverlayChromeStyle.actionFont)
         deleteAllButton.isHidden = cachedAreas.isEmpty
         deleteAllButton.addTarget(self, action: #selector(runDeleteAllAction), for: .touchUpInside)
 
         let closeButton = UIButton(type: .system)
-        closeButton.configuration = .plain()
-        closeButton.configuration?.title = "Done"
-        closeButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        closeButton.configuration = makeOverlayPlainButtonConfiguration(title: "Done")
         closeButton.addTarget(self, action: #selector(dismissOverlay), for: .touchUpInside)
 
         let contentStack = UIStackView(arrangedSubviews: [titleRow, descriptionLabel, detailStack, actionButton, cachedAreasStack, deleteAllButton, closeButton])
@@ -215,7 +205,7 @@ final class CachingOverlayViewController: UIViewController {
     }
 
     private func refreshActionState() {
-        actionButton.configuration = cachingActionButtonConfiguration(title: actionTitleProvider())
+        actionButton.configuration = makeOverlayButtonConfiguration(title: actionTitleProvider(), foregroundColor: .white, backgroundColor: .systemBlue)
     }
 
     private func handleRename(for area: CachedOfflineArea) {
@@ -270,19 +260,7 @@ final class CachingOverlayViewController: UIViewController {
     }
 
     private func cachingActionButtonConfiguration(title: String) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseForegroundColor = .white
-        configuration.baseBackgroundColor = .systemBlue
-        configuration.background.cornerRadius = 12
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 14, bottom: 10, trailing: 14)
-        configuration.attributedTitle = AttributedString(
-            title,
-            attributes: AttributeContainer([
-                .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                .foregroundColor: UIColor.white
-            ])
-        )
-        return configuration
+        makeOverlayButtonConfiguration(title: title, foregroundColor: .white, backgroundColor: .systemBlue)
     }
 }
 
@@ -300,12 +278,12 @@ final class CachedAreaTableViewCell: UITableViewCell {
 
         selectionStyle = .default
 
-        nameLabel.font = .systemFont(ofSize: 15, weight: .regular)
+        nameLabel.font = OverlayChromeStyle.bodyFont
         nameLabel.textColor = .label
         nameLabel.numberOfLines = 1
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        detailLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        detailLabel.font = OverlayChromeStyle.supportingFont
         detailLabel.textColor = .secondaryLabel
         detailLabel.numberOfLines = 1
         detailLabel.textAlignment = .left

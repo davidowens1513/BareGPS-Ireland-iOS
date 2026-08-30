@@ -4,7 +4,7 @@ enum IrelandAboutText {
 Overview
 \(AppBranding.displayName) helps you explore and log hills across Ireland. The app uses hill data and hill lists provided by MountainViews.ie, with start-place and trail information from MountainViews.ie, Coillte, Sport Ireland and Outdoor Recreation NI / Outscape.
 
-The app provides full GPX recording, importing, Go-To and saving and exporting/sharing facilities. It provides a bespoke bundled hiking-focused layer (OpenOnzyMap) to ensure coverage in areas of reduced cellular signal, as well as providing caching to allow offline access to OpenTopo Map or Satellite layers.
+The app provides full GPX recording, importing, Go-To and saving and exporting/sharing facilities. It provides a bespoke bundled hiking-focused layer (OpenBareMap) to ensure coverage in areas of reduced cellular signal, as well as providing caching to allow offline access to OpenTopo Map or Satellite layers.
 
 This is free software. Comments and requests are welcome.
 
@@ -12,7 +12,7 @@ Features
 The app allows you to:
 - import, record, save, reopen, and share GPX tracks, with selectable recording detail levels.
 
-- Access a bundled offline-safe Hiking map (OpenOnzyMap).
+- Access a bundled offline-safe Hiking map (OpenBareMap).
 
 - cache the visible map area (OpenTopoMap or Satellite) for offline use, with saved cache sizes, statuses, retry/resume support, and reusable named cached areas.
 
@@ -83,12 +83,12 @@ Sport Ireland provides 1,466 start points and 1,013 route records in the current
 
 Outdoor Recreation NI / Outscape provides 129 start points and 129 route records in the current app data. This is a curated subset of Northern Ireland off-road trail data, reduced from a larger source inventory to avoid showing large numbers of short fragments, rights of way and utility paths that are less useful as walking-route markers.
 
-OpenOnzyMap
-OpenOnzyMap is an hiking-focused offline-safe map, which is bundled with the app and thus can function in areas without cellular coverage. It includes local MBTiles, local Open Sans glyphs, and a custom cartographic style. The Map was built with OpenStreetMap, Tilemaker, QGIS, GDAL and SQLite.
+OpenBareMap
+OpenBareMap is an hiking-focused offline-safe map, which is bundled with the app and thus can function in areas without cellular coverage. It includes local MBTiles, local Open Sans glyphs, and a custom cartographic style. The Map was built with OpenStreetMap, Tilemaker, QGIS, GDAL and SQLite.
 
-[[openonzy-map-legend]]
+[[openbaremap-legend]]
 
-OpenOnzyMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
+OpenBareMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
 
 Safety
 Note that, for your own safety, you should not rely solely on this app, or any app, for your navigation and safety in the hills.  Possession of a map and compass and/or a dedicated GPS unit, and the ability to use them correctly, is an essential precaution. While phones have improved immeasurably in recent years, shortcomings in battery life, waterproofing and signal mean they are not yet suitable as a sole navigation device in the hills. 
@@ -110,7 +110,7 @@ Sport Ireland Start Points & Trail Data: Get Ireland Active - Sport Ireland 2023
 Outdoor Recreation NI / Outscape Trail Data: NI Off Road Trails Layer from the GreenspaceNI Map, created by Outscape for DAERA and DFI on behalf of the Strategic Outdoor Recreation Group (SORG), using data harmonised, combined and enhanced from Ordnance Survey of Northern Ireland, Northern Ireland Environment Agency, Outdoor Recreation Northern Ireland, DAERA, councils and other providers. Product currency stated by source: June 2024, annual update cycle. Attribution: © Crown copyright and database right Land & Property Services (2024) NIMA MOU577.2.
 Weather Data: Met Éireann
 Map Rendering: MapLibre
-OpenOnzyMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
+OpenBareMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
 Basemap data: © OpenStreetMap contributors
 Topographic map data: © OpenStreetMap contributors, SRTM
 Topographic map style: © OpenTopoMap (CC-BY-SA)
