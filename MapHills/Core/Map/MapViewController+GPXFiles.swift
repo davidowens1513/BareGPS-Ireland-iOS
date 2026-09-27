@@ -29,39 +29,16 @@ extension ViewController {
     }
 
     func importGPX(from fileURL: URL) {
-        let parserDelegate = GPXParserDelegate()
-        let needsScopedAccess = fileURL.startAccessingSecurityScopedResource()
-
-        defer {
-            if needsScopedAccess {
-                fileURL.stopAccessingSecurityScopedResource()
-            }
-        }
-
-        guard let xmlParser = XMLParser(contentsOf: fileURL) else {
+        let importedGPX: GPXImport
+        do {
+            importedGPX = try GPXImportService().importGPX(from: fileURL)
+        } catch {
             presentGPXImportAlert(
                 title: "GPX Import Failed",
-                message: "The selected file could not be opened."
+                message: error.localizedDescription
             )
             return
         }
-
-        xmlParser.delegate = parserDelegate
-
-        guard xmlParser.parse() else {
-            let message = xmlParser.parserError?.localizedDescription ?? "The GPX file could not be parsed."
-            presentGPXImportAlert(title: "GPX Import Failed", message: message)
-            return
-        }
-
-        let importedGPX = GPXImport(
-            waypoints: parserDelegate.waypoints,
-            trackSegments: parserDelegate.trackSegments,
-            skippedWaypointCount: parserDelegate.skippedWaypointCount,
-            skippedTrackPointCount: parserDelegate.skippedTrackPointCount,
-            skippedSegmentCount: parserDelegate.skippedSegmentCount,
-            encounteredGPXContent: parserDelegate.encounteredGPXContent
-        )
 
         guard !importedGPX.waypoints.isEmpty || !importedGPX.trackSegments.isEmpty else {
             let detail = gpxImportIssueSummary(for: importedGPX)

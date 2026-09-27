@@ -1,3 +1,5 @@
+import Foundation
+
 enum MapBaseLayer: String {
     case topographic
     case openBareMap
@@ -27,6 +29,33 @@ enum MapBaseLayer: String {
             return "© OpenStreetMap contributors"
         case .satellite:
             return "Sources: Esri, Maxar, Earthstar Geographics, USDA, USGS"
+        }
+    }
+
+    var supportsOfflineCaching: Bool {
+        switch self {
+        case .topographic, .satellite:
+            return true
+        case .openBareMap, .standard:
+            return false
+        }
+    }
+
+    func styleURL(
+        topographicStyleURL: URL?,
+        openBareMapStyleURL: URL?,
+        standardStyleURL: URL?,
+        satelliteStyleURL: URL?
+    ) -> URL? {
+        switch self {
+        case .topographic:
+            return topographicStyleURL
+        case .openBareMap:
+            return openBareMapStyleURL ?? topographicStyleURL
+        case .standard:
+            return standardStyleURL
+        case .satellite:
+            return satelliteStyleURL
         }
     }
 }

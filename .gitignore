@@ -1,0 +1,16 @@
+.DS_Store
+
+# Xcode local state and build products
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+*.xcresult
+
+# Python script caches
+__pycache__/
+*.py[cod]
+
+# Local review/export artifacts
+BareGPS_Ireland_Project_Review_*.pdf
+Ireland-Walking-Map-*.zip

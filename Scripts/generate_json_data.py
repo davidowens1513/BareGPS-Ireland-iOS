@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import csv
 import json
 import math
@@ -15,6 +16,17 @@ DESKTOP_DATA = Path.home() / "Desktop" / "BareGPSIrelandDataFiles"
 
 CURATED_OUTSCAPE_MINIMUM_LENGTH_KILOMETERS = 2.0
 CURATED_OUTSCAPE_NAME_PATTERN = re.compile(r"\b(walk|trail|loop|way|greenway|towpath)\b", re.IGNORECASE)
+DATA_FILE_NAMES = [
+    "RegionPeakDataset.json",
+    "MountainViewsStartPoints.json",
+    "SportIrelandStartPoints.json",
+    "CoillteStartPoints.json",
+    "OutscapeTrailStartPoints.json",
+    "CoillteTrailSummaries.json",
+    "SportIrelandTrailSummaries.json",
+    "OutscapeTrailSummaries.json",
+    "SportIrelandTrailIDByStartPlaceID.json",
+]
 
 
 def normalized_header(value):
@@ -55,11 +67,61 @@ def required_float(value):
     return result
 
 
+def strip_none_values(value):
+    if isinstance(value, dict):
+        return {
+            key: strip_none_values(nested_value)
+            for key, nested_value in value.items()
+            if nested_value is not None
+        }
+    if isinstance(value, list):
+        return [strip_none_values(item) for item in value]
+    return value
+
+
 def json_dump(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as json_file:
-        json.dump(value, json_file, ensure_ascii=False, indent=2)
+        json.dump(strip_none_values(value), json_file, ensure_ascii=False, indent=2)
         json_file.write("\n")
+
+
+def load_json(path):
+    with path.open("r", encoding="utf-8") as json_file:
+        return json.load(json_file)
+
+
+def validate_data_file(path):
+    text = path.read_text(encoding="utf-8")
+    data = json.loads(text)
+    if ": null" in text:
+        raise ValueError(f"{path.name} contains null fields")
+    if '"trailID"' in text:
+        raise ValueError(f"{path.name} contains embedded trailID fields")
+    if not isinstance(data, (list, dict)):
+        raise ValueError(f"{path.name} must contain a JSON array or object")
+    return len(data)
+
+
+def validate_data_directory(directory):
+    missing_files = [file_name for file_name in DATA_FILE_NAMES if not (directory / file_name).exists()]
+    if missing_files:
+        raise FileNotFoundError(f"Missing data files in {directory}: {', '.join(missing_files)}")
+
+    return {
+        file_name: validate_data_file(directory / file_name)
+        for file_name in DATA_FILE_NAMES
+    }
+
+
+def sync_desktop_source_to_bundle():
+    counts = validate_data_directory(DESKTOP_DATA)
+    APP_RESOURCES.mkdir(parents=True, exist_ok=True)
+    for file_name in DATA_FILE_NAMES:
+        shutil.copy2(DESKTOP_DATA / file_name, APP_RESOURCES / file_name)
+    print(f"Copied canonical Desktop JSON data from {DESKTOP_DATA} to {APP_RESOURCES}")
+    for file_name, count in counts.items():
+        print(f"{file_name}: {count}")
 
 
 def coordinate(latitude, longitude):
@@ -315,7 +377,6 @@ def build_sport_ireland_trail_summaries():
         name = (string_value(properties.get("Name")) or "").strip()
         length_kilometers = double_value(properties.get("LengthKm"))
         summaries[trail_id] = {
-            "trailID": trail_id,
             "name": name or "Sport Ireland Trail",
             "lengthMeters": length_kilometers * 1000 if length_kilometers is not None else None,
             "ascentMeters": double_value(properties.get("AscentMetres")),
@@ -377,7 +438,6 @@ def build_outscape_trail_summaries():
         length_kilometers = double_value(properties.get("Length"))
         trail_id = f"outscape-{fid}"
         summaries[trail_id] = {
-            "trailID": trail_id,
             "name": name or "Outscape Trail",
             "lengthMeters": length_kilometers * 1000 if length_kilometers is not None else None,
             "ascentMeters": None,
@@ -408,13 +468,28 @@ def generate_all(destination):
     json_dump(destination / "SportIrelandTrailIDByStartPlaceID.json", build_sport_ireland_trail_id_by_start_place_id())
 
 
-def main():
+def rebuild_from_legacy_imports():
     DESKTOP_DATA.mkdir(parents=True, exist_ok=True)
     generate_all(DESKTOP_DATA)
-    for json_path in DESKTOP_DATA.glob("*.json"):
-        shutil.copy2(json_path, APP_RESOURCES / json_path.name)
-    print(f"Wrote canonical JSON data to {DESKTOP_DATA}")
-    print(f"Copied app bundle JSON resources to {APP_RESOURCES}")
+    print(f"Rebuilt canonical Desktop JSON data at {DESKTOP_DATA}")
+    sync_desktop_source_to_bundle()
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Sync BareGPS Ireland app JSON resources from the canonical Desktop data directory."
+    )
+    parser.add_argument(
+        "--rebuild-from-legacy-imports",
+        action="store_true",
+        help="Regenerate the Desktop source-of-truth JSON files from the old CSV/GeoJSON imports, then sync them to the app bundle.",
+    )
+    args = parser.parse_args()
+
+    if args.rebuild_from_legacy_imports:
+        rebuild_from_legacy_imports()
+    else:
+        sync_desktop_source_to_bundle()
 
 
 if __name__ == "__main__":

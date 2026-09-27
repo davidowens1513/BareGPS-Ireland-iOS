@@ -10,7 +10,7 @@ import CoreLocation
 import MapLibre
 import UIKit
 
-struct Peak {
+struct Peak: Codable {
     let name: String
     let mvIndex: String
     let latitude: Double
@@ -166,7 +166,7 @@ enum StartPlaceRouteLengthFilter: Int, CaseIterable {
     }
 }
 
-struct StartPlace {
+struct StartPlace: Codable {
     let startNumber: String
     let nameOnMap: String
     let longName: String

@@ -439,41 +439,20 @@ extension ViewController {
         _ startPlace: StartPlace,
         routeLengthFilter: StartPlaceRouteLengthFilter? = nil
     ) -> Bool {
-        switch startPlace.provider {
-        case .mountainViews:
-            return true
-        case .coillte:
-            let routeLengths = coillteTrailSummaries(for: startPlace).map(\.lengthMeters)
-            guard !routeLengths.isEmpty else { return true }
-            return routeLengths.contains { routeLengthPassesFilter($0, routeLengthFilter: routeLengthFilter) }
-        case .sportIreland:
-            guard
-                let trailID = sportIrelandTrailIDByStartPlaceID[startPlace.id],
-                let trail = sportIrelandTrailSummariesByTrailID[trailID]
-            else {
-                return true
-            }
-            return routeLengthPassesFilter(trail.lengthMeters, routeLengthFilter: routeLengthFilter)
-        case .outscape:
-            guard let trail = outscapeTrailSummariesByTrailID[startPlace.id] else {
-                return true
-            }
-            return routeLengthPassesFilter(trail.lengthMeters, routeLengthFilter: routeLengthFilter)
-        }
+        startPlaceWalkSummaryProvider.startPlacePassesRouteLengthFilter(
+            startPlace,
+            routeLengthFilter: routeLengthFilter ?? startPlaceRouteLengthFilter
+        )
     }
 
     func routeLengthPassesFilter(
         _ lengthMeters: Double?,
         routeLengthFilter: StartPlaceRouteLengthFilter? = nil
     ) -> Bool {
-        let activeFilter = routeLengthFilter ?? startPlaceRouteLengthFilter
-        guard
-            let minimumLengthMeters = activeFilter.minimumLengthMeters,
-            let lengthMeters
-        else {
-            return true
-        }
-        return lengthMeters >= minimumLengthMeters
+        StartPlaceWalkSummaryProvider.routeLengthPassesFilter(
+            lengthMeters,
+            routeLengthFilter: routeLengthFilter ?? startPlaceRouteLengthFilter
+        )
     }
 
     func showSelectedStartPlaceHalo(for annotation: StartPlaceAnnotation) {
@@ -490,27 +469,6 @@ extension ViewController {
         if let selectedStartPlaceHaloAnnotation {
             mapView.removeAnnotation(selectedStartPlaceHaloAnnotation)
             self.selectedStartPlaceHaloAnnotation = nil
-        }
-    }
-
-    @discardableResult
-    func showSelectedIrelandPlaceHalo(for place: IrelandPlacename, coordinate: CLLocationCoordinate2D) -> IrelandPlaceSelectionAnnotation {
-        removeSelectedIrelandPlaceHalo()
-        let haloAnnotation = IrelandPlaceSelectionAnnotation()
-        haloAnnotation.coordinate = coordinate
-        haloAnnotation.place = place
-        haloAnnotation.title = place.name
-        haloAnnotation.subtitle = place.subtitle
-        selectedIrelandPlaceHaloAnnotation = haloAnnotation
-        mapView.addAnnotation(haloAnnotation)
-        return haloAnnotation
-    }
-
-    func removeSelectedIrelandPlaceHalo() {
-        pendingIrelandPlaceHaloRemovalToken += 1
-        if let selectedIrelandPlaceHaloAnnotation {
-            mapView.removeAnnotation(selectedIrelandPlaceHaloAnnotation)
-            self.selectedIrelandPlaceHaloAnnotation = nil
         }
     }
 

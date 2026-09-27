@@ -158,6 +158,36 @@ struct MapHillsTests {
     }
 
     @Test
+    func gpxImportServiceParsesFileURL() throws {
+        let xml = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <gpx version="1.1" creator="MapHills">
+            <wpt lat="53.1" lon="-8.2">
+                <name>Start Point</name>
+            </wpt>
+            <trk>
+                <trkseg>
+                    <trkpt lat="53.1" lon="-8.2" />
+                    <trkpt lat="53.1005" lon="-8.1995" />
+                </trkseg>
+            </trk>
+        </gpx>
+        """
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("gpx")
+        try xml.write(to: fileURL, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let importedGPX = try GPXImportService().importGPX(from: fileURL)
+
+        #expect(importedGPX.waypoints.count == 1)
+        #expect(importedGPX.waypoints.first?.name == "Start Point")
+        #expect(importedGPX.trackSegments.count == 1)
+        #expect(importedGPX.trackSegments.first?.count == 2)
+    }
+
+    @Test
     func gpxTrackSummaryParserDelegateCapturesPointsWithElevationAndTime() {
         let xml = """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -1142,7 +1172,7 @@ struct MapHillsTests {
     func bundledProviderTrailGeoJSONContainsUsableFeatures() throws {
         let coillteFeatures = try bundledGeoJSONFeatures(resourceName: "CoillteTrails")
         let sportIrelandFeatures = try bundledGeoJSONFeatures(resourceName: "SportIrelandTrails")
-        let outscapeFeatures = try bundledGeoJSONFeatures(resourceName: "OutscapeOffRoadTrails")
+        let outscapeFeatures = try bundledGeoJSONFeatures(resourceName: "OutscapeTrails")
 
         #expect(!coillteFeatures.isEmpty)
         #expect(!sportIrelandFeatures.isEmpty)
@@ -1338,3 +1368,4 @@ private final class MapHillsTestBundleToken {}
 private enum TestResourceError: Error {
     case missingResource(String)
 }
+

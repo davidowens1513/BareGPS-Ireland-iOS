@@ -11,16 +11,6 @@ import MapKit
 import CoreLocation
 import UniformTypeIdentifiers
 
-struct InitialMapData {
-    let peaks: [Peak]
-    let startPlaces: [StartPlace]
-    let irelandPlacenames: [IrelandPlacename]
-    let coillteTrailSummaries: [CoillteTrailSummary]
-    let sportIrelandTrailSummariesByTrailID: [String: SportIrelandTrailSummary]
-    let outscapeTrailSummariesByTrailID: [String: OutscapeTrailSummary]
-    let sportIrelandTrailIDByStartPlaceID: [String: String]
-}
-
 enum CalloutInvocationSource {
     case search
     case other
@@ -290,6 +280,14 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     var sportIrelandTrailSummariesByTrailID: [String: SportIrelandTrailSummary] = [:]
     var outscapeTrailSummariesByTrailID: [String: OutscapeTrailSummary] = [:]
     var sportIrelandTrailIDByStartPlaceID: [String: String] = [:]
+    var startPlaceWalkSummaryProvider: StartPlaceWalkSummaryProvider {
+        StartPlaceWalkSummaryProvider(
+            coillteTrailSummaries: coillteTrailSummaries,
+            sportIrelandTrailSummariesByTrailID: sportIrelandTrailSummariesByTrailID,
+            outscapeTrailSummariesByTrailID: outscapeTrailSummariesByTrailID,
+            sportIrelandTrailIDByStartPlaceID: sportIrelandTrailIDByStartPlaceID
+        )
+    }
     var selectedCoillteTrailPolylines: [CoillteTrailPolyline] = []
     var selectedSportIrelandTrailPolylines: [SportIrelandTrailPolyline] = []
     var selectedOutscapeTrailPolylines: [OutscapeTrailPolyline] = []
@@ -340,177 +338,19 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     let regionDefinition = ActiveRegion.current
 
-    // Load the local topographic JSON style file from the app bundle.
-    lazy var topographicStyleURL: URL? = {
-        if let url = Bundle.main.url(
-            forResource: regionDefinition.topographicStyleResourceName,
-            withExtension: "json"
-        ) {
-            return url
-        }
-
-        print("Missing map style JSON in app bundle")
-        return nil
-    }()
-
-    lazy var openBareMapStyleURL: URL? = {
-        guard let bundleResourceURL = Bundle.main.resourceURL else {
-            print("Missing bundle resource directory for OpenBareMap")
-            return nil
-        }
-
-        let styleSourceURL = bundleResourceURL
-            .appendingPathComponent("OpenBareMap.bundle", isDirectory: true)
-            .appendingPathComponent("style", isDirectory: true)
-            .appendingPathComponent("baregps-style.json")
-
-        guard FileManager.default.fileExists(atPath: styleSourceURL.path) else {
-            print("Missing OpenBareMap style bundle at \(styleSourceURL.path)")
-            return nil
-        }
-
-        do {
-            var styleJSON = try String(contentsOf: styleSourceURL, encoding: .utf8)
-            let bundleURL = bundleResourceURL.appendingPathComponent("OpenBareMap.bundle", isDirectory: true)
-            let fontsURL = bundleURL.appendingPathComponent("fonts", isDirectory: true)
-            let spritesURL = bundleURL.appendingPathComponent("sprites", isDirectory: true)
-            let glyphTemplate = "file://\(fontsURL.path)/{fontstack}/{range}.pbf"
-            let spriteTemplate = "file://\(spritesURL.path)/baregps-bog24"
-            let sourceNames = [
-                "ireland.mbtiles",
-                "contours.mbtiles",
-                "environment.mbtiles",
-                "hillshade.mbtiles",
-                "hiking.mbtiles",
-                "grid.mbtiles"
-            ]
-
-            for sourceName in sourceNames {
-                let absoluteSourceURL = "mbtiles://\(bundleURL.path)/\(sourceName)"
-                styleJSON = styleJSON.replacingOccurrences(
-                    of: "mbtiles://\(sourceName)",
-                    with: absoluteSourceURL
-                )
-            }
-
-            styleJSON = styleJSON.replacingOccurrences(
-                of: "\"glyphs\": \"./fonts/{fontstack}/{range}.pbf\"",
-                with: "\"glyphs\": \"\(glyphTemplate)\""
-            )
-            styleJSON = styleJSON.replacingOccurrences(
-                of: "\"glyphs\": \"../{fontstack}-{range}.pbf\"",
-                with: "\"glyphs\": \"\(glyphTemplate)\""
-            )
-            styleJSON = styleJSON.replacingOccurrences(
-                of: #""sprite":\s*"[^"]+""#,
-                with: "\"sprite\": \"\(spriteTemplate)\""
-                ,
-                options: .regularExpression
-            )
-
-            let resolvedStyleURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent("OpenBareMap-resolved-style.json")
-            try styleJSON.write(to: resolvedStyleURL, atomically: true, encoding: .utf8)
-            return resolvedStyleURL
-        } catch {
-            print("Failed to prepare OpenBareMap style: \(error.localizedDescription)")
-            return nil
-        }
-    }()
-
-    lazy var satelliteStyleURL: URL? = {
-        let styleJSON = """
-        {
-          "version": 8,
-          "name": "\(regionDefinition.satelliteStyleName)",
-          "sources": {
-            "esri-world-imagery": {
-              "type": "raster",
-              "tiles": [
-                "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              ],
-              "tileSize": 256,
-              "minzoom": 0,
-              "maxzoom": 19,
-              "attribution": "Sources: Esri, DigitalGlobe, GeoEye, i-cubed, USDA FSA, USGS, AEX, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community"
-            }
-          },
-          "layers": [
-            {
-              "id": "satellite-layer",
-              "type": "raster",
-              "source": "esri-world-imagery",
-              "minzoom": 0,
-              "maxzoom": 19
-            }
-          ],
-          "center": [\(regionDefinition.defaultMapCenter.longitude), \(regionDefinition.defaultMapCenter.latitude)],
-          "zoom": \(regionDefinition.defaultMapZoomLevel)
-        }
-        """
-
-        let styleURL = FileManager.default.temporaryDirectory.appendingPathComponent(regionDefinition.satelliteStyleFilename)
-        do {
-            try styleJSON.write(to: styleURL, atomically: true, encoding: .utf8)
-            return styleURL
-        } catch {
-            print("Failed to create satellite map style JSON: \(error.localizedDescription)")
-            return nil
-        }
-    }()
-
-    lazy var standardStyleURL: URL? = {
-        let styleJSON = """
-        {
-          "version": 8,
-          "name": "\(regionDefinition.standardStyleName)",
-          "sources": {
-            "osm-standard": {
-              "type": "raster",
-              "tiles": [
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-              ],
-              "tileSize": 256,
-              "minzoom": 0,
-              "maxzoom": 19,
-              "attribution": "© OpenStreetMap contributors"
-            }
-          },
-          "layers": [
-            {
-              "id": "standard-layer",
-              "type": "raster",
-              "source": "osm-standard",
-              "minzoom": 0,
-              "maxzoom": 19
-            }
-          ],
-          "center": [\(regionDefinition.defaultMapCenter.longitude), \(regionDefinition.defaultMapCenter.latitude)],
-          "zoom": \(regionDefinition.defaultMapZoomLevel)
-        }
-        """
-
-        let styleURL = FileManager.default.temporaryDirectory.appendingPathComponent(regionDefinition.standardStyleFilename)
-        do {
-            try styleJSON.write(to: styleURL, atomically: true, encoding: .utf8)
-            return styleURL
-        } catch {
-            print("Failed to create standard map style JSON: \(error.localizedDescription)")
-            return nil
-        }
-    }()
+    lazy var mapStyleURLProvider = MapStyleURLProvider(regionDefinition: regionDefinition)
+    lazy var topographicStyleURL = mapStyleURLProvider.topographicStyleURL()
+    lazy var openBareMapStyleURL = mapStyleURLProvider.openBareMapStyleURL()
+    lazy var satelliteStyleURL = mapStyleURLProvider.satelliteStyleURL()
+    lazy var standardStyleURL = mapStyleURLProvider.standardStyleURL()
 
     var currentMapStyleURL: URL? {
-        switch selectedMapBaseLayer {
-        case .topographic:
-            return topographicStyleURL
-        case .openBareMap:
-            return openBareMapStyleURL ?? topographicStyleURL
-        case .standard:
-            return standardStyleURL
-        case .satellite:
-            return satelliteStyleURL
-        }
+        selectedMapBaseLayer.styleURL(
+            topographicStyleURL: topographicStyleURL,
+            openBareMapStyleURL: openBareMapStyleURL,
+            standardStyleURL: standardStyleURL,
+            satelliteStyleURL: satelliteStyleURL
+        )
     }
 
     // MARK: - Lifecycle
@@ -879,6 +719,10 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         hillSearchFieldWidthConstraint = widthConstraint
         let infoHeightConstraint = hillSearchInfoView.heightAnchor.constraint(equalToConstant: 20)
         let suggestionsHeightConstraint = hillSearchSuggestionsTableView.heightAnchor.constraint(equalToConstant: 0)
+        let infoLabelLeadingConstraint = hillSearchInfoLabel.leadingAnchor.constraint(equalTo: hillSearchInfoView.leadingAnchor, constant: 8)
+        let infoLabelTrailingConstraint = hillSearchInfoLabel.trailingAnchor.constraint(equalTo: hillSearchInfoView.trailingAnchor, constant: -8)
+        infoLabelLeadingConstraint.priority = .defaultHigh
+        infoLabelTrailingConstraint.priority = .defaultHigh
         hillSearchSuggestionsHeightConstraint = suggestionsHeightConstraint
         NSLayoutConstraint.activate([
             hillSearchButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
@@ -897,8 +741,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             hillSearchInfoView.trailingAnchor.constraint(equalTo: hillSearchField.trailingAnchor),
             infoHeightConstraint,
 
-            hillSearchInfoLabel.leadingAnchor.constraint(equalTo: hillSearchInfoView.leadingAnchor, constant: 8),
-            hillSearchInfoLabel.trailingAnchor.constraint(equalTo: hillSearchInfoView.trailingAnchor, constant: -8),
+            infoLabelLeadingConstraint,
+            infoLabelTrailingConstraint,
             hillSearchInfoLabel.centerYAnchor.constraint(equalTo: hillSearchInfoView.centerYAnchor),
 
             hillSearchSuggestionsTableView.topAnchor.constraint(equalTo: hillSearchInfoView.bottomAnchor, constant: 0),
@@ -1119,7 +963,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         liveGPXStatsStack.spacing = 1
         liveGPXStatsStack.translatesAutoresizingMaskIntoConstraints = false
         liveGPXStatsStack.addArrangedSubview(
-            liveMetricsRow(
+            RecordingHUDViewFactory.liveMetricsRow(
                 leftTitle: "Distance",
                 leftValueLabel: liveDistanceValueLabel,
                 rightTitle: "Time",
@@ -1127,7 +971,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             )
         )
         liveGPXStatsStack.addArrangedSubview(
-            liveMetricsRow(
+            RecordingHUDViewFactory.liveMetricsRow(
                 leftTitle: "Ascent",
                 leftValueLabel: liveAscentValueLabel,
                 rightTitle: "Descent",
@@ -1135,7 +979,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             )
         )
         liveGPXStatsStack.addArrangedSubview(
-            liveMetricsRow(
+            RecordingHUDViewFactory.liveMetricsRow(
                 leftTitle: "Elevation",
                 leftValueLabel: liveElevationValueLabel,
                 rightTitle: "Grid Ref",
@@ -1143,7 +987,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             )
         )
         liveGPXStatsStack.addArrangedSubview(
-            liveMetricsRow(
+            RecordingHUDViewFactory.liveMetricsRow(
                 leftTitle: "Accuracy",
                 leftValueLabel: liveAccuracyValueLabel,
                 rightTitle: "Status",
@@ -1233,60 +1077,6 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         updateLiveGPXStatsTimer()
     }
 
-    func liveMetricsRow(
-        leftTitle: String,
-        leftValueLabel: UILabel,
-        rightTitle: String,
-        rightValueLabel: UILabel
-    ) -> UIStackView {
-        let row = UIStackView(arrangedSubviews: [
-            liveMetricCell(title: leftTitle, valueLabel: leftValueLabel),
-            liveMetricCell(title: rightTitle, valueLabel: rightValueLabel)
-        ])
-        row.axis = .horizontal
-        row.spacing = 8
-        row.distribution = .fillEqually
-        return row
-    }
-
-    func liveMetricCell(title: String, valueLabel: UILabel) -> UIView {
-        let container = UIView()
-        container.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.48)
-        container.layer.cornerRadius = 8
-        container.layer.borderWidth = 0.5
-        container.layer.borderColor = UIColor.systemGray3.withAlphaComponent(0.55).cgColor
-
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 9, weight: .semibold)
-        titleLabel.textColor = .secondaryLabel
-        titleLabel.numberOfLines = 1
-
-        valueLabel.translatesAutoresizingMaskIntoConstraints = false
-        valueLabel.font = .systemFont(ofSize: 12.5, weight: .bold)
-        valueLabel.textColor = .label
-        valueLabel.numberOfLines = 1
-        valueLabel.adjustsFontSizeToFitWidth = true
-        valueLabel.minimumScaleFactor = 0.75
-
-        let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
-        stack.axis = .vertical
-        stack.spacing = 1
-        stack.translatesAutoresizingMaskIntoConstraints = false
-
-        container.addSubview(stack)
-
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
-            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8),
-            stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 1),
-            stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -1)
-        ])
-
-        return container
-    }
-
     func setupCompactRecordingStrip() {
         compactRecordingStripView.translatesAutoresizingMaskIntoConstraints = false
         compactRecordingStripView.backgroundColor = UIColor.white.withAlphaComponent(0.5)
@@ -1304,11 +1094,11 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         compactRecordingStripStack.spacing = 0
         compactRecordingStripStack.translatesAutoresizingMaskIntoConstraints = false
 
-        let timeBox = compactRecordingMetricBox(title: "Time", valueLabel: compactTimeValueLabel)
-        let distanceBox = compactRecordingMetricBox(title: "Distance", valueLabel: compactDistanceValueLabel)
-        let ascentBox = compactRecordingMetricBox(title: "Ascent", valueLabel: compactAscentValueLabel)
-        let elevationBox = compactRecordingMetricBox(title: "Elevation", valueLabel: compactElevationValueLabel)
-        let statusBox = compactRecordingStatusBox()
+        let timeBox = RecordingHUDViewFactory.compactRecordingMetricBox(title: "Time", valueLabel: compactTimeValueLabel)
+        let distanceBox = RecordingHUDViewFactory.compactRecordingMetricBox(title: "Distance", valueLabel: compactDistanceValueLabel)
+        let ascentBox = RecordingHUDViewFactory.compactRecordingMetricBox(title: "Ascent", valueLabel: compactAscentValueLabel)
+        let elevationBox = RecordingHUDViewFactory.compactRecordingMetricBox(title: "Elevation", valueLabel: compactElevationValueLabel)
+        let statusBox = RecordingHUDViewFactory.compactRecordingStatusBox(boxView: compactStatusBoxView, dotView: compactStatusDotView)
 
         compactRecordingStripStack.addArrangedSubview(timeBox)
         compactRecordingStripStack.addArrangedSubview(distanceBox)
@@ -1336,86 +1126,6 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         ])
 
         updateCompactRecordingStrip()
-    }
-
-    func compactRecordingMetricBox(title: String, valueLabel: UILabel) -> UIView {
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 8.5, weight: .semibold)
-        titleLabel.textColor = .black
-        titleLabel.textAlignment = .left
-        titleLabel.numberOfLines = 1
-        titleLabel.adjustsFontSizeToFitWidth = true
-        titleLabel.minimumScaleFactor = 0.75
-
-        valueLabel.translatesAutoresizingMaskIntoConstraints = false
-        valueLabel.font = .systemFont(ofSize: 13, weight: .bold)
-        valueLabel.textColor = .black
-        valueLabel.textAlignment = .left
-        valueLabel.numberOfLines = 1
-        valueLabel.adjustsFontSizeToFitWidth = true
-        valueLabel.minimumScaleFactor = 0.65
-
-        let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
-        stack.axis = .vertical
-        stack.alignment = .fill
-        stack.spacing = 0
-        stack.translatesAutoresizingMaskIntoConstraints = false
-
-        let container = UIView()
-        container.backgroundColor = .clear
-        container.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(stack)
-
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 4),
-            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -4),
-            stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 4),
-            stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -4)
-        ])
-
-        addCompactRecordingSeparator(to: container)
-        return container
-    }
-
-    func compactRecordingStatusBox() -> UIView {
-        compactStatusBoxView.translatesAutoresizingMaskIntoConstraints = false
-        compactStatusBoxView.backgroundColor = .clear
-        compactStatusBoxView.layer.cornerRadius = 0
-        compactStatusBoxView.layer.borderWidth = 0
-
-        compactStatusDotView.translatesAutoresizingMaskIntoConstraints = false
-        compactStatusDotView.backgroundColor = .clear
-        compactStatusDotView.layer.borderWidth = 2
-        compactStatusDotView.layer.borderColor = UIColor.systemGray.cgColor
-        compactStatusDotView.layer.cornerRadius = 13
-        compactStatusDotView.clipsToBounds = true
-
-        compactStatusBoxView.addSubview(compactStatusDotView)
-
-        NSLayoutConstraint.activate([
-            compactStatusDotView.centerXAnchor.constraint(equalTo: compactStatusBoxView.centerXAnchor),
-            compactStatusDotView.centerYAnchor.constraint(equalTo: compactStatusBoxView.centerYAnchor),
-            compactStatusDotView.widthAnchor.constraint(equalToConstant: 26),
-            compactStatusDotView.heightAnchor.constraint(equalToConstant: 26)
-        ])
-
-        return compactStatusBoxView
-    }
-
-    func addCompactRecordingSeparator(to boxView: UIView) {
-        let separatorView = UIView()
-        separatorView.translatesAutoresizingMaskIntoConstraints = false
-        separatorView.backgroundColor = .black
-        boxView.addSubview(separatorView)
-
-        NSLayoutConstraint.activate([
-            separatorView.topAnchor.constraint(equalTo: boxView.topAnchor),
-            separatorView.bottomAnchor.constraint(equalTo: boxView.bottomAnchor),
-            separatorView.trailingAnchor.constraint(equalTo: boxView.trailingAnchor),
-            separatorView.widthAnchor.constraint(equalToConstant: 1)
-        ])
     }
 
     func setupAboutButton() {
@@ -1696,12 +1406,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     func canCacheCurrentMapLayer() -> Bool {
-        switch selectedMapBaseLayer {
-        case .topographic, .satellite:
-            return true
-        case .openBareMap, .standard:
-            return false
-        }
+        selectedMapBaseLayer.supportsOfflineCaching
     }
 
     func updateCachingButtonAppearance() {
@@ -2234,14 +1939,14 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         mapView.attributionButtonMargins = CGPoint(x: 24, y: bottomMargin)
     }
 
-    // MARK: - CSV Loading
+    // MARK: - Data Loading
 
-    func loadPeaksFromCSV() -> [Peak] {
-        MapDataLoader.loadPeaksFromCSV(resourceName: regionDefinition.hillDatasetResourceName)
+    func loadPeaksFromJSON() -> [Peak] {
+        MapDataLoader.loadPeaksFromJSON(resourceName: regionDefinition.hillDatasetResourceName)
     }
 
-    func loadStartPlacesFromCSV(resourceName: String, provider: StartPlaceProvider) -> [StartPlace] {
-        MapDataLoader.loadStartPlacesFromCSV(resourceName: resourceName, provider: provider)
+    func loadStartPlacesFromJSON(resourceName: String) -> [StartPlace] {
+        MapDataLoader.loadStartPlacesFromJSON(resourceName: resourceName)
     }
 
     func loadOutscapeDerivedTrailStartPlaces() -> [StartPlace] {
@@ -2275,23 +1980,9 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         guard !hasStartedInitialMapDataLoad else { return }
         hasStartedInitialMapDataLoad = true
 
-        let hillDatasetResourceName = regionDefinition.hillDatasetResourceName
-        let mountainViewsStartPlaceResourceName = regionDefinition.startPlaceDatasetResourceName
+        let dataLoader = InitialMapDataLoader(regionDefinition: regionDefinition)
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            let loadedData = InitialMapData(
-                peaks: MapDataLoader.loadPeaksFromCSV(resourceName: hillDatasetResourceName),
-                startPlaces: [
-                    MapDataLoader.loadStartPlacesFromCSV(resourceName: mountainViewsStartPlaceResourceName, provider: .mountainViews),
-                    MapDataLoader.loadStartPlacesFromCSV(resourceName: "SportIrelandStartPoints", provider: .sportIreland),
-                    MapDataLoader.loadStartPlacesFromCSV(resourceName: "CoillteStartPoints", provider: .coillte),
-                    MapDataLoader.loadOutscapeDerivedTrailStartPlaces()
-                ].flatMap { $0 },
-                irelandPlacenames: MapDataLoader.loadIrelandPlacenames(),
-                coillteTrailSummaries: MapDataLoader.loadCoillteTrailSummaries(),
-                sportIrelandTrailSummariesByTrailID: MapDataLoader.loadSportIrelandTrailSummariesByTrailID(),
-                outscapeTrailSummariesByTrailID: MapDataLoader.loadOutscapeTrailSummariesByTrailID(),
-                sportIrelandTrailIDByStartPlaceID: MapDataLoader.loadSportIrelandTrailIDByStartPlaceID()
-            )
+            let loadedData = dataLoader.load()
 
             DispatchQueue.main.async {
                 self?.applyInitialMapData(loadedData)
@@ -2399,59 +2090,19 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     func recordsTableText() -> String {
-        let allCodes = allClassificationCodes()
-        let sortedPeaks = peaks.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        let nameColumnWidth = min(max(sortedPeaks.map { $0.name.count }.max() ?? 8, 8), 28)
-        let codeColumnWidth = max(
-            4,
-            allCodes.map { classificationDisplayName(for: $0).count }.max() ?? 4
-        )
-
-        func padded(_ text: String, width: Int) -> String {
-            if text.count >= width {
-                return String(text.prefix(width))
+        RecordsTableFormatter(
+            peaks: peaks,
+            classificationCodes: allClassificationCodes(),
+            classificationDisplayName: { [weak self] code in
+                self?.classificationDisplayName(for: code) ?? code
+            },
+            peakClassificationCodes: { peak in
+                classificationCodes(for: peak)
+            },
+            isPeakLogged: { [weak self] peak in
+                self?.isPeakLogged(peak) ?? false
             }
-
-            return text + String(repeating: " ", count: width - text.count)
-        }
-
-        func row(_ values: [String], widths: [Int]) -> String {
-            "|" + zip(values, widths).map { value, width in
-                " " + padded(value, width: width) + " "
-            }.joined(separator: "|") + "|"
-        }
-
-        func separator(widths: [Int]) -> String {
-            "+" + widths.map { String(repeating: "-", count: $0 + 2) }.joined(separator: "+") + "+"
-        }
-
-        let widths = [nameColumnWidth] + Array(repeating: codeColumnWidth, count: allCodes.count)
-        let header = row(
-            ["Hill"] + allCodes.map { classificationDisplayName(for: $0) },
-            widths: widths
-        )
-        let horizontalRule = separator(widths: widths)
-
-        let rows = sortedPeaks.map { peak -> String in
-            let peakCodes = Set(classificationCodes(for: peak))
-            let cells = allCodes.map { code -> String in
-                guard peakCodes.contains(code) else {
-                    return ""
-                }
-
-                return isPeakLogged(peak) ? "✓" : "·"
-            }
-
-            return row([peak.name] + cells, widths: widths)
-        }
-
-        var lines = [horizontalRule, header, horizontalRule]
-        for tableRow in rows {
-            lines.append(tableRow)
-            lines.append(horizontalRule)
-        }
-
-        return lines.joined(separator: "\n")
+        ).tableText()
     }
 
     func showHillCallout(
@@ -2533,376 +2184,21 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         activeHillCalloutView = calloutView
     }
 
-    func showStartPlaceCallout(
-        for startPlaceAnnotation: StartPlaceAnnotation,
-        placementMode: StartPlaceCalloutView.PlacementMode = .belowAnchor
-    ) {
-        dismissActiveHillCallout(animated: false)
-        dismissActiveStartPlaceCallout(animated: false)
-        dismissActiveCachedAreaCallout(animated: false)
-        removeSelectedIrelandPlaceHalo()
-
-        guard let startPlace = startPlaceAnnotation.startPlace else { return }
-
-        let calloutView = StartPlaceCalloutView(
-            annotation: startPlaceAnnotation,
-            title: startPlaceDisplayTitle(for: startPlace),
-            fullName: startPlace.shortDisplayName,
-            gridReference: startPlace.gridReference.isEmpty ? "Not supplied" : startPlace.gridReference,
-            height: startPlace.heightM.map { "Height: \(formattedCompactElevation($0))" } ?? "Height: Not supplied",
-            status: startPlace.status,
-            parking: startPlace.parking.isEmpty ? "Not supplied" : startPlace.parking,
-            provider: startPlace.provider,
-            providerColor: markerColor(for: startPlace),
-            walkSummaries: walkSummaries(for: startPlace),
-            nearbyHillActions: nearbyHillActions(for: startPlace),
-            directionsHandler: { [weak self] in
-                self?.openDirections(to: startPlace)
-            },
-            googleDirectionsHandler: { [weak self] in
-                self?.openGoogleMapsDirections(to: startPlace)
-            },
-            mountainViewsStartPlaceHandler: mountainViewsStartPlaceURL(for: startPlace).map { url in
-                { UIApplication.shared.open(url) }
-            },
-            placementMode: placementMode
-        )
-
-        let anchorRectInMapView: CGRect
-        if let annotationView = mapView.view(for: startPlaceAnnotation) {
-            anchorRectInMapView = annotationView.frame
-        } else {
-            let anchorPoint = mapView.convert(startPlaceAnnotation.coordinate, toPointTo: mapView)
-            anchorRectInMapView = CGRect(x: anchorPoint.x - 22, y: anchorPoint.y - 22, width: 44, height: 44)
-        }
-
-        let constrainedRect = view.safeAreaLayoutGuide.layoutFrame.insetBy(dx: 0, dy: 8)
-        let anchorRect = clampedCalloutAnchorRect(
-            from: mapView.convert(anchorRectInMapView, to: view),
-            constrainedTo: constrainedRect
-        )
-
-        calloutView.presentCallout(
-            from: anchorRect,
-            in: view,
-            constrainedTo: constrainedRect,
-            animated: true
-        )
-        activeStartPlaceCalloutView = calloutView
-    }
-
-    func startPlaceDisplayTitle(for startPlace: StartPlace) -> String {
-        let title = startPlace.fullDisplayName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let duplicateSecondarySuffix = " (Secondary)"
-        guard title.hasSuffix(duplicateSecondarySuffix) else { return title }
-
-        let titleBeforeSuffix = String(title.dropLast(duplicateSecondarySuffix.count))
-        if titleBeforeSuffix.range(of: "Secondary", options: [.caseInsensitive, .diacriticInsensitive]) != nil {
-            return titleBeforeSuffix.trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-        return title
-    }
-
-    func walkSummaries(for startPlace: StartPlace) -> [StartPlaceWalkSummary] {
-        switch startPlace.provider {
-        case .coillte:
-            return coillteWalkSummaries(for: startPlace)
-        case .sportIreland:
-            return sportIrelandWalkSummaries(for: startPlace)
-        case .outscape:
-            return outscapeWalkSummaries(for: startPlace)
-        case .mountainViews:
-            return []
-        }
-    }
-
-    func coillteWalkSummaries(for startPlace: StartPlace) -> [StartPlaceWalkSummary] {
-        coillteTrailSummaries(for: startPlace)
-            .filter { routeLengthPassesFilter($0.lengthMeters) }
-            .map { trail in
-                StartPlaceWalkSummary(
-                    name: trail.name,
-                    length: trail.lengthMeters.map(formattedDistance) ?? "Not supplied",
-                    ascent: trail.ascentMeters.map(formattedElevation) ?? "Not supplied",
-                    selectionHandler: { [weak self] in
-                        self?.showCoillteTrailPolyline(trail)
-                    }
-                )
-            }
-    }
-
-    func coillteTrailSummaries(for startPlace: StartPlace) -> [CoillteTrailSummary] {
-        let startLocation = CLLocation(latitude: startPlace.latitude, longitude: startPlace.longitude)
-        return coillteTrailSummaries
-            .filter { trail in
-                let trailStart = CLLocation(latitude: trail.startCoordinate.latitude, longitude: trail.startCoordinate.longitude)
-                let trailFinish = CLLocation(latitude: trail.finishCoordinate.latitude, longitude: trail.finishCoordinate.longitude)
-                return startLocation.distance(from: trailStart) <= 20 || startLocation.distance(from: trailFinish) <= 20
-            }
-            .sorted { lhs, rhs in
-                lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
-            }
-    }
-
-    func sportIrelandWalkSummaries(for startPlace: StartPlace) -> [StartPlaceWalkSummary] {
-        guard
-            let trailID = sportIrelandTrailIDByStartPlaceID[startPlace.id],
-            let trail = sportIrelandTrailSummariesByTrailID[trailID]
-        else {
-            return []
-        }
-
-        guard routeLengthPassesFilter(trail.lengthMeters) else { return [] }
-
-        return [
-            StartPlaceWalkSummary(
-                name: trail.name,
-                length: trail.lengthMeters.map(formattedDistance) ?? "Not supplied",
-                ascent: trail.ascentMeters.map(formattedElevation) ?? "Not supplied",
-                selectionHandler: { [weak self] in
-                    self?.showSportIrelandTrailPolyline(trail)
-                }
-            )
-        ]
-    }
-
-    func outscapeWalkSummaries(for startPlace: StartPlace) -> [StartPlaceWalkSummary] {
-        guard let trail = outscapeTrailSummariesByTrailID[startPlace.id] else {
-            return []
-        }
-
-        guard routeLengthPassesFilter(trail.lengthMeters) else { return [] }
-
-        return [
-            StartPlaceWalkSummary(
-                name: trail.name,
-                length: trail.lengthMeters.map(formattedDistance) ?? "Not supplied",
-                ascent: trail.ascentMeters.map(formattedElevation) ?? "Not supplied",
-                selectionHandler: { [weak self] in
-                    self?.showOutscapeTrailPolyline(trail)
-                }
-            )
-        ]
-    }
-
-    func showCoillteTrailPolyline(_ trail: CoillteTrailSummary) {
-        dismissActiveHillCallout(animated: false)
-        dismissActiveStartPlaceCallout(animated: false)
-
-        clearSelectedTrailPolylines()
-
-        let displaySegments = displayCoordinateSegments(from: trail.coordinateSegments)
-        let polylines = displaySegments.map { coordinates -> CoillteTrailPolyline in
-            var mutableCoordinates = coordinates
-            return CoillteTrailPolyline(coordinates: &mutableCoordinates, count: UInt(mutableCoordinates.count))
-        }
-        selectedCoillteTrailPolylines = polylines
-        selectedProviderTrailName = trail.name
-        selectedProviderTrailProvider = .coillte
-        selectedProviderTrailLengthMeters = trail.lengthMeters
-        selectedProviderTrailColor = markerColor(for: .coillte)
-        selectedProviderTrailCoordinateSegments = displaySegments
-
-        guard !polylines.isEmpty else { return }
-        mapView.addAnnotations(polylines)
-        updateSelectedProviderTrailPill(animated: true)
-        let coordinates = displaySegments.flatMap { $0 }
-        setMapVisibleArea(for: coordinates, animated: true)
-    }
-
-    func showSportIrelandTrailPolyline(_ trail: SportIrelandTrailSummary) {
-        dismissActiveHillCallout(animated: false)
-        dismissActiveStartPlaceCallout(animated: false)
-        clearSelectedTrailPolylines()
-
-        let displaySegments = displayCoordinateSegments(from: trail.coordinateSegments)
-        let polylines = displaySegments.map { coordinates -> SportIrelandTrailPolyline in
-            var mutableCoordinates = coordinates
-            return SportIrelandTrailPolyline(coordinates: &mutableCoordinates, count: UInt(mutableCoordinates.count))
-        }
-        selectedSportIrelandTrailPolylines = polylines
-        selectedProviderTrailName = trail.name
-        selectedProviderTrailProvider = .sportIreland
-        selectedProviderTrailLengthMeters = trail.lengthMeters
-        selectedProviderTrailColor = markerColor(for: .sportIreland)
-        selectedProviderTrailCoordinateSegments = displaySegments
-
-        guard !polylines.isEmpty else { return }
-        mapView.addAnnotations(polylines)
-        updateSelectedProviderTrailPill(animated: true)
-        let coordinates = displaySegments.flatMap { $0 }
-        setMapVisibleArea(for: coordinates, animated: true)
-    }
-
-    func showOutscapeTrailPolyline(_ trail: OutscapeTrailSummary) {
-        dismissActiveHillCallout(animated: false)
-        dismissActiveStartPlaceCallout(animated: false)
-        clearSelectedTrailPolylines()
-
-        let displaySegments = displayCoordinateSegments(from: trail.coordinateSegments)
-        let polylines = displaySegments.map { coordinates -> OutscapeTrailPolyline in
-            var mutableCoordinates = coordinates
-            return OutscapeTrailPolyline(coordinates: &mutableCoordinates, count: UInt(mutableCoordinates.count))
-        }
-        selectedOutscapeTrailPolylines = polylines
-        selectedProviderTrailName = trail.name
-        selectedProviderTrailProvider = .outscape
-        selectedProviderTrailLengthMeters = trail.lengthMeters
-        selectedProviderTrailColor = markerColor(for: .outscape)
-        selectedProviderTrailCoordinateSegments = displaySegments
-
-        guard !polylines.isEmpty else { return }
-        mapView.addAnnotations(polylines)
-        updateSelectedProviderTrailPill(animated: true)
-        let coordinates = displaySegments.flatMap { $0 }
-        setMapVisibleArea(for: coordinates, animated: true)
-    }
-
-    func displayCoordinateSegments(
-        from segments: [[CLLocationCoordinate2D]],
-        maximumPointCount: Int = 3_000
-    ) -> [[CLLocationCoordinate2D]] {
-        let totalPointCount = segments.reduce(0) { $0 + $1.count }
-        guard totalPointCount > maximumPointCount else { return segments }
-
-        let strideLength = max(1, Int(ceil(Double(totalPointCount) / Double(maximumPointCount))))
-        return segments.compactMap { segment in
-            guard segment.count > 2 else { return segment }
-            var simplified = segment.enumerated().compactMap { index, coordinate in
-                index % strideLength == 0 ? coordinate : nil
-            }
-            if simplified.first?.latitude != segment.first?.latitude || simplified.first?.longitude != segment.first?.longitude,
-               let first = segment.first {
-                simplified.insert(first, at: 0)
-            }
-            if simplified.last?.latitude != segment.last?.latitude || simplified.last?.longitude != segment.last?.longitude,
-               let last = segment.last {
-                simplified.append(last)
-            }
-            return simplified.count > 1 ? simplified : nil
-        }
-    }
-
-    func clearSelectedTrailPolylines() {
-        if !selectedCoillteTrailPolylines.isEmpty {
-            deselectAnnotationsBeforeRemoval(selectedCoillteTrailPolylines)
-            mapView.removeAnnotations(selectedCoillteTrailPolylines)
-            selectedCoillteTrailPolylines.removeAll()
-        }
-        if !selectedSportIrelandTrailPolylines.isEmpty {
-            deselectAnnotationsBeforeRemoval(selectedSportIrelandTrailPolylines)
-            mapView.removeAnnotations(selectedSportIrelandTrailPolylines)
-            selectedSportIrelandTrailPolylines.removeAll()
-        }
-        if !selectedOutscapeTrailPolylines.isEmpty {
-            deselectAnnotationsBeforeRemoval(selectedOutscapeTrailPolylines)
-            mapView.removeAnnotations(selectedOutscapeTrailPolylines)
-            selectedOutscapeTrailPolylines.removeAll()
-        }
-        selectedProviderTrailName = nil
-        selectedProviderTrailProvider = nil
-        selectedProviderTrailLengthMeters = nil
-        selectedProviderTrailColor = nil
-        selectedProviderTrailCoordinateSegments.removeAll()
-        updateSelectedProviderTrailPill(animated: true)
-    }
-
-    func deselectAnnotationsBeforeRemoval(_ annotations: [MLNAnnotation]) {
-        let selectedAnnotations = mapView.selectedAnnotations
-        guard !selectedAnnotations.isEmpty else { return }
-
-        for annotation in annotations {
-            if selectedAnnotations.contains(where: { $0 === annotation }) {
-                mapView.deselectAnnotation(annotation, animated: false)
-            }
-        }
-    }
-
-    func updateSelectedProviderTrailPill(animated: Bool) {
-        let isVisible = selectedProviderTrailName?.isEmpty == false
-        selectedProviderTrailNameLabel.text = selectedProviderTrailName
-        let providerColor = selectedProviderTrailColor ?? .label
-        selectedProviderTrailPillView.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.94)
-        selectedProviderTrailPillView.layer.borderColor = UIColor.separator.withAlphaComponent(0.55).cgColor
-        selectedProviderTrailNameLabel.textColor = isVisible ? providerColor : .label
-        selectedProviderTrailCloseButton.tintColor = isVisible ? providerColor : .secondaryLabel
-
-        let changes = {
-            self.selectedProviderTrailPillView.alpha = isVisible ? 1 : 0
-        }
-        let completion: (Bool) -> Void = { _ in
-            self.selectedProviderTrailPillView.isHidden = !isVisible
-        }
-
-        if isVisible {
-            selectedProviderTrailPillView.isHidden = false
-        }
-
-        guard animated else {
-            changes()
-            completion(true)
-            return
-        }
-
-        UIView.animate(
-            withDuration: 0.18,
-            delay: 0,
-            options: [.beginFromCurrentState, .curveEaseOut],
-            animations: changes,
-            completion: completion
-        )
-    }
-
     func setMapVisibleArea(for coordinates: [CLLocationCoordinate2D], animated: Bool) {
-        guard !coordinates.isEmpty else { return }
-
-        var bounds = MLNCoordinateBounds(sw: coordinates[0], ne: coordinates[0])
-        for coordinate in coordinates.dropFirst() {
-            bounds.sw.latitude = min(bounds.sw.latitude, coordinate.latitude)
-            bounds.sw.longitude = min(bounds.sw.longitude, coordinate.longitude)
-            bounds.ne.latitude = max(bounds.ne.latitude, coordinate.latitude)
-            bounds.ne.longitude = max(bounds.ne.longitude, coordinate.longitude)
-        }
-
-        let southwestLocation = CLLocation(latitude: bounds.sw.latitude, longitude: bounds.sw.longitude)
-        let northeastLocation = CLLocation(latitude: bounds.ne.latitude, longitude: bounds.ne.longitude)
-        let routeDiagonalMeters = southwestLocation.distance(from: northeastLocation)
-        if routeDiagonalMeters < 250 {
-            let center = CLLocationCoordinate2D(
-                latitude: (bounds.sw.latitude + bounds.ne.latitude) / 2,
-                longitude: (bounds.sw.longitude + bounds.ne.longitude) / 2
-            )
-            let targetZoomLevel = min(maximumMapZoomLevel, max(mapView.zoomLevel, 16.0))
-            mapView.setCenter(center, zoomLevel: targetZoomLevel, animated: animated)
-            return
-        }
-
-        mapView.setVisibleCoordinateBounds(
-            bounds,
-            edgePadding: UIEdgeInsets(top: 96, left: 48, bottom: 96, right: 96),
-            animated: animated,
-            completionHandler: nil
-        )
+        MapVisibleAreaFitter(
+            mapView: mapView,
+            maximumMapZoomLevel: maximumMapZoomLevel
+        ).setVisibleArea(for: coordinates, animated: animated)
     }
 
     func nearestStartPlaceActions(for peak: Peak) -> [CalloutButtonAction] {
-        let peakLocation = CLLocation(latitude: peak.latitude, longitude: peak.longitude)
-
-        return startPlaces
-            .filter { visibleStartPlaceProviders.contains($0.provider) && startPlacePassesRouteLengthFilter($0) }
-            .compactMap { startPlace -> (startPlace: StartPlace, distance: CLLocationDistance)? in
-                let startLocation = CLLocation(latitude: startPlace.latitude, longitude: startPlace.longitude)
-                let distance = startLocation.distance(from: peakLocation)
-                guard distance <= 6_000 else { return nil }
-                return (startPlace, distance)
-            }
-            .sorted { lhs, rhs in
-                if lhs.distance != rhs.distance {
-                    return lhs.distance < rhs.distance
-                }
-                return lhs.startPlace.shortDisplayName.localizedCaseInsensitiveCompare(rhs.startPlace.shortDisplayName) == .orderedAscending
-            }
-            .prefix(8)
+        NearbyStartPlaceSelector(
+            startPlaces: startPlaces,
+            visibleProviders: visibleStartPlaceProviders,
+            routeLengthFilter: startPlaceRouteLengthFilter,
+            walkSummaryProvider: startPlaceWalkSummaryProvider
+        )
+            .candidates(near: peak)
             .map { candidate in
                 CalloutButtonAction(
                     title: candidate.startPlace.fullDisplayName,
@@ -2912,93 +2208,6 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                     }
                 )
             }
-    }
-
-    func selectionKey(for startPlace: StartPlace) -> String {
-        "\(startPlace.provider.rawValue)|\(startPlace.id)|\(String(format: "%.6f", startPlace.latitude))|\(String(format: "%.6f", startPlace.longitude))"
-    }
-
-    func startPlaceAnnotation(for startPlace: StartPlace) -> StartPlaceAnnotation? {
-        let targetKey = selectionKey(for: startPlace)
-        return startPlaceAnnotation(forSelectionKey: targetKey)
-    }
-
-    func startPlaceAnnotation(forSelectionKey targetKey: String) -> StartPlaceAnnotation? {
-        return startPlaceAnnotations(from: mapView.annotations).first { annotation in
-            guard let candidate = annotation.startPlace else { return false }
-            return selectionKey(for: candidate) == targetKey
-        }
-    }
-
-    func refreshStartPlaceAnnotation(forSelectionKey targetKey: String) -> StartPlaceAnnotation? {
-        guard let existingAnnotation = startPlaceAnnotation(forSelectionKey: targetKey) else { return nil }
-
-        let refreshedAnnotation = StartPlaceAnnotation()
-        refreshedAnnotation.coordinate = existingAnnotation.coordinate
-        refreshedAnnotation.title = existingAnnotation.title
-        refreshedAnnotation.subtitle = existingAnnotation.subtitle
-        refreshedAnnotation.startPlace = existingAnnotation.startPlace
-
-        mapView.removeAnnotation(existingAnnotation)
-        mapView.addAnnotation(refreshedAnnotation)
-        return refreshedAnnotation
-    }
-
-    func focusOnStartPlace(
-        _ startPlace: StartPlace,
-        placementMode: StartPlaceCalloutView.PlacementMode = .belowAnchor,
-        invocationSource: CalloutInvocationSource = .other,
-        animated: Bool = true
-    ) {
-        dismissActiveHillCallout(animated: false)
-        removeSelectedIrelandPlaceHalo()
-        pendingStartPlaceCalloutPlacementMode = placementMode
-        pendingStartPlaceCalloutSelectionToken += 1
-        let selectionToken = pendingStartPlaceCalloutSelectionToken
-
-        let targetZoomLevel: Double = invocationSource == .search ? 14.0 : 16.0
-        if invocationSource == .search {
-            mapView.setCenter(startPlace.coordinate, zoomLevel: targetZoomLevel, animated: animated)
-            positionCoordinateForCallout(startPlace.coordinate)
-        } else {
-            mapView.setCenter(startPlace.coordinate, zoomLevel: mapView.zoomLevel, animated: animated)
-            positionCoordinateForCallout(startPlace.coordinate)
-        }
-
-        guard let annotation = startPlaceAnnotation(for: startPlace) else {
-            pendingStartPlaceCalloutPlacementMode = nil
-            return
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
-            guard let self else { return }
-            guard selectionToken == self.pendingStartPlaceCalloutSelectionToken else { return }
-            self.mapView.selectAnnotation(annotation, animated: false, completionHandler: nil)
-        }
-    }
-
-    func focusOnIrelandPlace(
-        _ place: IrelandPlacename,
-        coordinate: CLLocationCoordinate2D? = nil,
-        animated: Bool = true
-    ) {
-        dismissActiveHillCallout(animated: false)
-        dismissActiveStartPlaceCallout(animated: false)
-        dismissActiveCachedAreaCallout(animated: false)
-        removeSelectedIrelandPlaceHalo()
-
-        let selectionCoordinate = coordinate ?? place.coordinate ?? mapView.centerCoordinate
-        mapView.setCenter(selectionCoordinate, zoomLevel: 12.0, animated: animated)
-        let haloAnnotation = showSelectedIrelandPlaceHalo(for: place, coordinate: selectionCoordinate)
-        pendingIrelandPlaceHaloRemovalToken += 1
-        let removalToken = pendingIrelandPlaceHaloRemovalToken
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
-            guard let self else { return }
-            guard removalToken == self.pendingIrelandPlaceHaloRemovalToken else { return }
-            guard self.selectedIrelandPlaceHaloAnnotation === haloAnnotation else { return }
-            self.removeSelectedIrelandPlaceHalo()
-        }
     }
 
     func openDirections(to startPlace: StartPlace) {
@@ -3029,99 +2238,21 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     func nearbyHillActions(for startPlace: StartPlace) -> [StartPlaceNearbyHillAction] {
-        let startLocation = CLLocation(latitude: startPlace.latitude, longitude: startPlace.longitude)
-        let maximumNearbyHillDistanceKilometers = 6.0
-
-        return peaks.compactMap { peak -> (peak: Peak, distanceMeters: CLLocationDistance)? in
-            let hillLocation = CLLocation(latitude: peak.latitude, longitude: peak.longitude)
-            let distanceMeters = hillLocation.distance(from: startLocation)
-            guard distanceMeters <= maximumNearbyHillDistanceKilometers * 1_000 else {
-                return nil
-            }
-            return (peak, distanceMeters)
-        }
-        .sorted { lhs, rhs in
-            if lhs.distanceMeters != rhs.distanceMeters {
-                return lhs.distanceMeters < rhs.distanceMeters
-            }
-            return lhs.peak.name.localizedCaseInsensitiveCompare(rhs.peak.name) == .orderedAscending
-        }
-        .prefix(6)
-        .map { candidate in
-            let peak = candidate.peak
-            let distanceText = formattedDistance(candidate.distanceMeters).replacingOccurrences(of: " ", with: "")
-            let bearingDegrees = goToSessionStore.bearing(
-                from: startPlace.coordinate,
-                to: peak.coordinate
-            )
-            let metricsText: String
-
-            if let startHeight = startPlace.heightM {
-                let heightDifference = peak.heightM - startHeight
-                let gainText = formattedElevation(heightDifference).replacingOccurrences(of: " ", with: "")
-                metricsText = "\(distanceText), \(gainText)↑, \(MapFormatting.formattedDegrees(bearingDegrees))"
-            } else {
-                metricsText = "\(distanceText), \(MapFormatting.formattedDegrees(bearingDegrees))"
-            }
-
-            return StartPlaceNearbyHillAction(
-                title: peak.name,
-                metrics: metricsText,
-                handler: { [weak self] in
-                    self?.focusOnPeak(
-                        peak,
-                        placementMode: .belowAnchor,
-                        positionsPeakForCallout: true,
-                        invocationSource: .other
-                    )
-                }
-            )
-        }
-    }
-
-    func cachedOfflineArea(for id: String) -> CachedOfflineArea? {
-        cachedOfflineAreas.first(where: { $0.id == id })
-    }
-
-    func showCachedAreaCallout(for annotation: MLNAnnotation, area: CachedOfflineArea) {
-        dismissActiveHillCallout(animated: false)
-        dismissActiveCachedAreaCallout(animated: false)
-
-        let metrics = [area.detailLevel.title, area.status.title, ByteCountFormatter.string(fromByteCount: Int64(area.byteCount), countStyle: .file)]
-            .joined(separator: " • ")
-        let calloutView = CachedAreaCalloutView(
-            annotation: annotation,
-            title: area.name,
-            metrics: metrics,
-            primaryActionTitle: "Rename",
-            primaryActionHandler: { [weak self] in
-                guard let self else { return }
-                self.dismissActiveCachedAreaCallout(animated: false)
-                self.promptToRenameCachedOfflineArea(area) { updatedArea in
-                    guard let updatedArea else { return }
-                    self.showCachedAreaCallout(for: annotation, area: updatedArea)
-                }
+        NearbyHillActionBuilder(
+            peaks: peaks,
+            displayUnitSystem: selectedDisplayUnitSystem,
+            bearing: { [goToSessionStore] start, end in
+                goToSessionStore.bearing(from: start, to: end)
             },
-            secondaryActionTitle: "Delete",
-            secondaryActionHandler: { [weak self] in
-                guard let self else { return }
-                self.dismissActiveCachedAreaCallout(animated: false)
-                self.confirmDeleteCachedOfflineArea(area) { _ in }
+            focusOnPeak: { [weak self] peak in
+                self?.focusOnPeak(
+                    peak,
+                    placementMode: .belowAnchor,
+                    positionsPeakForCallout: true,
+                    invocationSource: .other
+                )
             }
-        )
-
-        let anchorPoint = mapView.convert(annotation.coordinate, toPointTo: mapView)
-        let anchorRect = mapView.convert(CGRect(x: anchorPoint.x - 22, y: anchorPoint.y - 22, width: 44, height: 44), to: view)
-        let constrainedRect = view.safeAreaLayoutGuide.layoutFrame.insetBy(dx: 0, dy: 8)
-
-        calloutView.presentCallout(
-            from: anchorRect,
-            in: view,
-            constrainedTo: constrainedRect,
-            animated: true
-        )
-
-        activeCachedAreaCalloutView = calloutView
-        activeCachedAreaID = area.id
+        ).actions(for: startPlace)
     }
+
 }
