@@ -11,6 +11,10 @@ import UIKit
 
 extension ViewController: MLNMapViewDelegate {
 
+    func mapView(_ mapView: MLNMapView, didFinishLoading style: MLNStyle) {
+        applyGridLineVisibility()
+    }
+
     func mapView(_ mapView: MLNMapView, didUpdate userLocation: MLNUserLocation?) {
         // Refresh pin distances whenever the user's location changes.
         refreshPeakAnnotationSubtitles()

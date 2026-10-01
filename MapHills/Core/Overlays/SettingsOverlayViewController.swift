@@ -32,6 +32,7 @@ final class SettingsOverlayViewController: UIViewController {
     private var importedTrackColor: UIColor
     private var markerColorOptions: [MarkerColorOption]
     private var showsHillMarkers: Bool
+    private var showsGridLines: Bool
     private var visibleStartPlaceProviders: Set<StartPlaceProvider>
     private var startPlaceRouteLengthFilter: StartPlaceRouteLengthFilter
     private var nearestHundredConfiguration: NearestHundredConfiguration?
@@ -46,6 +47,7 @@ final class SettingsOverlayViewController: UIViewController {
     private let importedTrackColorChangeHandler: (UIColor) -> Void
     private let markerColorChangeHandler: (String, UIColor) -> Void
     private let hillMarkerVisibilityChangeHandler: (Bool) -> Void
+    private let gridLineVisibilityChangeHandler: (Bool) -> Void
     private let startPlaceProviderVisibilityChangeHandler: (Set<StartPlaceProvider>) -> Void
     private let startPlaceRouteLengthFilterChangeHandler: (StartPlaceRouteLengthFilter) -> Void
     private let startPlaceProviderCountProvider: (StartPlaceProvider, StartPlaceRouteLengthFilter) -> Int
@@ -65,6 +67,7 @@ final class SettingsOverlayViewController: UIViewController {
     private let recordedTrackColorWell = UIColorWell()
     private let importedTrackColorWell = UIColorWell()
     private let hillMarkerSwitch = UISwitch()
+    private let gridLineSwitch = UISwitch()
     private let mapOrientationModeLabel = UILabel()
     private let trackRecordingModeLabel = UILabel()
     private let nearestHundredSetupModeControl = UISegmentedControl(items: NearestHundredSetupMode.allCases.map(\.title))
@@ -88,6 +91,7 @@ final class SettingsOverlayViewController: UIViewController {
         importedTrackColor: UIColor,
         markerColorOptions: [MarkerColorOption],
         showsHillMarkers: Bool,
+        showsGridLines: Bool,
         visibleStartPlaceProviders: Set<StartPlaceProvider>,
         startPlaceRouteLengthFilter: StartPlaceRouteLengthFilter,
         localHundredConfiguration: LocalHundredConfiguration?,
@@ -102,6 +106,7 @@ final class SettingsOverlayViewController: UIViewController {
         importedTrackColorChangeHandler: @escaping (UIColor) -> Void,
         markerColorChangeHandler: @escaping (String, UIColor) -> Void,
         hillMarkerVisibilityChangeHandler: @escaping (Bool) -> Void,
+        gridLineVisibilityChangeHandler: @escaping (Bool) -> Void,
         startPlaceProviderVisibilityChangeHandler: @escaping (Set<StartPlaceProvider>) -> Void,
         startPlaceRouteLengthFilterChangeHandler: @escaping (StartPlaceRouteLengthFilter) -> Void,
         startPlaceProviderCountProvider: @escaping (StartPlaceProvider, StartPlaceRouteLengthFilter) -> Int,
@@ -119,6 +124,7 @@ final class SettingsOverlayViewController: UIViewController {
         self.importedTrackColor = importedTrackColor
         self.markerColorOptions = markerColorOptions
         self.showsHillMarkers = showsHillMarkers
+        self.showsGridLines = showsGridLines
         self.visibleStartPlaceProviders = visibleStartPlaceProviders
         self.startPlaceRouteLengthFilter = startPlaceRouteLengthFilter
         self.nearestHundredConfiguration = localHundredConfiguration
@@ -133,6 +139,7 @@ final class SettingsOverlayViewController: UIViewController {
         self.importedTrackColorChangeHandler = importedTrackColorChangeHandler
         self.markerColorChangeHandler = markerColorChangeHandler
         self.hillMarkerVisibilityChangeHandler = hillMarkerVisibilityChangeHandler
+        self.gridLineVisibilityChangeHandler = gridLineVisibilityChangeHandler
         self.startPlaceProviderVisibilityChangeHandler = startPlaceProviderVisibilityChangeHandler
         self.startPlaceRouteLengthFilterChangeHandler = startPlaceRouteLengthFilterChangeHandler
         self.startPlaceProviderCountProvider = startPlaceProviderCountProvider
@@ -183,18 +190,9 @@ final class SettingsOverlayViewController: UIViewController {
             mapOrientationModeControl.selectedSegmentIndex = selectedMapOrientationMode.rawValue
             mapOrientationModeControl.addTarget(self, action: #selector(mapOrientationModeChanged(_:)), for: .valueChanged)
 
-            mapInteractionLockSwitch.accessibilityIdentifier = "mapInteractionLockSwitch"
-            mapInteractionLockSwitch.isOn = isMapInteractionLocked
-            mapInteractionLockSwitch.addTarget(self, action: #selector(mapInteractionLockSwitchChanged(_:)), for: .valueChanged)
-            let mapInteractionLockStack = makeMapInteractionLockStack(
-                noteText: "When locked, the map keeps the selected orientation and ignores pan, pinch, and rotate gestures.",
-                lockSwitch: mapInteractionLockSwitch
-            )
-
             let stack = UIStackView(arrangedSubviews: [
                 mapOrientationModeControl,
-                mapOrientationModeLabel,
-                mapInteractionLockStack
+                mapOrientationModeLabel
             ])
             stack.axis = .vertical
             stack.spacing = 8
@@ -206,6 +204,28 @@ final class SettingsOverlayViewController: UIViewController {
                 stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
                 stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
                 stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
+            ])
+        }
+
+        let mapInteractionSection = makeSectionView(
+            title: "Map Interaction",
+            description: "Control whether the map accepts pan, pinch, and rotate gestures."
+        ) { container in
+            mapInteractionLockSwitch.accessibilityIdentifier = "mapInteractionLockSwitch"
+            mapInteractionLockSwitch.isOn = isMapInteractionLocked
+            mapInteractionLockSwitch.addTarget(self, action: #selector(mapInteractionLockSwitchChanged(_:)), for: .valueChanged)
+            let mapInteractionLockStack = makeMapInteractionLockStack(
+                noteText: "When locked, the map keeps the selected orientation and ignores pan, pinch, and rotate gestures.",
+                lockSwitch: mapInteractionLockSwitch
+            )
+            mapInteractionLockStack.translatesAutoresizingMaskIntoConstraints = false
+            container.addSubview(mapInteractionLockStack)
+
+            NSLayoutConstraint.activate([
+                mapInteractionLockStack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
+                mapInteractionLockStack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
+                mapInteractionLockStack.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
+                mapInteractionLockStack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
             ])
         }
 
@@ -264,10 +284,19 @@ final class SettingsOverlayViewController: UIViewController {
             ])
         }
 
-        let colorsSection = makeSectionView(
-            title: "Track Colors",
-            description: "Choose colors for the Snail Trail, Go To line, recorded tracks, and imported GPX tracks on the map."
+        let coloursSection = makeSectionView(
+            title: "Colours",
+            description: "Choose colours for markers, points and lines."
         ) { container in
+            func colorRow(for index: Int, option: MarkerColorOption) -> UIStackView {
+                let colorWell = UIColorWell()
+                colorWell.selectedColor = option.color
+                colorWell.supportsAlpha = false
+                colorWell.tag = index
+                colorWell.addTarget(self, action: #selector(markerColorOptionChanged(_:)), for: .valueChanged)
+                return self.makeColorWellRow(title: option.title, colorWell: colorWell)
+            }
+
             snailTrailColorWell.selectedColor = snailTrailColor
             snailTrailColorWell.supportsAlpha = false
             snailTrailColorWell.addTarget(self, action: #selector(snailTrailColorChanged(_:)), for: .valueChanged)
@@ -284,40 +313,6 @@ final class SettingsOverlayViewController: UIViewController {
             importedTrackColorWell.supportsAlpha = false
             importedTrackColorWell.addTarget(self, action: #selector(importedTrackColorChanged(_:)), for: .valueChanged)
 
-            let stack = UIStackView(
-                arrangedSubviews: [
-                    makeColorWellRow(title: "Snail Trail", colorWell: snailTrailColorWell),
-                    makeColorWellRow(title: "Go To Line", colorWell: goToLineColorWell),
-                    makeColorWellRow(title: "Recorded Track", colorWell: recordedTrackColorWell),
-                    makeColorWellRow(title: "Imported GPX", colorWell: importedTrackColorWell)
-                ]
-            )
-            stack.axis = .vertical
-            stack.spacing = 8
-            stack.translatesAutoresizingMaskIntoConstraints = false
-            container.addSubview(stack)
-
-            NSLayoutConstraint.activate([
-                stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
-                stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
-                stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
-                stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
-            ])
-        }
-
-        let hillMarkerColorsSection = makeSectionView(
-            title: "Marker Colors",
-            description: "Choose colors for map marker categories."
-        ) { container in
-            func colorRow(for index: Int, option: MarkerColorOption) -> UIStackView {
-                let colorWell = UIColorWell()
-                colorWell.selectedColor = option.color
-                colorWell.supportsAlpha = false
-                colorWell.tag = index
-                colorWell.addTarget(self, action: #selector(markerColorOptionChanged(_:)), for: .valueChanged)
-                return self.makeColorWellRow(title: option.title, colorWell: colorWell)
-            }
-
             let startPointOptionIDs = ["mvStartPoints", "coillteStartPoints", "sportIrelandStartPoints", "outscapeStartPoints"]
             let generalRows = markerColorOptions.enumerated()
                 .filter { !startPointOptionIDs.contains($0.element.id) }
@@ -328,15 +323,35 @@ final class SettingsOverlayViewController: UIViewController {
                 return colorRow(for: indexedOption.offset, option: indexedOption.element)
             }
 
-            let startPointsLabel = UILabel()
-            startPointsLabel.text = "Start Points"
-            startPointsLabel.font = OverlayChromeStyle.sectionTitleFont
-            startPointsLabel.textColor = .label
-
-            let stack = UIStackView(arrangedSubviews: generalRows + [startPointsLabel] + startPointRows)
+            let trackRows = [
+                makeColorWellRow(title: "Snail Trail", colorWell: snailTrailColorWell),
+                makeColorWellRow(title: "Go To Line", colorWell: goToLineColorWell),
+                makeColorWellRow(title: "Recorded Track", colorWell: recordedTrackColorWell),
+                makeColorWellRow(title: "Imported GPX", colorWell: importedTrackColorWell)
+            ]
+            let markersSubhead = makeColourSubheadLabel("Markers")
+            let startPointsSubhead = makeColourSubheadLabel("Start Points")
+            let tracksSubhead = makeColourSubheadLabel("Tracks")
+            let firstDivider = makeDividerView()
+            let secondDivider = makeDividerView()
+            let stack = UIStackView(
+                arrangedSubviews: [markersSubhead] + generalRows + [
+                    firstDivider,
+                    startPointsSubhead
+                ] + startPointRows + [
+                    secondDivider,
+                    tracksSubhead
+                ] + trackRows
+            )
             stack.axis = .vertical
             stack.spacing = 8
-            stack.setCustomSpacing(14, after: generalRows.last ?? startPointsLabel)
+            stack.setCustomSpacing(10, after: markersSubhead)
+            stack.setCustomSpacing(12, after: generalRows.last ?? markersSubhead)
+            stack.setCustomSpacing(10, after: firstDivider)
+            stack.setCustomSpacing(10, after: startPointsSubhead)
+            stack.setCustomSpacing(12, after: startPointRows.last ?? startPointsSubhead)
+            stack.setCustomSpacing(10, after: secondDivider)
+            stack.setCustomSpacing(10, after: tracksSubhead)
             stack.translatesAutoresizingMaskIntoConstraints = false
             container.addSubview(stack)
 
@@ -392,23 +407,32 @@ final class SettingsOverlayViewController: UIViewController {
             ])
         }
 
-        let displayHillMarkersSection = makeSectionView(
-            title: "Display Hill Markers",
-            description: "Controls hill pins only. Hill search, filters, and records remain available."
+        let mapDetailSection = makeSectionView(
+            title: "Map Detail",
+            description: "Control optional map detail overlays. Search, filters, and records remain available when hill markers are hidden."
         ) { container in
             hillMarkerSwitch.accessibilityIdentifier = "hillMarkerSwitch"
             hillMarkerSwitch.isOn = showsHillMarkers
             hillMarkerSwitch.addTarget(self, action: #selector(hillMarkerSwitchChanged(_:)), for: .valueChanged)
 
-            let row = self.makeSwitchRow(title: "Show Hill Markers", toggle: hillMarkerSwitch)
-            row.translatesAutoresizingMaskIntoConstraints = false
-            container.addSubview(row)
+            gridLineSwitch.accessibilityIdentifier = "gridLineSwitch"
+            gridLineSwitch.isOn = showsGridLines
+            gridLineSwitch.addTarget(self, action: #selector(gridLineSwitchChanged(_:)), for: .valueChanged)
+
+            let stack = UIStackView(arrangedSubviews: [
+                self.makeSwitchRow(title: "Show Hill Markers", toggle: hillMarkerSwitch),
+                self.makeSwitchRow(title: "Display Grid Lines", toggle: gridLineSwitch)
+            ])
+            stack.axis = .vertical
+            stack.spacing = 10
+            stack.translatesAutoresizingMaskIntoConstraints = false
+            container.addSubview(stack)
 
             NSLayoutConstraint.activate([
-                row.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
-                row.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
-                row.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
-                row.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
+                stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
+                stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
+                stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
+                stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
             ])
         }
 
@@ -521,12 +545,12 @@ final class SettingsOverlayViewController: UIViewController {
         let contentStack = UIStackView(arrangedSubviews: [
             titleRow,
             orientationSection,
+            mapInteractionSection,
+            mapDetailSection,
+            displayStartPointsSection,
             recordingSection,
             snailTrailSection,
-            colorsSection,
-            hillMarkerColorsSection,
-            displayHillMarkersSection,
-            displayStartPointsSection,
+            coloursSection,
             nearestHundredSection
         ])
         contentStack.axis = .vertical
@@ -743,6 +767,15 @@ final class SettingsOverlayViewController: UIViewController {
         label.text = title
         label.font = OverlayChromeStyle.supportingFont
         label.textColor = .secondaryLabel
+        return label
+    }
+
+    private func makeColourSubheadLabel(_ title: String) -> UILabel {
+        let label = UILabel()
+        label.text = title
+        label.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
+        label.textColor = .systemBlue
+        label.numberOfLines = 1
         return label
     }
 
@@ -971,6 +1004,11 @@ final class SettingsOverlayViewController: UIViewController {
     @objc private func hillMarkerSwitchChanged(_ sender: UISwitch) {
         showsHillMarkers = sender.isOn
         hillMarkerVisibilityChangeHandler(sender.isOn)
+    }
+
+    @objc private func gridLineSwitchChanged(_ sender: UISwitch) {
+        showsGridLines = sender.isOn
+        gridLineVisibilityChangeHandler(sender.isOn)
     }
 
     @objc private func startPlaceProviderSwitchChanged(_ sender: UISwitch) {

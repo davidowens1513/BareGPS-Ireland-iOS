@@ -123,13 +123,26 @@ final class MapHillsUITests: XCTestCase {
         let app = launchApp()
         openSettings(app: app)
 
+        XCTAssertTrue(app.staticTexts["Map Orientation"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Map Interaction"].exists)
+        XCTAssertTrue(app.staticTexts["Map Detail"].exists)
+        XCTAssertTrue(app.staticTexts["Display Grid Lines"].exists)
         XCTAssertTrue(app.staticTexts["Nearest 100"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Track Recording"].exists)
         XCTAssertTrue(app.staticTexts["Snail Trail"].exists)
-        XCTAssertTrue(app.staticTexts["Track Colors"].exists)
+        XCTAssertTrue(app.staticTexts["Colours"].exists)
+        XCTAssertTrue(app.staticTexts["Markers"].exists)
+        XCTAssertTrue(app.staticTexts["Start Points"].exists)
+        XCTAssertTrue(app.staticTexts["Tracks"].exists)
+        XCTAssertTrue(app.switches["mapInteractionLockSwitch"].exists)
+        XCTAssertTrue(app.switches["hillMarkerSwitch"].exists)
+        XCTAssertTrue(app.switches["gridLineSwitch"].exists)
         XCTAssertTrue(app.switches["snailTrailSwitch"].exists)
         XCTAssertFalse(app.staticTexts["Units"].exists)
         XCTAssertFalse(app.staticTexts["Recording Display"].exists)
+        XCTAssertFalse(app.staticTexts["Display Hill Markers"].exists)
+        XCTAssertFalse(app.staticTexts["Track Colors"].exists)
+        XCTAssertFalse(app.staticTexts["Marker Colors"].exists)
     }
 
     @MainActor

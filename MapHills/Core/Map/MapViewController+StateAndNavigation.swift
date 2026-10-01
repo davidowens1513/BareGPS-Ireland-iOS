@@ -616,6 +616,25 @@ extension ViewController {
         preferencesStore.saveTrackRecordingQuality(trackRecordingQuality)
     }
 
+    func saveShowsGridLines(_ showsGridLines: Bool) {
+        self.showsGridLines = showsGridLines
+        preferencesStore.saveShowsGridLines(showsGridLines)
+        applyGridLineVisibility()
+    }
+
+    func applyGridLineVisibility() {
+        guard selectedMapBaseLayer == .openBareMap, let style = mapView.style else { return }
+        let gridLayerIdentifiers = [
+            "irish-grid-1km",
+            "irish-grid-10km",
+            "irish-grid-labels"
+        ]
+
+        for layerIdentifier in gridLayerIdentifiers {
+            style.layer(withIdentifier: layerIdentifier)?.isVisible = showsGridLines
+        }
+    }
+
     func saveShowsCompactRecordingGrid(_ showsCompactRecordingGrid: Bool) {
         self.showsCompactRecordingGrid = showsCompactRecordingGrid
         preferencesStore.saveShowsCompactRecordingGrid(showsCompactRecordingGrid)

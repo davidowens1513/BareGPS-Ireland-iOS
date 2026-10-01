@@ -101,8 +101,11 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     var liveRecordingUnlockRemainingSeconds = 0
     var isLiveRecordingControlsUnlocked = false
     let hillCountOverlayLabel = UILabel()
-    let centerCrosshairHorizontalView = UIView()
-    let centerCrosshairVerticalView = UIView()
+    let centerCrosshairLeftView = UIView()
+    let centerCrosshairRightView = UIView()
+    let centerCrosshairTopView = UIView()
+    let centerCrosshairBottomView = UIView()
+    let centerCrosshairCircleView = UIView()
     let cacheProgressOverlayLabel = UILabel()
     let currentGridRefOverlayLabel = UILabel()
     var visibleHillCountOnMap = 0
@@ -160,6 +163,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     var goToLineColor: UIColor = .systemTeal
     var recordedTrackColor: UIColor = .systemRed
     var importedTrackColor: UIColor = .systemTeal
+    var showsGridLines = true
     var localHundredConfiguration: LocalHundredConfiguration?
     var selectedHeightBands: Set<HeightFilterBand> = []
     var selectedClassificationCodes: Set<String> = []
@@ -427,6 +431,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         goToLineColor = persistedFilterState.goToLineColor
         recordedTrackColor = persistedFilterState.recordedTrackColor
         importedTrackColor = persistedFilterState.importedTrackColor
+        showsGridLines = persistedFilterState.showsGridLines
         selectedHeightBands = Set(persistedFilterState.selectedHeightBandIDs.compactMap(HeightFilterBand.init(rawValue:)))
         selectedClassificationCodes = Set(persistedFilterState.selectedClassificationCodes)
         advancedHillFilter = persistedFilterState.advancedHillFilter
@@ -603,8 +608,13 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     func setupCenterCrosshair() {
-        let crosshairColor = UIColor.label.withAlphaComponent(0.18)
-        for crosshairView in [centerCrosshairHorizontalView, centerCrosshairVerticalView] {
+        let crosshairColor = UIColor.label.withAlphaComponent(0.6)
+        for crosshairView in [
+            centerCrosshairLeftView,
+            centerCrosshairRightView,
+            centerCrosshairTopView,
+            centerCrosshairBottomView
+        ] {
             crosshairView.translatesAutoresizingMaskIntoConstraints = false
             crosshairView.backgroundColor = crosshairColor
             crosshairView.isUserInteractionEnabled = false
@@ -612,15 +622,36 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             view.addSubview(crosshairView)
         }
 
+        centerCrosshairCircleView.translatesAutoresizingMaskIntoConstraints = false
+        centerCrosshairCircleView.backgroundColor = .clear
+        centerCrosshairCircleView.layer.borderColor = crosshairColor.cgColor
+        centerCrosshairCircleView.layer.borderWidth = 1
+        centerCrosshairCircleView.layer.cornerRadius = 3
+        centerCrosshairCircleView.isUserInteractionEnabled = false
+        centerCrosshairCircleView.accessibilityElementsHidden = true
+        view.addSubview(centerCrosshairCircleView)
+
         NSLayoutConstraint.activate([
-            centerCrosshairHorizontalView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            centerCrosshairHorizontalView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            centerCrosshairHorizontalView.widthAnchor.constraint(equalToConstant: 34),
-            centerCrosshairHorizontalView.heightAnchor.constraint(equalToConstant: 1),
-            centerCrosshairVerticalView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            centerCrosshairVerticalView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            centerCrosshairVerticalView.widthAnchor.constraint(equalToConstant: 1),
-            centerCrosshairVerticalView.heightAnchor.constraint(equalToConstant: 34)
+            centerCrosshairLeftView.trailingAnchor.constraint(equalTo: centerCrosshairCircleView.leadingAnchor, constant: -2),
+            centerCrosshairLeftView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            centerCrosshairLeftView.widthAnchor.constraint(equalToConstant: 12),
+            centerCrosshairLeftView.heightAnchor.constraint(equalToConstant: 1),
+            centerCrosshairRightView.leadingAnchor.constraint(equalTo: centerCrosshairCircleView.trailingAnchor, constant: 2),
+            centerCrosshairRightView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            centerCrosshairRightView.widthAnchor.constraint(equalToConstant: 12),
+            centerCrosshairRightView.heightAnchor.constraint(equalToConstant: 1),
+            centerCrosshairTopView.bottomAnchor.constraint(equalTo: centerCrosshairCircleView.topAnchor, constant: -2),
+            centerCrosshairTopView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            centerCrosshairTopView.widthAnchor.constraint(equalToConstant: 1),
+            centerCrosshairTopView.heightAnchor.constraint(equalToConstant: 12),
+            centerCrosshairBottomView.topAnchor.constraint(equalTo: centerCrosshairCircleView.bottomAnchor, constant: 2),
+            centerCrosshairBottomView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            centerCrosshairBottomView.widthAnchor.constraint(equalToConstant: 1),
+            centerCrosshairBottomView.heightAnchor.constraint(equalToConstant: 12),
+            centerCrosshairCircleView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            centerCrosshairCircleView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            centerCrosshairCircleView.widthAnchor.constraint(equalToConstant: 6),
+            centerCrosshairCircleView.heightAnchor.constraint(equalTo: centerCrosshairCircleView.widthAnchor)
         ])
     }
 

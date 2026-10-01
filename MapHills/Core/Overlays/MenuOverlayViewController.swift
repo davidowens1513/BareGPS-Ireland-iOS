@@ -530,7 +530,7 @@ final class MenuOverlayViewController: UIViewController {
     }
 
     private func markerColorDescriptionText(for schema: MenuFilterSchema) -> String {
-        "Choose colors for map marker categories."
+        "Choose colours for markers, points and lines."
     }
 
     private func updateMarkerColorDescription() {
