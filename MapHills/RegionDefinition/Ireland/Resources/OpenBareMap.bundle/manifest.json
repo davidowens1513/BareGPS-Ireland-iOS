@@ -1,8 +1,8 @@
 {
-  "name": "MapData",
-  "product": "Ireland map package",
-  "version": "0.6.0",
-  "created": "2026-08-28",
+  "name": "OpenBareMap",
+  "product": "OpenBareMap Ireland offline map package",
+  "version": "1.0.0",
+  "created": "2026-10-01",
   "source": {
     "basemap": "ireland.mbtiles",
     "contours": "contours.mbtiles",
@@ -10,16 +10,21 @@
     "hillshade": "hillshade.mbtiles",
     "hiking": "hiking.mbtiles",
     "irish_grid": "grid.mbtiles",
-    "dem": "SRTM 1 Arc-Second Global, Version 3"
+    "dem": "SRTM 1 Arc-Second Global, Version 3",
+    "townlands": "style/townlands.geojson"
   },
   "folders": {
     "style": "style",
     "fonts": "fonts",
     "sprites": "sprites"
   },
-  "glyph_ranges": ["0-255", "256-511", "8192-8447"],
+  "glyph_ranges": [
+    "0-255",
+    "256-511",
+    "8192-8447"
+  ],
   "checksums": "SHA256SUMS.txt",
   "attribution": "ATTRIBUTION.txt",
   "notice": "NOTICE.txt",
-  "notes": "Offline topographic data bundle for Ireland. Includes strengthened hillshade, roads and contours; woodland and patterned bog landcover; rock, scree, shingle and direction-neutral crag features; an all-island Irish Grid overlay; revised labels; and named hiking POIs. The style uses local MBTiles, local Open Sans glyphs and a bundled sprite sheet."
+  "notes": "Offline topographic data bundle for Ireland. Includes hillshade, roads, contours, woodland and patterned bog landcover, terrain features, Irish Grid overlay, hiking POIs, revised larger labels, and townland placename labels. The style uses local MBTiles, local Open Sans glyphs, bundled sprites, and a bundled GeoJSON townlands source."
 }

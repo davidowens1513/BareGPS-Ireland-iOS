@@ -115,6 +115,7 @@ extension ViewController {
             markerColorOptions: markerColorOptions(),
             showsHillMarkers: showsHillMarkers,
             showsGridLines: showsGridLines,
+            showsTownlands: showsTownlands,
             visibleStartPlaceProviders: visibleStartPlaceProviders,
             startPlaceRouteLengthFilter: startPlaceRouteLengthFilter,
             localHundredConfiguration: localHundredConfiguration,
@@ -159,6 +160,9 @@ extension ViewController {
             },
             gridLineVisibilityChangeHandler: { [weak self] showsGridLines in
                 self?.saveShowsGridLines(showsGridLines)
+            },
+            townlandVisibilityChangeHandler: { [weak self] showsTownlands in
+                self?.saveShowsTownlands(showsTownlands)
             },
             startPlaceProviderVisibilityChangeHandler: { [weak self] providers in
                 self?.saveVisibleStartPlaceProviders(providers)

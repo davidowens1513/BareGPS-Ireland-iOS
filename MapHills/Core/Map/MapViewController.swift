@@ -164,6 +164,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     var recordedTrackColor: UIColor = .systemRed
     var importedTrackColor: UIColor = .systemTeal
     var showsGridLines = true
+    var showsTownlands = true
     var localHundredConfiguration: LocalHundredConfiguration?
     var selectedHeightBands: Set<HeightFilterBand> = []
     var selectedClassificationCodes: Set<String> = []
@@ -432,6 +433,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         recordedTrackColor = persistedFilterState.recordedTrackColor
         importedTrackColor = persistedFilterState.importedTrackColor
         showsGridLines = persistedFilterState.showsGridLines
+        showsTownlands = persistedFilterState.showsTownlands
         selectedHeightBands = Set(persistedFilterState.selectedHeightBandIDs.compactMap(HeightFilterBand.init(rawValue:)))
         selectedClassificationCodes = Set(persistedFilterState.selectedClassificationCodes)
         advancedHillFilter = persistedFilterState.advancedHillFilter

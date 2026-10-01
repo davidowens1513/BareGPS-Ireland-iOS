@@ -47,8 +47,8 @@ struct MapStyleURLProvider {
             var styleJSON = try String(contentsOf: styleSourceURL, encoding: .utf8)
             let fontsURL = bundleURL.appendingPathComponent("fonts", isDirectory: true)
             let spritesURL = bundleURL.appendingPathComponent("sprites", isDirectory: true)
+            let styleDirectoryURL = bundleURL.appendingPathComponent("style", isDirectory: true)
             let glyphTemplate = "file://\(fontsURL.path)/{fontstack}/{range}.pbf"
-            let spriteTemplate = "file://\(spritesURL.path)/baregps-bog24"
             let sourceNames = [
                 "ireland.mbtiles",
                 "contours.mbtiles",
@@ -75,8 +75,13 @@ struct MapStyleURLProvider {
                 with: "\"glyphs\": \"\(glyphTemplate)\""
             )
             styleJSON = styleJSON.replacingOccurrences(
-                of: #""sprite":\s*"[^"]+""#,
-                with: "\"sprite\": \"\(spriteTemplate)\"",
+                of: #""sprite":\s*"\./sprites/([^"]+)""#,
+                with: "\"sprite\": \"file://\(spritesURL.path)/$1\"",
+                options: .regularExpression
+            )
+            styleJSON = styleJSON.replacingOccurrences(
+                of: #""data":\s*"\./([^"]+\.geojson)""#,
+                with: "\"data\": \"file://\(styleDirectoryURL.path)/$1\"",
                 options: .regularExpression
             )
 

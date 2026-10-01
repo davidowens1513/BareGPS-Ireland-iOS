@@ -712,6 +712,7 @@ struct PersistedFilterState {
     let recordedTrackColor: UIColor
     let importedTrackColor: UIColor
     let showsGridLines: Bool
+    let showsTownlands: Bool
     let selectedHeightBandIDs: [String]
     let selectedClassificationCodes: [String]
     let advancedHillFilter: AdvancedHillFilter
@@ -734,6 +735,7 @@ final class AppPreferencesStore {
         static let recordedTrackColor = "recordedTrackColor"
         static let importedTrackColor = "importedTrackColor"
         static let showsGridLines = "showsGridLines"
+        static let showsTownlands = "showsTownlands"
         static let selectedHeightBands = "selectedHeightBands"
         static let selectedClassificationCodes = "selectedClassificationCodes"
         static let advancedHillFilter = "advancedHillFilter"
@@ -776,6 +778,7 @@ final class AppPreferencesStore {
         let recordedTrackColor = loadColor(forKey: Key.recordedTrackColor) ?? .systemRed
         let importedTrackColor = loadColor(forKey: Key.importedTrackColor) ?? .systemTeal
         let showsGridLines = userDefaults.object(forKey: Key.showsGridLines) as? Bool ?? true
+        let showsTownlands = userDefaults.object(forKey: Key.showsTownlands) as? Bool ?? true
         let selectedHeightBandIDs = userDefaults.stringArray(forKey: Key.selectedHeightBands) ?? []
         let selectedClassificationCodes = userDefaults.stringArray(forKey: Key.selectedClassificationCodes) ?? []
         let advancedHillFilter: AdvancedHillFilter = loadCodableValue(forKey: Key.advancedHillFilter) ?? AdvancedHillFilter()
@@ -795,6 +798,7 @@ final class AppPreferencesStore {
             recordedTrackColor: recordedTrackColor,
             importedTrackColor: importedTrackColor,
             showsGridLines: showsGridLines,
+            showsTownlands: showsTownlands,
             selectedHeightBandIDs: selectedHeightBandIDs,
             selectedClassificationCodes: selectedClassificationCodes,
             advancedHillFilter: advancedHillFilter,
@@ -908,6 +912,10 @@ final class AppPreferencesStore {
 
     func saveShowsGridLines(_ showsGridLines: Bool) {
         userDefaults.set(showsGridLines, forKey: Key.showsGridLines)
+    }
+
+    func saveShowsTownlands(_ showsTownlands: Bool) {
+        userDefaults.set(showsTownlands, forKey: Key.showsTownlands)
     }
 
     func loadNearestHundredConfiguration() -> NearestHundredConfiguration? {

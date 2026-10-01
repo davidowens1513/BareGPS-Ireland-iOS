@@ -622,6 +622,12 @@ extension ViewController {
         applyGridLineVisibility()
     }
 
+    func saveShowsTownlands(_ showsTownlands: Bool) {
+        self.showsTownlands = showsTownlands
+        preferencesStore.saveShowsTownlands(showsTownlands)
+        applyTownlandVisibility()
+    }
+
     func applyGridLineVisibility() {
         guard selectedMapBaseLayer == .openBareMap, let style = mapView.style else { return }
         let gridLayerIdentifiers = [
@@ -633,6 +639,11 @@ extension ViewController {
         for layerIdentifier in gridLayerIdentifiers {
             style.layer(withIdentifier: layerIdentifier)?.isVisible = showsGridLines
         }
+    }
+
+    func applyTownlandVisibility() {
+        guard selectedMapBaseLayer == .openBareMap, let style = mapView.style else { return }
+        style.layer(withIdentifier: "townland-labels")?.isVisible = showsTownlands
     }
 
     func saveShowsCompactRecordingGrid(_ showsCompactRecordingGrid: Bool) {

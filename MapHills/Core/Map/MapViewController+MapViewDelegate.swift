@@ -13,6 +13,7 @@ extension ViewController: MLNMapViewDelegate {
 
     func mapView(_ mapView: MLNMapView, didFinishLoading style: MLNStyle) {
         applyGridLineVisibility()
+        applyTownlandVisibility()
     }
 
     func mapView(_ mapView: MLNMapView, didUpdate userLocation: MLNUserLocation?) {

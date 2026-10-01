@@ -33,6 +33,7 @@ final class SettingsOverlayViewController: UIViewController {
     private var markerColorOptions: [MarkerColorOption]
     private var showsHillMarkers: Bool
     private var showsGridLines: Bool
+    private var showsTownlands: Bool
     private var visibleStartPlaceProviders: Set<StartPlaceProvider>
     private var startPlaceRouteLengthFilter: StartPlaceRouteLengthFilter
     private var nearestHundredConfiguration: NearestHundredConfiguration?
@@ -48,6 +49,7 @@ final class SettingsOverlayViewController: UIViewController {
     private let markerColorChangeHandler: (String, UIColor) -> Void
     private let hillMarkerVisibilityChangeHandler: (Bool) -> Void
     private let gridLineVisibilityChangeHandler: (Bool) -> Void
+    private let townlandVisibilityChangeHandler: (Bool) -> Void
     private let startPlaceProviderVisibilityChangeHandler: (Set<StartPlaceProvider>) -> Void
     private let startPlaceRouteLengthFilterChangeHandler: (StartPlaceRouteLengthFilter) -> Void
     private let startPlaceProviderCountProvider: (StartPlaceProvider, StartPlaceRouteLengthFilter) -> Int
@@ -68,6 +70,7 @@ final class SettingsOverlayViewController: UIViewController {
     private let importedTrackColorWell = UIColorWell()
     private let hillMarkerSwitch = UISwitch()
     private let gridLineSwitch = UISwitch()
+    private let townlandSwitch = UISwitch()
     private let mapOrientationModeLabel = UILabel()
     private let trackRecordingModeLabel = UILabel()
     private let nearestHundredSetupModeControl = UISegmentedControl(items: NearestHundredSetupMode.allCases.map(\.title))
@@ -92,6 +95,7 @@ final class SettingsOverlayViewController: UIViewController {
         markerColorOptions: [MarkerColorOption],
         showsHillMarkers: Bool,
         showsGridLines: Bool,
+        showsTownlands: Bool,
         visibleStartPlaceProviders: Set<StartPlaceProvider>,
         startPlaceRouteLengthFilter: StartPlaceRouteLengthFilter,
         localHundredConfiguration: LocalHundredConfiguration?,
@@ -107,6 +111,7 @@ final class SettingsOverlayViewController: UIViewController {
         markerColorChangeHandler: @escaping (String, UIColor) -> Void,
         hillMarkerVisibilityChangeHandler: @escaping (Bool) -> Void,
         gridLineVisibilityChangeHandler: @escaping (Bool) -> Void,
+        townlandVisibilityChangeHandler: @escaping (Bool) -> Void,
         startPlaceProviderVisibilityChangeHandler: @escaping (Set<StartPlaceProvider>) -> Void,
         startPlaceRouteLengthFilterChangeHandler: @escaping (StartPlaceRouteLengthFilter) -> Void,
         startPlaceProviderCountProvider: @escaping (StartPlaceProvider, StartPlaceRouteLengthFilter) -> Int,
@@ -125,6 +130,7 @@ final class SettingsOverlayViewController: UIViewController {
         self.markerColorOptions = markerColorOptions
         self.showsHillMarkers = showsHillMarkers
         self.showsGridLines = showsGridLines
+        self.showsTownlands = showsTownlands
         self.visibleStartPlaceProviders = visibleStartPlaceProviders
         self.startPlaceRouteLengthFilter = startPlaceRouteLengthFilter
         self.nearestHundredConfiguration = localHundredConfiguration
@@ -140,6 +146,7 @@ final class SettingsOverlayViewController: UIViewController {
         self.markerColorChangeHandler = markerColorChangeHandler
         self.hillMarkerVisibilityChangeHandler = hillMarkerVisibilityChangeHandler
         self.gridLineVisibilityChangeHandler = gridLineVisibilityChangeHandler
+        self.townlandVisibilityChangeHandler = townlandVisibilityChangeHandler
         self.startPlaceProviderVisibilityChangeHandler = startPlaceProviderVisibilityChangeHandler
         self.startPlaceRouteLengthFilterChangeHandler = startPlaceRouteLengthFilterChangeHandler
         self.startPlaceProviderCountProvider = startPlaceProviderCountProvider
@@ -419,9 +426,14 @@ final class SettingsOverlayViewController: UIViewController {
             gridLineSwitch.isOn = showsGridLines
             gridLineSwitch.addTarget(self, action: #selector(gridLineSwitchChanged(_:)), for: .valueChanged)
 
+            townlandSwitch.accessibilityIdentifier = "townlandSwitch"
+            townlandSwitch.isOn = showsTownlands
+            townlandSwitch.addTarget(self, action: #selector(townlandSwitchChanged(_:)), for: .valueChanged)
+
             let stack = UIStackView(arrangedSubviews: [
                 self.makeSwitchRow(title: "Show Hill Markers", toggle: hillMarkerSwitch),
-                self.makeSwitchRow(title: "Display Grid Lines", toggle: gridLineSwitch)
+                self.makeSwitchRow(title: "Display Grid Lines", toggle: gridLineSwitch),
+                self.makeSwitchRow(title: "Display Townlands", toggle: townlandSwitch)
             ])
             stack.axis = .vertical
             stack.spacing = 10
@@ -1009,6 +1021,11 @@ final class SettingsOverlayViewController: UIViewController {
     @objc private func gridLineSwitchChanged(_ sender: UISwitch) {
         showsGridLines = sender.isOn
         gridLineVisibilityChangeHandler(sender.isOn)
+    }
+
+    @objc private func townlandSwitchChanged(_ sender: UISwitch) {
+        showsTownlands = sender.isOn
+        townlandVisibilityChangeHandler(sender.isOn)
     }
 
     @objc private func startPlaceProviderSwitchChanged(_ sender: UISwitch) {
