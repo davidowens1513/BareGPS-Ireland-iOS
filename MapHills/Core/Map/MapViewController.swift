@@ -1132,7 +1132,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
             compactRecordingStripView.centerXAnchor.constraint(equalTo: safeArea.centerXAnchor),
-            compactRecordingStripView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -156),
+            compactRecordingStripView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -134),
             compactRecordingStripView.widthAnchor.constraint(equalTo: safeArea.widthAnchor, multiplier: 0.6),
             compactRecordingStripStack.leadingAnchor.constraint(equalTo: compactRecordingStripView.leadingAnchor),
             compactRecordingStripStack.trailingAnchor.constraint(equalTo: compactRecordingStripView.trailingAnchor),
@@ -1948,7 +1948,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         let actualScaleBarWidth = mapView.scaleBar.bounds.width
         let scaleBarWidth = actualScaleBarWidth > 0 ? actualScaleBarWidth : fallbackScaleBarWidth
         let centeredX = (view.bounds.width - scaleBarWidth) / 2
-        let bottomMargin = max(110, view.safeAreaInsets.bottom + 114)
+        let bottomMargin = max(74, view.safeAreaInsets.bottom + 78)
 
         mapView.scaleBarMargins = CGPoint(
             x: max(12, centeredX),
