@@ -1132,7 +1132,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
             compactRecordingStripView.centerXAnchor.constraint(equalTo: safeArea.centerXAnchor),
-            compactRecordingStripView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -122),
+            compactRecordingStripView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -156),
             compactRecordingStripView.widthAnchor.constraint(equalTo: safeArea.widthAnchor, multiplier: 0.6),
             compactRecordingStripStack.leadingAnchor.constraint(equalTo: compactRecordingStripView.leadingAnchor),
             compactRecordingStripStack.trailingAnchor.constraint(equalTo: compactRecordingStripView.trailingAnchor),
@@ -1221,7 +1221,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         hillCountOverlayLabel.translatesAutoresizingMaskIntoConstraints = false
         hillCountOverlayLabel.font = .systemFont(ofSize: 9.6, weight: .semibold)
         hillCountOverlayLabel.textColor = UIColor.secondaryLabel.withAlphaComponent(0.78)
-        hillCountOverlayLabel.textAlignment = .left
+        hillCountOverlayLabel.textAlignment = .center
         hillCountOverlayLabel.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.32)
         hillCountOverlayLabel.layer.cornerRadius = 8
         hillCountOverlayLabel.clipsToBounds = true
@@ -1234,8 +1234,9 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         view.addSubview(hillCountOverlayLabel)
 
         NSLayoutConstraint.activate([
-            hillCountOverlayLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 14),
+            hillCountOverlayLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             hillCountOverlayLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -36),
+            hillCountOverlayLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 14),
             hillCountOverlayLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -74)
         ])
     }
@@ -1947,7 +1948,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         let actualScaleBarWidth = mapView.scaleBar.bounds.width
         let scaleBarWidth = actualScaleBarWidth > 0 ? actualScaleBarWidth : fallbackScaleBarWidth
         let centeredX = (view.bounds.width - scaleBarWidth) / 2
-        let bottomMargin = max(72, view.safeAreaInsets.bottom + 76)
+        let bottomMargin = max(110, view.safeAreaInsets.bottom + 114)
 
         mapView.scaleBarMargins = CGPoint(
             x: max(12, centeredX),
