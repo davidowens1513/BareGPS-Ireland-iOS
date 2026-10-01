@@ -22,11 +22,9 @@ final class SettingsOverlayViewController: UIViewController {
         }
     }
 
-    private var selectedDisplayUnitSystem: DisplayUnitSystem
     private var selectedMapOrientationMode: MapOrientationMode
     private var isMapInteractionLocked: Bool
     private var selectedTrackRecordingQuality: TrackRecordingQuality
-    private var showsCompactRecordingGrid: Bool
     private var showsSnailTrail: Bool
     private var snailTrailColor: UIColor
     private var goToLineColor: UIColor
@@ -38,11 +36,9 @@ final class SettingsOverlayViewController: UIViewController {
     private var startPlaceRouteLengthFilter: StartPlaceRouteLengthFilter
     private var nearestHundredConfiguration: NearestHundredConfiguration?
     private let currentPositionGridReference: String?
-    private let displayUnitSystemChangeHandler: (DisplayUnitSystem) -> Void
     private let mapOrientationModeChangeHandler: (MapOrientationMode) -> Void
     private let mapInteractionLockChangeHandler: (Bool) -> Void
     private let trackRecordingQualityChangeHandler: (TrackRecordingQuality) -> Void
-    private let compactRecordingGridChangeHandler: (Bool) -> Void
     private let snailTrailVisibilityChangeHandler: (Bool) -> Void
     private let snailTrailColorChangeHandler: (UIColor) -> Void
     private let goToLineColorChangeHandler: (UIColor) -> Void
@@ -60,7 +56,6 @@ final class SettingsOverlayViewController: UIViewController {
     private let dimmingView = UIView()
     private let cardView = UIView()
     private let contentScrollView = UIScrollView()
-    private let displayUnitControl = UISegmentedControl(items: DisplayUnitSystem.allCases.map(\.title))
     private let mapOrientationModeControl = UISegmentedControl(items: MapOrientationMode.allCases.map(\.title))
     private let mapInteractionLockSwitch = UISwitch()
     private let trackRecordingQualityControl = UISegmentedControl(items: TrackRecordingQuality.allCases.map(\.title))
@@ -72,7 +67,6 @@ final class SettingsOverlayViewController: UIViewController {
     private let hillMarkerSwitch = UISwitch()
     private let mapOrientationModeLabel = UILabel()
     private let trackRecordingModeLabel = UILabel()
-    private let compactRecordingGridSwitch = UISwitch()
     private let nearestHundredSetupModeControl = UISegmentedControl(items: NearestHundredSetupMode.allCases.map(\.title))
     private let nearestHundredStatusButton = UIButton(type: .system)
     private let nearestHundredCurrentPositionLabel = UILabel()
@@ -84,11 +78,9 @@ final class SettingsOverlayViewController: UIViewController {
     private let nearestHundredCurrentPositionStack = UIStackView()
 
     init(
-        selectedDisplayUnitSystem: DisplayUnitSystem,
         selectedMapOrientationMode: MapOrientationMode,
         isMapInteractionLocked: Bool,
         selectedTrackRecordingQuality: TrackRecordingQuality,
-        showsCompactRecordingGrid: Bool,
         showsSnailTrail: Bool,
         snailTrailColor: UIColor,
         goToLineColor: UIColor,
@@ -100,11 +92,9 @@ final class SettingsOverlayViewController: UIViewController {
         startPlaceRouteLengthFilter: StartPlaceRouteLengthFilter,
         localHundredConfiguration: LocalHundredConfiguration?,
         currentPositionGridReference: String?,
-        displayUnitSystemChangeHandler: @escaping (DisplayUnitSystem) -> Void,
         mapOrientationModeChangeHandler: @escaping (MapOrientationMode) -> Void,
         mapInteractionLockChangeHandler: @escaping (Bool) -> Void,
         trackRecordingQualityChangeHandler: @escaping (TrackRecordingQuality) -> Void,
-        compactRecordingGridChangeHandler: @escaping (Bool) -> Void,
         snailTrailVisibilityChangeHandler: @escaping (Bool) -> Void,
         snailTrailColorChangeHandler: @escaping (UIColor) -> Void,
         goToLineColorChangeHandler: @escaping (UIColor) -> Void,
@@ -119,11 +109,9 @@ final class SettingsOverlayViewController: UIViewController {
         localHundredFromCurrentPositionHandler: @escaping () -> LocalHundredSetupResult,
         localHundredResetHandler: @escaping () -> Void
     ) {
-        self.selectedDisplayUnitSystem = selectedDisplayUnitSystem
         self.selectedMapOrientationMode = selectedMapOrientationMode
         self.isMapInteractionLocked = isMapInteractionLocked
         self.selectedTrackRecordingQuality = selectedTrackRecordingQuality
-        self.showsCompactRecordingGrid = showsCompactRecordingGrid
         self.showsSnailTrail = showsSnailTrail
         self.snailTrailColor = snailTrailColor
         self.goToLineColor = goToLineColor
@@ -135,11 +123,9 @@ final class SettingsOverlayViewController: UIViewController {
         self.startPlaceRouteLengthFilter = startPlaceRouteLengthFilter
         self.nearestHundredConfiguration = localHundredConfiguration
         self.currentPositionGridReference = currentPositionGridReference
-        self.displayUnitSystemChangeHandler = displayUnitSystemChangeHandler
         self.mapOrientationModeChangeHandler = mapOrientationModeChangeHandler
         self.mapInteractionLockChangeHandler = mapInteractionLockChangeHandler
         self.trackRecordingQualityChangeHandler = trackRecordingQualityChangeHandler
-        self.compactRecordingGridChangeHandler = compactRecordingGridChangeHandler
         self.snailTrailVisibilityChangeHandler = snailTrailVisibilityChangeHandler
         self.snailTrailColorChangeHandler = snailTrailColorChangeHandler
         self.goToLineColorChangeHandler = goToLineColorChangeHandler
@@ -183,34 +169,6 @@ final class SettingsOverlayViewController: UIViewController {
 
         let titleLabel = makeOverlayTitleLabel("Settings")
         let titleRow = makeOverlayTitleRow(with: titleLabel)
-
-        let unitsSection = makeSectionView(
-            title: "Units",
-            description: "Choose whether hills, distances, and GPX stats are shown in metric or imperial units."
-        ) { container in
-            styleSchemaControl(displayUnitControl)
-            displayUnitControl.selectedSegmentIndex = selectedDisplayUnitSystem.rawValue
-            displayUnitControl.addTarget(self, action: #selector(displayUnitSystemChanged(_:)), for: .valueChanged)
-
-            let unitsNoteLabel = UILabel()
-            unitsNoteLabel.text = "Height classifications are unaffected."
-            unitsNoteLabel.font = OverlayChromeStyle.bodyFont
-            unitsNoteLabel.textColor = .secondaryLabel
-            unitsNoteLabel.numberOfLines = 0
-
-            let stack = UIStackView(arrangedSubviews: [displayUnitControl, unitsNoteLabel])
-            stack.axis = .vertical
-            stack.spacing = 8
-            stack.translatesAutoresizingMaskIntoConstraints = false
-            container.addSubview(stack)
-
-            NSLayoutConstraint.activate([
-                stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
-                stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
-                stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
-                stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
-            ])
-        }
 
         mapOrientationModeLabel.font = OverlayChromeStyle.bodyFont
         mapOrientationModeLabel.textColor = .secondaryLabel
@@ -275,34 +233,6 @@ final class SettingsOverlayViewController: UIViewController {
                 stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
                 stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
                 stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
-            ])
-        }
-
-        let recordingDisplaySection = makeSectionView(
-            title: "Recording Display",
-            attributedDescription: recordingDisplayDescription()
-        ) { container in
-            compactRecordingGridSwitch.accessibilityIdentifier = "compactRecordingGridSwitch"
-            compactRecordingGridSwitch.isOn = showsCompactRecordingGrid
-            compactRecordingGridSwitch.addTarget(self, action: #selector(compactRecordingGridSwitchChanged(_:)), for: .valueChanged)
-
-            let compactRecordingGridLabel = UILabel()
-            compactRecordingGridLabel.text = "Use Compact Grid"
-            compactRecordingGridLabel.font = OverlayChromeStyle.bodyFont
-            compactRecordingGridLabel.textColor = .label
-
-            let row = UIStackView(arrangedSubviews: [compactRecordingGridLabel, compactRecordingGridSwitch])
-            row.axis = .horizontal
-            row.alignment = .center
-            row.distribution = .equalSpacing
-            row.translatesAutoresizingMaskIntoConstraints = false
-            container.addSubview(row)
-
-            NSLayoutConstraint.activate([
-                row.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
-                row.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
-                row.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
-                row.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
             ])
         }
 
@@ -592,14 +522,12 @@ final class SettingsOverlayViewController: UIViewController {
             titleRow,
             orientationSection,
             recordingSection,
-            recordingDisplaySection,
             snailTrailSection,
             colorsSection,
             hillMarkerColorsSection,
             displayHillMarkersSection,
             displayStartPointsSection,
-            nearestHundredSection,
-            unitsSection
+            nearestHundredSection
         ])
         contentStack.axis = .vertical
         contentStack.spacing = 16
@@ -748,30 +676,6 @@ final class SettingsOverlayViewController: UIViewController {
             .font: OverlayChromeStyle.supportingFont,
             .foregroundColor: UIColor.white
         ], for: .selected)
-    }
-
-    private func recordingDisplayDescription() -> NSAttributedString {
-        let baseAttributes: [NSAttributedString.Key: Any] = [
-            .font: OverlayChromeStyle.bodyFont,
-            .foregroundColor: UIColor.secondaryLabel
-        ]
-
-        let result = NSMutableAttributedString(
-            string: "Choose on-map display between a full metrics grid with recording controls, and a compact metrics grid. If you choose compact, recording controls are operated by tapping the ",
-            attributes: baseAttributes
-        )
-        result.append(inlinePlayIconAttachment())
-        result.append(NSAttributedString(string: " button in the right column.", attributes: baseAttributes))
-        return result
-    }
-
-    private func inlinePlayIconAttachment() -> NSAttributedString {
-        let attachment = NSTextAttachment()
-        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 11, weight: .bold)
-        attachment.image = UIImage(systemName: "play.fill", withConfiguration: symbolConfiguration)?
-            .withTintColor(.systemBlue, renderingMode: .alwaysOriginal)
-        attachment.bounds = CGRect(x: 0, y: -1, width: 11, height: 11)
-        return NSAttributedString(attachment: attachment)
     }
 
     private func makeColorWellRow(title: String, colorWell: UIColorWell) -> UIStackView {
@@ -1004,12 +908,6 @@ final class SettingsOverlayViewController: UIViewController {
         )
     }
 
-    @objc private func displayUnitSystemChanged(_ sender: UISegmentedControl) {
-        guard let displayUnitSystem = DisplayUnitSystem(rawValue: sender.selectedSegmentIndex) else { return }
-        selectedDisplayUnitSystem = displayUnitSystem
-        displayUnitSystemChangeHandler(displayUnitSystem)
-    }
-
     @objc private func mapOrientationModeChanged(_ sender: UISegmentedControl) {
         guard let mapOrientationMode = MapOrientationMode(rawValue: sender.selectedSegmentIndex) else { return }
         selectedMapOrientationMode = mapOrientationMode
@@ -1032,11 +930,6 @@ final class SettingsOverlayViewController: UIViewController {
         selectedTrackRecordingQuality = trackRecordingQuality
         trackRecordingModeLabel.text = trackRecordingQuality.descriptionText
         trackRecordingQualityChangeHandler(trackRecordingQuality)
-    }
-
-    @objc private func compactRecordingGridSwitchChanged(_ sender: UISwitch) {
-        showsCompactRecordingGrid = sender.isOn
-        compactRecordingGridChangeHandler(sender.isOn)
     }
 
     @objc private func snailTrailSwitchChanged(_ sender: UISwitch) {

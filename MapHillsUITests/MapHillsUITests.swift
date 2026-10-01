@@ -127,8 +127,9 @@ final class MapHillsUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Track Recording"].exists)
         XCTAssertTrue(app.staticTexts["Snail Trail"].exists)
         XCTAssertTrue(app.staticTexts["Track Colors"].exists)
-        XCTAssertTrue(app.staticTexts["Units"].exists)
         XCTAssertTrue(app.switches["snailTrailSwitch"].exists)
+        XCTAssertFalse(app.staticTexts["Units"].exists)
+        XCTAssertFalse(app.staticTexts["Recording Display"].exists)
     }
 
     @MainActor

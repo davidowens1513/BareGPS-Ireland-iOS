@@ -23,7 +23,7 @@ Built around Irish hill data and lists, the app helps you see hills on a live ma
 - Mark hills as logged and review your logged hill list.
 - Search and manage logged hills quickly.
 - Customise hill marker colours and track colours.
-- Choose metric or imperial display units.
+- Uses metric display units throughout.
 - Choose north-up or heads-up map orientation.
 - Use Local 100 to work from either your current position or a chosen grid reference.
 

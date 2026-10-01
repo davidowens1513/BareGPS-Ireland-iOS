@@ -493,32 +493,16 @@ extension ViewController {
     }
 
     func showHillCountOverlay(for count: Int) {
-        hillCountOverlayTimer?.invalidate()
-        hillCountOverlayLabel.text = "  No. of Hills on Map: \(count)  "
-        hillCountOverlayLabel.isHidden = false
-
-        UIView.animate(withDuration: 0.2) {
-            self.hillCountOverlayLabel.alpha = 1
-        }
-
-        hillCountOverlayTimer = Timer.scheduledTimer(
-            withTimeInterval: 5,
-            repeats: false
-        ) { [weak self] _ in
-            self?.hideHillCountOverlay()
-        }
+        visibleHillCountOnMap = count
+        updateMapStatusOverlay()
     }
 
-    func hideHillCountOverlay() {
-        UIView.animate(
-            withDuration: 0.2,
-            animations: {
-                self.hillCountOverlayLabel.alpha = 0
-            },
-            completion: { _ in
-                self.hillCountOverlayLabel.isHidden = true
-            }
-        )
+    func updateMapStatusOverlay() {
+        let currentPositionText = currentPositionGridReferenceText() ?? "u/a"
+        let centerPositionText = centerPositionGridReferenceText() ?? "u/a"
+        let accuracyText = MapFormatting.formattedLiveGPXAccuracy(mapView.userLocation?.location, unitSystem: .metric)
+        hillCountOverlayLabel.text = "  Hills shown on Map: \(visibleHillCountOnMap)  \n  Current Position: \(currentPositionText)  \n  Centre Position: \(centerPositionText)  \n  GPS Accuracy: \(accuracyText)  "
+        hillCountOverlayLabel.isHidden = false
     }
 
     func presentGPXImportAlert(title: String, message: String) {
@@ -1232,25 +1216,26 @@ extension ViewController {
     }
 
     func currentLocationGridReferenceText() -> String? {
+        currentPositionGridReferenceText().map { "Grid Ref: \($0)" }
+    }
+
+    func currentPositionGridReferenceText() -> String? {
         let authorizationStatus = locationManager.authorizationStatus
         guard authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways else {
             return nil
         }
         guard let coordinate = currentValidUserCoordinate() else { return nil }
-        guard let gridReference = irishNationalGridReference(for: coordinate) else { return nil }
-        return "Grid Ref: \(gridReference)"
+        return irishNationalGridReference(for: coordinate)
+    }
+
+    func centerPositionGridReferenceText() -> String? {
+        irishNationalGridReference(for: mapView.centerCoordinate)
     }
 
     func updateCurrentGridRefOverlay() {
-        guard let gridReferenceText = currentLocationGridReferenceText() else {
-            currentGridRefOverlayLabel.isHidden = true
-            cacheProgressOverlayBottomConstraint?.constant = -6
-            return
-        }
-
-        currentGridRefOverlayLabel.text = "  \(gridReferenceText)  "
-        currentGridRefOverlayLabel.isHidden = false
-        cacheProgressOverlayBottomConstraint?.constant = -44
+        currentGridRefOverlayLabel.isHidden = true
+        cacheProgressOverlayBottomConstraint?.constant = -6
+        updateMapStatusOverlay()
     }
 
     func updatePositionIndicator() {

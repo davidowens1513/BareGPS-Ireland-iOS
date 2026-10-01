@@ -328,7 +328,10 @@ extension ViewController {
     // MARK: - Peak Annotations
 
     func addPeakAnnotations() {
-        guard showsHillMarkers else { return }
+        guard showsHillMarkers else {
+            showHillCountOverlay(for: 0)
+            return
+        }
 
         let visiblePeaks = filteredPeaks()
         let annotations = peakAnnotationPresentationStore.makePeakAnnotations(

@@ -22,7 +22,7 @@ The app allows you to:
 
 - show hills on a live map using simple filters, based on hill categories or height. 
 
-- use either metric or imperial units.
+- use metric units throughout.
 
 - search the map for hills, known starting/parking points, and Irish places such as towns, villages, and cities. Search only applies to currently filtered and displayed hills and starting points. You can also search the full hill database from the Log Register.
 
@@ -46,14 +46,11 @@ The app allows you to:
 
 Recording a GPX
 
-Metrics Grids
-In Settings, under Recording Display, you can choose between two metrics grids on the map. The options are a full metrics display with recording controls and a compact display, which is the default, without recording controls.
+Metrics Grid
+The map uses a compact live metrics grid while GPX recording is active.
 
-Recording using full on-map grid
-When using the full grid, a long tap makes the grid active and usable for 20 seconds, after which it becomes inactive in order to prevent accidental operation.
-
-Recording using compact on-map grid
-Tap the [icon] button in the right column and a dialog including recording controls will open.
+Recording controls
+Tap the GPX button in the right column to open the dialog containing recording controls and the full live metrics grid.
 
 Using Recording Controls
 Tap Start to begin recording, Stop to end the current track, Discard to throw away a recording you do not want to keep, and Save to keep it on the device.

@@ -366,17 +366,12 @@ extension ViewController {
         }
 
         updateLiveGPXStatsCard()
-        updateLiveGPXStatsTimer()
     }
 
     func updateLiveGPXStatsCard() {
-        liveGPXStatsCardView.isHidden = showsCompactRecordingGrid
-        compactRecordingStripView.isHidden = !showsCompactRecordingGrid
-        liveGPXStatsCardView.layer.borderWidth = isTrailRecording ? 3 : 1
-        liveGPXStatsCardView.layer.borderColor = (isTrailRecording
-            ? UIColor.systemGray2.withAlphaComponent(0.8)
-            : UIColor.systemGray3.withAlphaComponent(0.65)
-        ).cgColor
+        showsCompactRecordingGrid = true
+        liveGPXStatsCardView.isHidden = true
+        compactRecordingStripView.isHidden = false
 
         if let summary = currentGPXRecordingSummary() {
             liveDistanceValueLabel.text = formattedLiveGPXDistance(summary.distanceMeters)
@@ -428,15 +423,6 @@ extension ViewController {
             hasSavableRecording: recordedTrailPoints.count > 1
         )
         updateCompactRecordingStrip()
-    }
-
-    func updateLiveGPXStatsTimer() {
-        guard liveGPXStatsTimer == nil else { return }
-        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
-            self?.updateLiveGPXStatsCard()
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        liveGPXStatsTimer = timer
     }
 
     func liveRecordingStatusText() -> NSAttributedString {

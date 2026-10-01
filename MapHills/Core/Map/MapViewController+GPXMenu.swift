@@ -32,6 +32,9 @@ extension ViewController {
             elevationFormatter: { [weak self] in
                 self?.formattedElevation($0) ?? ""
             },
+            accuracyProvider: { [weak self] in
+                self?.formattedLiveGPXAccuracy(self?.mapView.userLocation?.location) ?? "u/a"
+            },
             importHandler: { [weak self] in
                 self?.importGPXFromFiles()
             },

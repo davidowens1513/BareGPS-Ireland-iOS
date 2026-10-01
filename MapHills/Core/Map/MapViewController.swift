@@ -97,14 +97,15 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     let compactElevationValueLabel = UILabel()
     let compactStatusBoxView = UIView()
     let compactStatusDotView = UIView()
-    var liveGPXStatsTimer: Timer?
     var liveRecordingUnlockTimer: Timer?
     var liveRecordingUnlockRemainingSeconds = 0
     var isLiveRecordingControlsUnlocked = false
     let hillCountOverlayLabel = UILabel()
-    var hillCountOverlayTimer: Timer?
+    let centerCrosshairHorizontalView = UIView()
+    let centerCrosshairVerticalView = UIView()
     let cacheProgressOverlayLabel = UILabel()
     let currentGridRefOverlayLabel = UILabel()
+    var visibleHillCountOnMap = 0
     var cacheProgressOverlayBottomConstraint: NSLayoutConstraint?
     var currentGridRefOverlayBottomConstraint: NSLayoutConstraint?
     weak var goToOverlayViewController: GoToHillOverlayViewController?
@@ -380,9 +381,9 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
         setupMap()
         setupPositionIndicator()
+        setupCenterCrosshair()
         setupMapLogo()
         setupZoomSlider()
-        setupLiveGPXStatsCard()
         setupCompactRecordingStrip()
         setupRecenterButton()
         setupOrientationButton()
@@ -527,8 +528,6 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     deinit {
-        liveGPXStatsTimer?.invalidate()
-        liveGPXStatsTimer = nil
         liveRecordingUnlockTimer?.invalidate()
         liveRecordingUnlockTimer = nil
         NotificationCenter.default.removeObserver(self)
@@ -601,6 +600,28 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
         view.addSubview(positionIndicatorAccuracyRingView)
         view.addSubview(positionIndicatorView)
+    }
+
+    func setupCenterCrosshair() {
+        let crosshairColor = UIColor.label.withAlphaComponent(0.18)
+        for crosshairView in [centerCrosshairHorizontalView, centerCrosshairVerticalView] {
+            crosshairView.translatesAutoresizingMaskIntoConstraints = false
+            crosshairView.backgroundColor = crosshairColor
+            crosshairView.isUserInteractionEnabled = false
+            crosshairView.accessibilityElementsHidden = true
+            view.addSubview(crosshairView)
+        }
+
+        NSLayoutConstraint.activate([
+            centerCrosshairHorizontalView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            centerCrosshairHorizontalView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            centerCrosshairHorizontalView.widthAnchor.constraint(equalToConstant: 34),
+            centerCrosshairHorizontalView.heightAnchor.constraint(equalToConstant: 1),
+            centerCrosshairVerticalView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            centerCrosshairVerticalView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            centerCrosshairVerticalView.widthAnchor.constraint(equalToConstant: 1),
+            centerCrosshairVerticalView.heightAnchor.constraint(equalToConstant: 34)
+        ])
     }
 
     func setupMapLogo() {
@@ -1074,7 +1095,6 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         ])
 
         updateLiveGPXStatsCard()
-        updateLiveGPXStatsTimer()
     }
 
     func setupCompactRecordingStrip() {
@@ -1199,23 +1219,24 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     func setupHillCountOverlay() {
         hillCountOverlayLabel.translatesAutoresizingMaskIntoConstraints = false
-        hillCountOverlayLabel.font = .systemFont(ofSize: 12, weight: .semibold)
-        hillCountOverlayLabel.textColor = .label
-        hillCountOverlayLabel.textAlignment = .center
-        hillCountOverlayLabel.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.58)
-        hillCountOverlayLabel.layer.cornerRadius = 10
+        hillCountOverlayLabel.font = .systemFont(ofSize: 9.6, weight: .semibold)
+        hillCountOverlayLabel.textColor = UIColor.secondaryLabel.withAlphaComponent(0.78)
+        hillCountOverlayLabel.textAlignment = .left
+        hillCountOverlayLabel.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.32)
+        hillCountOverlayLabel.layer.cornerRadius = 8
         hillCountOverlayLabel.clipsToBounds = true
-        hillCountOverlayLabel.numberOfLines = 1
-        hillCountOverlayLabel.alpha = 0
-        hillCountOverlayLabel.isHidden = true
+        hillCountOverlayLabel.numberOfLines = 4
+        hillCountOverlayLabel.adjustsFontSizeToFitWidth = true
+        hillCountOverlayLabel.minimumScaleFactor = 0.8
+        hillCountOverlayLabel.alpha = 1
+        hillCountOverlayLabel.isHidden = false
 
         view.addSubview(hillCountOverlayLabel)
 
         NSLayoutConstraint.activate([
-            hillCountOverlayLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            hillCountOverlayLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -36),
-            hillCountOverlayLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            hillCountOverlayLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -72)
+            hillCountOverlayLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 14),
+            hillCountOverlayLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -120),
+            hillCountOverlayLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -74)
         ])
     }
 

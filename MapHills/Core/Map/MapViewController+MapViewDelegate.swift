@@ -57,12 +57,14 @@ extension ViewController: MLNMapViewDelegate {
     func mapView(_ mapView: MLNMapView, regionDidChangeAnimated animated: Bool) {
         updateCachingIndicatorAppearance()
         updatePositionIndicator()
+        updateCurrentGridRefOverlay()
         updateZoomSliderFromMap()
     }
 
     func mapViewRegionIsChanging(_ mapView: MLNMapView) {
         updateOrientationButtonAppearance()
         updatePositionIndicator()
+        updateCurrentGridRefOverlay()
         updateZoomSliderFromMap()
     }
 }

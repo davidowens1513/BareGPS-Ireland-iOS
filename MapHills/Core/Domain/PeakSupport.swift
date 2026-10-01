@@ -760,12 +760,14 @@ final class AppPreferencesStore {
     func loadFilterState() -> PersistedFilterState {
         let selectedFilterSchema = MenuFilterSchema(rawValue: userDefaults.integer(forKey: Key.filterSchema)) ?? .classification
         let selectedHillFilterMode: HillFilterMode = .simple
-        let displayUnitSystem = DisplayUnitSystem(rawValue: userDefaults.integer(forKey: Key.displayUnitSystem)) ?? .metric
+        userDefaults.removeObject(forKey: Key.displayUnitSystem)
+        let displayUnitSystem = DisplayUnitSystem.metric
         let mapOrientationMode = MapOrientationMode(rawValue: userDefaults.integer(forKey: Key.mapOrientationMode)) ?? .northUp
         userDefaults.removeObject(forKey: Key.isMapInteractionLocked)
         let isMapInteractionLocked = false
         let trackRecordingQuality = TrackRecordingQuality(rawValue: userDefaults.integer(forKey: Key.trackRecordingQuality)) ?? .standard
-        let showsCompactRecordingGrid = userDefaults.object(forKey: Key.showsCompactRecordingGrid) as? Bool ?? true
+        userDefaults.removeObject(forKey: Key.showsCompactRecordingGrid)
+        let showsCompactRecordingGrid = true
         let showsSnailTrail = userDefaults.object(forKey: Key.showsSnailTrail) as? Bool ?? true
         let snailTrailColor = loadColor(forKey: Key.snailTrailColor) ?? UIColor.systemRed.withAlphaComponent(0.75)
         let goToLineColor = loadColor(forKey: Key.goToLineColor) ?? .systemTeal
@@ -813,7 +815,7 @@ final class AppPreferencesStore {
     }
 
     func saveDisplayUnitSystem(_ displayUnitSystem: DisplayUnitSystem) {
-        userDefaults.set(displayUnitSystem.rawValue, forKey: Key.displayUnitSystem)
+        userDefaults.removeObject(forKey: Key.displayUnitSystem)
     }
 
     func saveMapOrientationMode(_ mapOrientationMode: MapOrientationMode) {
@@ -873,11 +875,11 @@ final class AppPreferencesStore {
     }
 
     func loadShowsCompactRecordingGrid() -> Bool {
-        userDefaults.object(forKey: Key.showsCompactRecordingGrid) as? Bool ?? true
+        true
     }
 
     func saveShowsCompactRecordingGrid(_ showsCompactRecordingGrid: Bool) {
-        userDefaults.set(showsCompactRecordingGrid, forKey: Key.showsCompactRecordingGrid)
+        userDefaults.removeObject(forKey: Key.showsCompactRecordingGrid)
     }
 
     func saveShowsSnailTrail(_ showsSnailTrail: Bool) {

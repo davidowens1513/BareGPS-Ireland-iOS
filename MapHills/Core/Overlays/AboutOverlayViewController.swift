@@ -244,7 +244,7 @@ final class AboutOverlayViewController: UIViewController {
         [
             AboutMenuItem(symbolName: "magnifyingglass", title: "Search", detail: "Search filtered hills, filtered starting points, and Irish towns, villages and cities."),
             AboutMenuItem(symbolName: "questionmark", title: "About", detail: "Open app information, data credits, safety notes and this menu guide."),
-            AboutMenuItem(symbolName: "gearshape.fill", title: "Settings", detail: "Change units, map orientation, marker colours, start-point datasets and provider route display."),
+            AboutMenuItem(symbolName: "gearshape.fill", title: "Settings", detail: "Change map orientation, marker colours, start-point datasets and provider route display."),
             AboutMenuItem(symbolName: "line.3.horizontal.decrease.circle", title: "Filter", detail: "Filter hills by height or classification, manage advanced filters, and review filtered hill lists."),
             AboutMenuItem(symbolName: "list.bullet.clipboard", title: "Log Register", detail: "Review, search, log, unlog and export your hill records."),
             AboutMenuItem(symbolName: "internaldrive.fill", title: "Cache", detail: "Save visible map areas for offline use and manage saved cached areas."),
@@ -307,7 +307,7 @@ final class AboutOverlayViewController: UIViewController {
         ]
 
         let headingLines: Set<String> = ["Overview", "Features", "Recording a GPX", "Menus", "Support", "Credits", "Credits:", "Location Permissions and Data", "Safety", "Private Land", "Additional Providers", "OpenBareMap", "Coillte", "Sport Ireland", ActiveRegion.current.externalDataProviderName]
-        let subheadingLines: Set<String> = ["Recording using full on-map grid", "Recording using compact on-map grid", "Using Recording Controls", "Metrics Grids"]
+        let subheadingLines: Set<String> = ["Recording controls", "Using Recording Controls", "Metrics Grid"]
 
         for rawLine in text.components(separatedBy: .newlines) {
             let line = rawLine.trimmingCharacters(in: .whitespaces)

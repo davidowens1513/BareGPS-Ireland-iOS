@@ -18,6 +18,7 @@ final class GPXOverlayViewController: UIViewController {
     private let summaryProvider: () -> GPXRecordingSummary?
     private let distanceFormatter: (CLLocationDistance) -> String
     private let elevationFormatter: (Double) -> String
+    private let accuracyProvider: () -> String
     private let importHandler: () -> Void
     private let savedHandler: () -> Void
     private let waypointsHandler: () -> Void
@@ -51,7 +52,9 @@ final class GPXOverlayViewController: UIViewController {
     private let distanceValueLabel = UILabel()
     private let timeValueLabel = UILabel()
     private let ascentValueLabel = UILabel()
+    private let descentValueLabel = UILabel()
     private let elevationValueLabel = UILabel()
+    private let accuracyValueLabel = UILabel()
     private let statusLabel = UILabel()
     private var refreshTimer: Timer?
 
@@ -65,6 +68,7 @@ final class GPXOverlayViewController: UIViewController {
         summaryProvider: @escaping () -> GPXRecordingSummary?,
         distanceFormatter: @escaping (CLLocationDistance) -> String,
         elevationFormatter: @escaping (Double) -> String,
+        accuracyProvider: @escaping () -> String,
         importHandler: @escaping () -> Void,
         savedHandler: @escaping () -> Void,
         waypointsHandler: @escaping () -> Void,
@@ -85,6 +89,7 @@ final class GPXOverlayViewController: UIViewController {
         self.summaryProvider = summaryProvider
         self.distanceFormatter = distanceFormatter
         self.elevationFormatter = elevationFormatter
+        self.accuracyProvider = accuracyProvider
         self.importHandler = importHandler
         self.savedHandler = savedHandler
         self.waypointsHandler = waypointsHandler
@@ -227,8 +232,16 @@ final class GPXOverlayViewController: UIViewController {
             metricsRow(
                 leftTitle: "Ascent",
                 leftValueLabel: ascentValueLabel,
-                rightTitle: "Current Elevation",
-                rightValueLabel: elevationValueLabel
+                rightTitle: "Descent",
+                rightValueLabel: descentValueLabel
+            )
+        )
+        metricsGridView.addArrangedSubview(
+            metricsRow(
+                leftTitle: "Elevation",
+                leftValueLabel: elevationValueLabel,
+                rightTitle: "Accuracy",
+                rightValueLabel: accuracyValueLabel
             )
         )
 
@@ -499,7 +512,9 @@ final class GPXOverlayViewController: UIViewController {
             distanceValueLabel.text = formattedDistance(summary.distanceMeters)
             timeValueLabel.text = formattedDuration(summary.duration)
             ascentValueLabel.text = formattedElevation(summary.ascentMeters)
+            descentValueLabel.text = formattedElevation(summary.descentMeters)
             elevationValueLabel.text = summary.currentElevationMeters.map(formattedElevation) ?? "Unavailable"
+            accuracyValueLabel.text = accuracyProvider()
         } else {
             statsStack.isHidden = true
         }

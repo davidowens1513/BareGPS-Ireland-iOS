@@ -104,11 +104,9 @@ extension ViewController {
 
     @objc func showSettings() {
         let settingsViewController = SettingsOverlayViewController(
-            selectedDisplayUnitSystem: selectedDisplayUnitSystem,
             selectedMapOrientationMode: selectedMapOrientationMode,
             isMapInteractionLocked: isMapInteractionLocked,
             selectedTrackRecordingQuality: selectedTrackRecordingQuality,
-            showsCompactRecordingGrid: showsCompactRecordingGrid,
             showsSnailTrail: showsSnailTrail,
             snailTrailColor: snailTrailColor,
             goToLineColor: goToLineColor,
@@ -120,15 +118,6 @@ extension ViewController {
             startPlaceRouteLengthFilter: startPlaceRouteLengthFilter,
             localHundredConfiguration: localHundredConfiguration,
             currentPositionGridReference: currentLocalHundredPositionGridReference(),
-            displayUnitSystemChangeHandler: { [weak self] displayUnitSystem in
-                guard let self else { return }
-                self.saveDisplayUnitSystem(displayUnitSystem)
-                self.updateLiveGPXStatsCard()
-                if let overlay = self.goToOverlayViewController {
-                    self.updateGoToOverlayNavigation(for: overlay.target)
-                }
-                self.reloadPeakAnnotations()
-            },
             mapOrientationModeChangeHandler: { [weak self] mapOrientationMode in
                 self?.saveMapOrientationMode(mapOrientationMode)
             },
@@ -137,9 +126,6 @@ extension ViewController {
             },
             trackRecordingQualityChangeHandler: { [weak self] trackRecordingQuality in
                 self?.saveTrackRecordingQuality(trackRecordingQuality)
-            },
-            compactRecordingGridChangeHandler: { [weak self] showsCompactRecordingGrid in
-                self?.saveShowsCompactRecordingGrid(showsCompactRecordingGrid)
             },
             snailTrailVisibilityChangeHandler: { [weak self] showsSnailTrail in
                 self?.saveShowsSnailTrail(showsSnailTrail)
