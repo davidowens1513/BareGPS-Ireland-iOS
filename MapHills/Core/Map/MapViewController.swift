@@ -1132,7 +1132,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
             compactRecordingStripView.centerXAnchor.constraint(equalTo: safeArea.centerXAnchor),
-            compactRecordingStripView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -78),
+            compactRecordingStripView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -122),
             compactRecordingStripView.widthAnchor.constraint(equalTo: safeArea.widthAnchor, multiplier: 0.6),
             compactRecordingStripStack.leadingAnchor.constraint(equalTo: compactRecordingStripView.leadingAnchor),
             compactRecordingStripStack.trailingAnchor.constraint(equalTo: compactRecordingStripView.trailingAnchor),
@@ -1235,7 +1235,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
         NSLayoutConstraint.activate([
             hillCountOverlayLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 14),
-            hillCountOverlayLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -120),
+            hillCountOverlayLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -36),
             hillCountOverlayLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -74)
         ])
     }
@@ -1947,7 +1947,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         let actualScaleBarWidth = mapView.scaleBar.bounds.width
         let scaleBarWidth = actualScaleBarWidth > 0 ? actualScaleBarWidth : fallbackScaleBarWidth
         let centeredX = (view.bounds.width - scaleBarWidth) / 2
-        let bottomMargin = max(18, view.safeAreaInsets.bottom + 22)
+        let bottomMargin = max(72, view.safeAreaInsets.bottom + 76)
 
         mapView.scaleBarMargins = CGPoint(
             x: max(12, centeredX),
