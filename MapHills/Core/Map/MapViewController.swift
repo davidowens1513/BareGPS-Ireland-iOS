@@ -109,6 +109,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     let cacheProgressOverlayLabel = UILabel()
     let currentGridRefOverlayLabel = UILabel()
     var visibleHillCountOnMap = 0
+    var isHillCountLineVisible = true
+    var hillCountLineHideTimer: Timer?
     var cacheProgressOverlayBottomConstraint: NSLayoutConstraint?
     var currentGridRefOverlayBottomConstraint: NSLayoutConstraint?
     weak var goToOverlayViewController: GoToHillOverlayViewController?
@@ -1252,15 +1254,15 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     func setupHillCountOverlay() {
         hillCountOverlayLabel.translatesAutoresizingMaskIntoConstraints = false
-        hillCountOverlayLabel.font = .systemFont(ofSize: 9.6, weight: .semibold)
+        hillCountOverlayLabel.font = .monospacedDigitSystemFont(ofSize: 9.6, weight: .semibold)
         hillCountOverlayLabel.textColor = UIColor.secondaryLabel.withAlphaComponent(0.78)
         hillCountOverlayLabel.textAlignment = .center
         hillCountOverlayLabel.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.32)
         hillCountOverlayLabel.layer.cornerRadius = 8
         hillCountOverlayLabel.clipsToBounds = true
-        hillCountOverlayLabel.numberOfLines = 4
-        hillCountOverlayLabel.adjustsFontSizeToFitWidth = true
-        hillCountOverlayLabel.minimumScaleFactor = 0.8
+        hillCountOverlayLabel.numberOfLines = 5
+        hillCountOverlayLabel.adjustsFontSizeToFitWidth = false
+        hillCountOverlayLabel.lineBreakMode = .byClipping
         hillCountOverlayLabel.alpha = 1
         hillCountOverlayLabel.isHidden = false
 
@@ -1268,7 +1270,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
         NSLayoutConstraint.activate([
             hillCountOverlayLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            hillCountOverlayLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -36),
+            hillCountOverlayLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
             hillCountOverlayLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 14),
             hillCountOverlayLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -74)
         ])

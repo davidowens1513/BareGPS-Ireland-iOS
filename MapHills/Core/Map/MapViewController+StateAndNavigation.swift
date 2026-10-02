@@ -493,16 +493,65 @@ extension ViewController {
     }
 
     func showHillCountOverlay(for count: Int) {
+        let countChanged = count != visibleHillCountOnMap
         visibleHillCountOnMap = count
-        updateMapStatusOverlay()
+
+        if countChanged || (isHillCountLineVisible && hillCountLineHideTimer == nil) {
+            showHillCountLineTemporarily()
+        } else {
+            updateMapStatusOverlay()
+        }
     }
 
     func updateMapStatusOverlay() {
         let currentPositionText = currentPositionGridReferenceText() ?? "u/a"
         let centerPositionText = centerPositionGridReferenceText() ?? "u/a"
+        let distanceToCenterText = distanceToCenterText() ?? "u/a"
         let accuracyText = MapFormatting.formattedLiveGPXAccuracy(mapView.userLocation?.location, unitSystem: .metric)
-        hillCountOverlayLabel.text = "  Hills shown on Map: \(visibleHillCountOnMap)  \n  Current Position: \(currentPositionText)  \n  Centre Position: \(centerPositionText)  \n  GPS Accuracy: \(accuracyText)  "
+        var statusLines: [String] = []
+
+        if isHillCountLineVisible {
+            statusLines.append("  Hills shown on Map: \(visibleHillCountOnMap)  ")
+        }
+
+        statusLines.append("  Current Position: \(currentPositionText)  ")
+        statusLines.append("  Centre Position: \(centerPositionText)  ")
+        statusLines.append("  Distance to Centre: \(distanceToCenterText)  ")
+        statusLines.append("  GPS Accuracy: \(accuracyText)  ")
+
+        let statusText = statusLines.joined(separator: "\n")
+        if hillCountOverlayLabel.text != statusText {
+            hillCountOverlayLabel.text = statusText
+        }
         hillCountOverlayLabel.isHidden = false
+    }
+
+    func showHillCountLineTemporarily() {
+        hillCountLineHideTimer?.invalidate()
+        isHillCountLineVisible = true
+        updateMapStatusOverlay()
+
+        let timer = Timer(timeInterval: 20, repeats: false) { [weak self] _ in
+            self?.hideHillCountLine()
+        }
+        hillCountLineHideTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
+    }
+
+    func hideHillCountLine() {
+        hillCountLineHideTimer?.invalidate()
+        hillCountLineHideTimer = nil
+        isHillCountLineVisible = false
+        updateMapStatusOverlay()
+    }
+
+    func distanceToCenterText() -> String? {
+        guard let userCoordinate = currentValidUserCoordinate() else { return nil }
+        let userLocation = CLLocation(latitude: userCoordinate.latitude, longitude: userCoordinate.longitude)
+        let centerCoordinate = mapView.centerCoordinate
+        guard CLLocationCoordinate2DIsValid(centerCoordinate) else { return nil }
+        let centerLocation = CLLocation(latitude: centerCoordinate.latitude, longitude: centerCoordinate.longitude)
+        return MapFormatting.formattedDistance(userLocation.distance(from: centerLocation), unitSystem: .metric)
     }
 
     func presentGPXImportAlert(title: String, message: String) {
