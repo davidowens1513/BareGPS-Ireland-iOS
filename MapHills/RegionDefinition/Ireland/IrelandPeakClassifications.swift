@@ -225,6 +225,8 @@ extension IrelandRegionDefinition {
             return "Nuttall"
         case "HU":
             return "Hump"
+        case "TU":
+            return "Tump"
         case "SIM":
             return "Simm"
         case "HEW":

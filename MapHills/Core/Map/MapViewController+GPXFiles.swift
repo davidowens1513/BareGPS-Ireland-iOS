@@ -263,9 +263,11 @@ extension ViewController {
     func appendBreadcrumbCoordinateIfNeeded(_ location: CLLocation) {
         let didAppend = trailRecordingStore.appendBreadcrumbLocationIfNeeded(
             location,
-            minimumDistance: 5,
+            minimumDistance: 2,
             maximumHorizontalAccuracy: trailMaximumHorizontalAccuracy,
-            trailDuration: breadcrumbTrailDuration
+            trailDuration: breadcrumbTrailDuration,
+            maximumStaleSampleInterval: 60,
+            maximumStaleSampleDistance: 75
         )
 
         guard didAppend else { return }

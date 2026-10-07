@@ -1366,7 +1366,9 @@ final class TrailRecordingStore {
         _ location: CLLocation,
         minimumDistance: CLLocationDistance,
         maximumHorizontalAccuracy: CLLocationAccuracy,
-        trailDuration: TimeInterval
+        trailDuration: TimeInterval,
+        maximumStaleSampleInterval: TimeInterval,
+        maximumStaleSampleDistance: CLLocationDistance
     ) -> Bool {
         guard !isRecording else { return false }
         guard location.horizontalAccuracy >= 0 else { return false }
@@ -1381,10 +1383,17 @@ final class TrailRecordingStore {
 
         pruneBreadcrumbTrail(relativeTo: location.timestamp, duration: trailDuration)
 
-        if let lastCoordinate = breadcrumbTrailPoints.last?.coordinate {
-            let lastLocation = CLLocation(latitude: lastCoordinate.latitude, longitude: lastCoordinate.longitude)
+        if let lastPoint = breadcrumbTrailPoints.last {
+            let lastLocation = CLLocation(latitude: lastPoint.latitude, longitude: lastPoint.longitude)
             let distanceFromLastPoint = location.distance(from: lastLocation)
-            guard distanceFromLastPoint >= minimumDistance else { return false }
+            let timeSinceLastPoint = location.timestamp.timeIntervalSince(lastPoint.timestamp)
+
+            if timeSinceLastPoint > maximumStaleSampleInterval
+                && distanceFromLastPoint > maximumStaleSampleDistance {
+                breadcrumbTrailPoints.removeAll()
+            } else {
+                guard distanceFromLastPoint >= minimumDistance else { return false }
+            }
         }
 
         breadcrumbTrailPoints.append(trackPoint)

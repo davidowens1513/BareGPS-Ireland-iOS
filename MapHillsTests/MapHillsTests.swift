@@ -344,6 +344,7 @@ struct MapHillsTests {
         #expect(codes.contains("P500"))
         #expect(codes.contains("P600"))
         #expect(displayNameForClassificationCode("HEW") == "Hewitt")
+        #expect(displayNameForClassificationCode("TU") == "Tump")
         #expect(displayNameForClassificationCode("SIB") == "Island")
         #expect(displayNameForClassificationCode("COH") == "County Highpoint")
         #expect(displayNameForClassificationCode("DIL") == "Dillon")
@@ -1011,6 +1012,35 @@ struct MapHillsTests {
 
         #expect(store.breadcrumbTrailPoints.count == 1)
         #expect(store.breadcrumbTrailPoints.first?.timestamp == start.addingTimeInterval(200))
+    }
+
+    @Test
+    func breadcrumbAppendBreaksStaleDistantTrail() {
+        let store = TrailRecordingStore()
+        let start = Date(timeIntervalSinceReferenceDate: 5000)
+        store.breadcrumbTrailPoints = [
+            RecordedTrackPoint(latitude: 53.0, longitude: -4.0, altitude: nil, timestamp: start)
+        ]
+        let laterLocation = CLLocation(
+            coordinate: CLLocationCoordinate2D(latitude: 53.01, longitude: -4.0),
+            altitude: 100,
+            horizontalAccuracy: 5,
+            verticalAccuracy: 5,
+            timestamp: start.addingTimeInterval(90)
+        )
+
+        let didAppend = store.appendBreadcrumbLocationIfNeeded(
+            laterLocation,
+            minimumDistance: 2,
+            maximumHorizontalAccuracy: 35,
+            trailDuration: 5 * 60,
+            maximumStaleSampleInterval: 60,
+            maximumStaleSampleDistance: 75
+        )
+
+        #expect(didAppend)
+        #expect(store.breadcrumbTrailPoints.count == 1)
+        #expect(store.breadcrumbTrailPoints.first?.timestamp == laterLocation.timestamp)
     }
 
     @Test
