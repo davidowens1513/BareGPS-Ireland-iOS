@@ -1,27 +1,39 @@
-OPENBAREMAP DATA BUNDLE 1.0.0
+BAREGPS IRELAND 2.0 MAP PACKAGE
+OpenBareMap map-data version 1.1.0
 
-Contents
-  ireland.mbtiles       Base vector map
-  contours.mbtiles      20 metre contour lines
-  environment.mbtiles   Coastline, woodland, bog and wetland
-  hillshade.mbtiles     Light terrain shading
-  hiking.mbtiles        Walking-relevant points of interest
-  grid.mbtiles          Traditional all-island Irish Grid overlay
-  style/                 MapLibre style, townland labels, and local style assets
-  fonts/                 Local Open Sans glyphs
-  sprites/               Bundled bog and crag pattern sprites
+This is the complete offline mapping payload prepared for incorporation into
+BareGPS Ireland 2.0. The application version and map-data version are separate:
 
-This bundle is ready to be embedded in an offline MapLibre-compatible map
-application. It is not itself an installable phone app. The host application
-must support MBTiles sources, resolve the mbtiles:// URLs in the style, and
-serve the local glyph ranges, sprites, and style/townlands.geojson file.
+  Application: BareGPS Ireland 2.0
+  Map data:    OpenBareMap 1.1.0
 
-Version 1.0.0 adds townland placename labels from TownlandsPlacenames.csv.
-Townland labels use a lighter/different label treatment and are drawn from
-zoom 12 upward.
+Runtime entry point
+  baregps-style.json
 
-Start view used during design:
-  Ireland: longitude -8.15412, latitude 53.4, zoom 7
+Runtime contents
+  ireland.mbtiles       Main vector basemap
+  contours.mbtiles      Contour lines and elevation labels
+  environment.mbtiles   Land cover, coast and terrain detail
+  hillshade.mbtiles     Raster terrain shading
+  hiking.mbtiles        Dedicated hiking points
+  grid.mbtiles          Irish National Grid overlay
+  islands.mbtiles       Island-name centroids
+  style/townlands.geojson
+                         Townland names
+  fonts/                 Offline Open Sans glyph ranges
+  sprites/               Bog pattern and crag/cliff sprite sheets
 
-Verify the files using SHA256SUMS.txt. Attribution and licence information is
-in ATTRIBUTION.txt, NOTICE.txt and LICENSE-APACHE-2.0.txt.
+Additional contents
+  documentation/         Current map legend
+  build-sources/         Reproducibility configuration and Lua processing files
+  INTEGRATION.txt        Host-app integration contract
+  manifest.json          Machine-readable package manifest
+  SHA256SUMS.txt         Integrity hashes for every bundled file
+  ATTRIBUTION.txt        Data and asset attribution
+  NOTICE.txt             Distribution and display requirements
+
+The package is offline and self-contained. It does not require a web tile
+service. Verify it with:
+
+  shasum -a 256 -c SHA256SUMS.txt
+

@@ -34,9 +34,7 @@ struct MapStyleURLProvider {
         }
 
         let bundleURL = bundleResourceURL.appendingPathComponent("OpenBareMap.bundle", isDirectory: true)
-        let styleSourceURL = bundleURL
-            .appendingPathComponent("style", isDirectory: true)
-            .appendingPathComponent("baregps-style.json")
+        let styleSourceURL = bundleURL.appendingPathComponent("baregps-style.json")
 
         guard fileManager.fileExists(atPath: styleSourceURL.path) else {
             print("Missing OpenBareMap style bundle at \(styleSourceURL.path)")
@@ -47,7 +45,6 @@ struct MapStyleURLProvider {
             var styleJSON = try String(contentsOf: styleSourceURL, encoding: .utf8)
             let fontsURL = bundleURL.appendingPathComponent("fonts", isDirectory: true)
             let spritesURL = bundleURL.appendingPathComponent("sprites", isDirectory: true)
-            let styleDirectoryURL = bundleURL.appendingPathComponent("style", isDirectory: true)
             let glyphTemplate = "file://\(fontsURL.path)/{fontstack}/{range}.pbf"
             let sourceNames = [
                 "ireland.mbtiles",
@@ -55,7 +52,8 @@ struct MapStyleURLProvider {
                 "environment.mbtiles",
                 "hillshade.mbtiles",
                 "hiking.mbtiles",
-                "grid.mbtiles"
+                "grid.mbtiles",
+                "islands.mbtiles"
             ]
 
             for sourceName in sourceNames {
@@ -81,7 +79,7 @@ struct MapStyleURLProvider {
             )
             styleJSON = styleJSON.replacingOccurrences(
                 of: #""data":\s*"\./([^"]+\.geojson)""#,
-                with: "\"data\": \"file://\(styleDirectoryURL.path)/$1\"",
+                with: "\"data\": \"file://\(bundleURL.path)/$1\"",
                 options: .regularExpression
             )
 

@@ -695,6 +695,27 @@ extension ViewController {
         style.layer(withIdentifier: "townland-labels")?.isVisible = showsTownlands
     }
 
+    func saveOpenBareMapDetail(_ detail: OpenBareMapDetail, isVisible: Bool) {
+        if isVisible {
+            visibleOpenBareMapDetails.insert(detail)
+        } else {
+            visibleOpenBareMapDetails.remove(detail)
+        }
+        preferencesStore.saveVisibleOpenBareMapDetails(visibleOpenBareMapDetails)
+        applyOpenBareMapDetailVisibility()
+    }
+
+    func applyOpenBareMapDetailVisibility() {
+        guard selectedMapBaseLayer == .openBareMap, let style = mapView.style else { return }
+
+        for detail in OpenBareMapDetail.allCases {
+            let isVisible = visibleOpenBareMapDetails.contains(detail)
+            for layerIdentifier in detail.layerIdentifiers {
+                style.layer(withIdentifier: layerIdentifier)?.isVisible = isVisible
+            }
+        }
+    }
+
     func saveShowsCompactRecordingGrid(_ showsCompactRecordingGrid: Bool) {
         self.showsCompactRecordingGrid = showsCompactRecordingGrid
         preferencesStore.saveShowsCompactRecordingGrid(showsCompactRecordingGrid)

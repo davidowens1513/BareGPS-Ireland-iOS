@@ -59,3 +59,67 @@ enum MapBaseLayer: String {
         }
     }
 }
+
+enum OpenBareMapDetail: String, CaseIterable {
+    case hillshade
+    case landCover
+    case boundaries
+    case minorRoads
+    case roadNames
+    case railwaysAndStations
+    case ferryRoutes
+    case cyclingRoutes
+    case hikingRoutes
+    case islandNames
+    case waterFeatureNames
+
+    static let defaultVisibleDetails = Set(allCases).subtracting([
+        .boundaries,
+        .roadNames,
+        .railwaysAndStations,
+        .ferryRoutes
+    ])
+
+    var title: String {
+        switch self {
+        case .hillshade: return "Hillshade"
+        case .landCover: return "Land Cover"
+        case .boundaries: return "Boundaries"
+        case .minorRoads: return "Minor Roads"
+        case .roadNames: return "Road Names"
+        case .railwaysAndStations: return "Railways and Stations"
+        case .ferryRoutes: return "Ferry Routes"
+        case .cyclingRoutes: return "Cycling Routes"
+        case .hikingRoutes: return "Hiking Routes"
+        case .islandNames: return "Island Names"
+        case .waterFeatureNames: return "Water-Feature Names"
+        }
+    }
+
+    var layerIdentifiers: [String] {
+        switch self {
+        case .hillshade:
+            return ["terrain-hillshade"]
+        case .landCover:
+            return ["landcover"]
+        case .boundaries:
+            return ["administrative-boundaries", "county-boundaries", "local-boundaries"]
+        case .minorRoads:
+            return ["roads-casing-minor", "roads-minor"]
+        case .roadNames:
+            return ["road-labels"]
+        case .railwaysAndStations:
+            return ["railways", "station-labels"]
+        case .ferryRoutes:
+            return ["ferry-routes"]
+        case .cyclingRoutes:
+            return ["cycling-routes"]
+        case .hikingRoutes:
+            return ["hiking-routes"]
+        case .islandNames:
+            return ["island-labels"]
+        case .waterFeatureNames:
+            return ["water-labels"]
+        }
+    }
+}

@@ -1,0 +1,51 @@
+BAREGPS IRELAND 2.0 INTEGRATION CONTRACT
+
+1. Copy this directory into the app's map-package location without renaming or
+   flattening its subdirectories.
+
+2. Load baregps-style.json as the MapLibre style document.
+
+3. Resolve these style URLs against the package root:
+
+   mbtiles://ireland.mbtiles      vector
+   mbtiles://contours.mbtiles     vector
+   mbtiles://environment.mbtiles  vector
+   mbtiles://hillshade.mbtiles    raster PNG tiles
+   mbtiles://hiking.mbtiles       vector
+   mbtiles://grid.mbtiles         vector
+   mbtiles://islands.mbtiles      vector
+
+   The host's MBTiles protocol handler must use TMS row addressing when reading
+   the tiles table. Do not send these URLs to the network.
+
+4. Resolve relative style resources against the package root:
+
+   ./fonts/{fontstack}/{range}.pbf
+   ./sprites/baregps-bog27
+   ./style/townlands.geojson
+
+   Both 1x and 2x sprite JSON/PNG pairs are supplied. Glyph ranges included are
+   0-255, 256-511 and 8192-8447 for the bundled Open Sans faces.
+
+5. Preserve the complete package. The environmental, hiking, grid and island
+   databases are not optional extensions: the style references them directly.
+
+6. Show the required OpenStreetMap contributor attribution in the map UI or in
+   an immediately accessible attribution screen. See ATTRIBUTION.txt and
+   NOTICE.txt.
+
+7. Before accepting an installed package, verify SHA256SUMS.txt and require:
+
+   manifest.json packageFormat = baregps-ireland-map-package-v1
+   manifest.json targetApplication.version = 2.0
+   manifest.json map.version = 1.1.0
+
+Recommended start view
+  Centre: longitude -8.15412, latitude 53.4
+  Zoom:   7
+
+The style contains the agreed 1.1 cartography, including stronger hillshade,
+progressive contours, ochre minor roads, dark-grey buildings, blue water,
+Irish Grid, island labels from zoom 10, villages from zoom 10, hamlets from
+zoom 11, dedicated hiking points, and restored terrain/crag detail.
+

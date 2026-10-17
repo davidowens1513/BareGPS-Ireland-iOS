@@ -34,6 +34,7 @@ final class SettingsOverlayViewController: UIViewController {
     private var showsHillMarkers: Bool
     private var showsGridLines: Bool
     private var showsTownlands: Bool
+    private var visibleOpenBareMapDetails: Set<OpenBareMapDetail>
     private var visibleStartPlaceProviders: Set<StartPlaceProvider>
     private var startPlaceRouteLengthFilter: StartPlaceRouteLengthFilter
     private var nearestHundredConfiguration: NearestHundredConfiguration?
@@ -50,6 +51,7 @@ final class SettingsOverlayViewController: UIViewController {
     private let hillMarkerVisibilityChangeHandler: (Bool) -> Void
     private let gridLineVisibilityChangeHandler: (Bool) -> Void
     private let townlandVisibilityChangeHandler: (Bool) -> Void
+    private let openBareMapDetailVisibilityChangeHandler: (OpenBareMapDetail, Bool) -> Void
     private let startPlaceProviderVisibilityChangeHandler: (Set<StartPlaceProvider>) -> Void
     private let startPlaceRouteLengthFilterChangeHandler: (StartPlaceRouteLengthFilter) -> Void
     private let startPlaceProviderCountProvider: (StartPlaceProvider, StartPlaceRouteLengthFilter) -> Int
@@ -96,6 +98,7 @@ final class SettingsOverlayViewController: UIViewController {
         showsHillMarkers: Bool,
         showsGridLines: Bool,
         showsTownlands: Bool,
+        visibleOpenBareMapDetails: Set<OpenBareMapDetail>,
         visibleStartPlaceProviders: Set<StartPlaceProvider>,
         startPlaceRouteLengthFilter: StartPlaceRouteLengthFilter,
         localHundredConfiguration: LocalHundredConfiguration?,
@@ -112,6 +115,7 @@ final class SettingsOverlayViewController: UIViewController {
         hillMarkerVisibilityChangeHandler: @escaping (Bool) -> Void,
         gridLineVisibilityChangeHandler: @escaping (Bool) -> Void,
         townlandVisibilityChangeHandler: @escaping (Bool) -> Void,
+        openBareMapDetailVisibilityChangeHandler: @escaping (OpenBareMapDetail, Bool) -> Void,
         startPlaceProviderVisibilityChangeHandler: @escaping (Set<StartPlaceProvider>) -> Void,
         startPlaceRouteLengthFilterChangeHandler: @escaping (StartPlaceRouteLengthFilter) -> Void,
         startPlaceProviderCountProvider: @escaping (StartPlaceProvider, StartPlaceRouteLengthFilter) -> Int,
@@ -131,6 +135,7 @@ final class SettingsOverlayViewController: UIViewController {
         self.showsHillMarkers = showsHillMarkers
         self.showsGridLines = showsGridLines
         self.showsTownlands = showsTownlands
+        self.visibleOpenBareMapDetails = visibleOpenBareMapDetails
         self.visibleStartPlaceProviders = visibleStartPlaceProviders
         self.startPlaceRouteLengthFilter = startPlaceRouteLengthFilter
         self.nearestHundredConfiguration = localHundredConfiguration
@@ -147,6 +152,7 @@ final class SettingsOverlayViewController: UIViewController {
         self.hillMarkerVisibilityChangeHandler = hillMarkerVisibilityChangeHandler
         self.gridLineVisibilityChangeHandler = gridLineVisibilityChangeHandler
         self.townlandVisibilityChangeHandler = townlandVisibilityChangeHandler
+        self.openBareMapDetailVisibilityChangeHandler = openBareMapDetailVisibilityChangeHandler
         self.startPlaceProviderVisibilityChangeHandler = startPlaceProviderVisibilityChangeHandler
         self.startPlaceRouteLengthFilterChangeHandler = startPlaceRouteLengthFilterChangeHandler
         self.startPlaceProviderCountProvider = startPlaceProviderCountProvider
@@ -430,11 +436,20 @@ final class SettingsOverlayViewController: UIViewController {
             townlandSwitch.isOn = showsTownlands
             townlandSwitch.addTarget(self, action: #selector(townlandSwitchChanged(_:)), for: .valueChanged)
 
+            let openBareMapDetailRows = OpenBareMapDetail.allCases.enumerated().map { index, detail in
+                let toggle = UISwitch()
+                toggle.tag = index
+                toggle.accessibilityIdentifier = "openBareMapDetailSwitch.\(detail.rawValue)"
+                toggle.isOn = visibleOpenBareMapDetails.contains(detail)
+                toggle.addTarget(self, action: #selector(openBareMapDetailSwitchChanged(_:)), for: .valueChanged)
+                return self.makeSwitchRow(title: detail.title, toggle: toggle)
+            }
+
             let stack = UIStackView(arrangedSubviews: [
                 self.makeSwitchRow(title: "Show Hill Markers", toggle: hillMarkerSwitch),
                 self.makeSwitchRow(title: "Display Grid Lines", toggle: gridLineSwitch),
                 self.makeSwitchRow(title: "Display Townlands", toggle: townlandSwitch)
-            ])
+            ] + openBareMapDetailRows)
             stack.axis = .vertical
             stack.spacing = 10
             stack.translatesAutoresizingMaskIntoConstraints = false
@@ -1026,6 +1041,17 @@ final class SettingsOverlayViewController: UIViewController {
     @objc private func townlandSwitchChanged(_ sender: UISwitch) {
         showsTownlands = sender.isOn
         townlandVisibilityChangeHandler(sender.isOn)
+    }
+
+    @objc private func openBareMapDetailSwitchChanged(_ sender: UISwitch) {
+        guard OpenBareMapDetail.allCases.indices.contains(sender.tag) else { return }
+        let detail = OpenBareMapDetail.allCases[sender.tag]
+        if sender.isOn {
+            visibleOpenBareMapDetails.insert(detail)
+        } else {
+            visibleOpenBareMapDetails.remove(detail)
+        }
+        openBareMapDetailVisibilityChangeHandler(detail, sender.isOn)
     }
 
     @objc private func startPlaceProviderSwitchChanged(_ sender: UISwitch) {

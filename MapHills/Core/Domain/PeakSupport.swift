@@ -713,6 +713,7 @@ struct PersistedFilterState {
     let importedTrackColor: UIColor
     let showsGridLines: Bool
     let showsTownlands: Bool
+    let visibleOpenBareMapDetails: Set<OpenBareMapDetail>
     let selectedHeightBandIDs: [String]
     let selectedClassificationCodes: [String]
     let advancedHillFilter: AdvancedHillFilter
@@ -736,6 +737,7 @@ final class AppPreferencesStore {
         static let importedTrackColor = "importedTrackColor"
         static let showsGridLines = "showsGridLines"
         static let showsTownlands = "showsTownlands"
+        static let visibleOpenBareMapDetails = "visibleOpenBareMapDetails"
         static let selectedHeightBands = "selectedHeightBands"
         static let selectedClassificationCodes = "selectedClassificationCodes"
         static let advancedHillFilter = "advancedHillFilter"
@@ -779,6 +781,10 @@ final class AppPreferencesStore {
         let importedTrackColor = loadColor(forKey: Key.importedTrackColor) ?? .systemTeal
         let showsGridLines = userDefaults.object(forKey: Key.showsGridLines) as? Bool ?? true
         let showsTownlands = userDefaults.object(forKey: Key.showsTownlands) as? Bool ?? true
+        let visibleOpenBareMapDetails = Set(
+            (userDefaults.stringArray(forKey: Key.visibleOpenBareMapDetails) ?? OpenBareMapDetail.defaultVisibleDetails.map(\.rawValue))
+                .compactMap(OpenBareMapDetail.init(rawValue:))
+        )
         let selectedHeightBandIDs = userDefaults.stringArray(forKey: Key.selectedHeightBands) ?? []
         let selectedClassificationCodes = userDefaults.stringArray(forKey: Key.selectedClassificationCodes) ?? []
         let advancedHillFilter: AdvancedHillFilter = loadCodableValue(forKey: Key.advancedHillFilter) ?? AdvancedHillFilter()
@@ -799,6 +805,7 @@ final class AppPreferencesStore {
             importedTrackColor: importedTrackColor,
             showsGridLines: showsGridLines,
             showsTownlands: showsTownlands,
+            visibleOpenBareMapDetails: visibleOpenBareMapDetails,
             selectedHeightBandIDs: selectedHeightBandIDs,
             selectedClassificationCodes: selectedClassificationCodes,
             advancedHillFilter: advancedHillFilter,
@@ -916,6 +923,10 @@ final class AppPreferencesStore {
 
     func saveShowsTownlands(_ showsTownlands: Bool) {
         userDefaults.set(showsTownlands, forKey: Key.showsTownlands)
+    }
+
+    func saveVisibleOpenBareMapDetails(_ details: Set<OpenBareMapDetail>) {
+        userDefaults.set(details.map(\.rawValue).sorted(), forKey: Key.visibleOpenBareMapDetails)
     }
 
     func loadNearestHundredConfiguration() -> NearestHundredConfiguration? {

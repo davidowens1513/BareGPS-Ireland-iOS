@@ -1,0 +1,15 @@
+{
+  "layers": {
+    "island_name": { "minzoom": 7, "maxzoom": 14 }
+  },
+  "settings": {
+    "minzoom": 7,
+    "maxzoom": 14,
+    "basezoom": 14,
+    "include_ids": true,
+    "name": "OpenBareMap Ireland island names",
+    "version": "1.1",
+    "description": "Priority island and islet names",
+    "compress": "gzip"
+  }
+}

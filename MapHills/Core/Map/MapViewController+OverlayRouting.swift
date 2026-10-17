@@ -116,6 +116,7 @@ extension ViewController {
             showsHillMarkers: showsHillMarkers,
             showsGridLines: showsGridLines,
             showsTownlands: showsTownlands,
+            visibleOpenBareMapDetails: visibleOpenBareMapDetails,
             visibleStartPlaceProviders: visibleStartPlaceProviders,
             startPlaceRouteLengthFilter: startPlaceRouteLengthFilter,
             localHundredConfiguration: localHundredConfiguration,
@@ -163,6 +164,9 @@ extension ViewController {
             },
             townlandVisibilityChangeHandler: { [weak self] showsTownlands in
                 self?.saveShowsTownlands(showsTownlands)
+            },
+            openBareMapDetailVisibilityChangeHandler: { [weak self] detail, isVisible in
+                self?.saveOpenBareMapDetail(detail, isVisible: isVisible)
             },
             startPlaceProviderVisibilityChangeHandler: { [weak self] providers in
                 self?.saveVisibleStartPlaceProviders(providers)
