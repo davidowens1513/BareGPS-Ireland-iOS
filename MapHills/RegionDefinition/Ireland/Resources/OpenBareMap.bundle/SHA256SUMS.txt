@@ -9,7 +9,7 @@ ac7b44fbb10be0d133a8f1fa65c3227d5348f1484e3579060711d021a42fc0a1  ./build-source
 f7b92be59ae7dc113a745285d09ffb7a59de7f98e1ed8a68830a4e61805620fe  ./build-sources/islands-process.lua
 71ccd2d5fe8d3f9db07dd2a2bbbd82f1b895f7ada69cc46adeba7b01cac644b6  ./build-sources/process.lua
 a51dd1cefdc08a165a200095003ffc7c195cb164d62690cb304425cc7ca3f504  ./contours.mbtiles
-69ff75ee30a9558bd9323345246aeffcec507128b2642bd0bf9039bd7a8ba5f0  ./documentation/OpenBareMap-Legend.png
+07e7eed0d7eeec97b671c06021abc4bff9c305d835b6ff5d5d8b4e260fff3000  ./documentation/OpenBareMap-Legend.png
 b15846994360a5861514c5cc539192b111201bcebc810f2a9bfcc80331e732c8  ./environment.mbtiles
 b3a5c066b416d69012009e3446ddd9544607ceb7355734922635521b6834c4d8  ./fonts/Open Sans Bold/0-255.pbf
 910a9d831040b8accfc9d70cf235dd4822e59a24e0d5e1736cee5d501c3d17a7  ./fonts/Open Sans Bold/256-511.pbf
