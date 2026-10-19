@@ -44,8 +44,7 @@ Recommended start view
   Centre: longitude -8.15412, latitude 53.4
   Zoom:   7
 
-The style contains the agreed 1.1 cartography, including stronger hillshade,
-progressive contours, ochre minor roads, dark-grey buildings, blue water,
-Irish Grid, island labels from zoom 10, villages from zoom 10, hamlets from
-zoom 11, dedicated hiking points, and restored terrain/crag detail.
-
+The style contains the finalized 1.1 cartography, including hillshade,
+progressive contours, terrain and crag detail, subdued Irish Grid lines,
+English-first feature names, island labels, named hiking POIs, and the bundled
+OpenBareMap 1.1 legend.

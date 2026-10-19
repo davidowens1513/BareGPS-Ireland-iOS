@@ -6,39 +6,39 @@
   "sources": {
     "ireland": {
       "type": "vector",
-      "url": "mbtiles://ireland.mbtiles"
+      "url": "PASTE_YOUR_LOCAL_TILE_SOURCE_HERE"
     },
     "contours": {
       "type": "vector",
-      "url": "mbtiles://contours.mbtiles"
+      "url": "PASTE_YOUR_LOCAL_CONTOUR_SOURCE_HERE"
     },
     "environment": {
       "type": "vector",
-      "url": "mbtiles://environment.mbtiles"
+      "url": "PASTE_YOUR_LOCAL_ENVIRONMENT_SOURCE_HERE"
     },
     "hillshade": {
       "type": "raster",
-      "url": "mbtiles://hillshade.mbtiles",
+      "url": "PASTE_YOUR_LOCAL_HILLSHADE_SOURCE_HERE",
       "tileSize": 256
     },
     "hiking": {
       "type": "vector",
-      "url": "mbtiles://hiking.mbtiles",
+      "url": "PASTE_YOUR_LOCAL_HIKING_SOURCE_HERE",
       "attribution": "© OpenStreetMap contributors"
     },
     "irish-grid": {
       "type": "vector",
-      "url": "mbtiles://grid.mbtiles",
+      "url": "PASTE_YOUR_LOCAL_GRID_SOURCE_HERE",
       "attribution": "Irish Grid (EPSG:29903)"
     },
     "islands": {
       "type": "vector",
-      "url": "mbtiles://islands.mbtiles",
+      "url": "PASTE_YOUR_LOCAL_ISLAND_SOURCE_HERE",
       "attribution": "© OpenStreetMap contributors"
     },
     "townlands": {
       "type": "geojson",
-      "data": "./style/townlands.geojson",
+      "data": "./townlands.geojson",
       "attribution": "Townland placenames"
     }
   },
@@ -69,7 +69,7 @@
         "fill-color": [
           "match",
           ["get", "class"],
-          "wood", "#c8d8b0",
+          "wood", "#afd190",
           "farmland", "#e4dfbd",
           "grass", "#dce7c6",
           "heath", "#d8cbb8",
@@ -353,7 +353,7 @@
       "source": "ireland",
       "source-layer": "building",
       "paint": {
-        "fill-color": "#626664",
+        "fill-color": "#898c8b",
         "fill-opacity": 0.82
       }
     },
@@ -506,7 +506,7 @@
       "minzoom": 10,
       "layout": {
         "symbol-placement": "line",
-        "text-field": ["coalesce", ["get", "name:latin"], ["get", "name"]],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
         "text-font": ["Open Sans Regular"],
         "text-size": [
           "interpolate",
@@ -559,21 +559,21 @@
       "minzoom": 10,
       "filter": ["!in", "name", "Éire / Ireland", "Ireland / Éire", "Ireland", "Éire"],
       "layout": {
-        "text-field": ["coalesce", ["get", "name"], ["get", "name_ga"], ["get", "name_en"]],
-        "text-font": ["Open Sans Semibold"],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
+        "text-font": ["Open Sans Regular"],
         "text-size": [
           "interpolate", ["linear"], ["zoom"],
-          10, ["match", ["get", "class"], "island", 10.5, 9],
-          13, ["match", ["get", "class"], "island", 14, 10.5]
+          10, ["match", ["get", "class"], "island", 11.45, 10.1],
+          13, ["match", ["get", "class"], "island", 14.6, 11.45]
         ],
-        "text-letter-spacing": 0.03,
+        "text-letter-spacing": 0.08,
         "text-allow-overlap": true,
         "text-ignore-placement": true
       },
       "paint": {
-        "text-color": "#3f493f",
+        "text-color": "#46534c",
         "text-halo-color": "#f3efe6",
-        "text-halo-width": 1.5
+        "text-halo-width": 1.2
       }
     },
     {
@@ -583,9 +583,9 @@
       "source-layer": "grid_1km",
       "minzoom": 12,
       "paint": {
-        "line-color": "#477d91",
-        "line-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0.38, 14, 0.5, 16, 0.54],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.58, 14, 0.78, 16, 0.9]
+        "line-color": "#6f929f",
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 12, 0.2, 14, 0.28, 16, 0.32],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.45, 14, 0.58, 16, 0.68]
       }
     },
     {
@@ -595,9 +595,9 @@
       "source-layer": "grid_10km",
       "minzoom": 10,
       "paint": {
-        "line-color": "#386d82",
-        "line-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.34, 12, 0.5, 15, 0.58],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.72, 12, 1, 15, 1.2]
+        "line-color": "#628592",
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.22, 12, 0.3, 15, 0.36],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.58, 12, 0.72, 15, 0.86]
       }
     },
     {
@@ -610,14 +610,14 @@
         "symbol-placement": "line",
         "symbol-spacing": 420,
         "text-field": ["get", "label"],
-        "text-font": ["Open Sans Semibold"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 12, 8, 15, 9.5],
+        "text-font": ["Open Sans Regular"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 12, 7, 15, 8.5],
         "text-max-angle": 5,
         "text-allow-overlap": false
       },
       "paint": {
-        "text-color": "#315f72",
-        "text-opacity": 0.86,
+        "text-color": "#567783",
+        "text-opacity": 0.58,
         "text-halo-color": "#f3efe6",
         "text-halo-width": 1
       }
@@ -627,16 +627,16 @@
       "type": "symbol",
       "source": "ireland",
       "source-layer": "water_name",
-      "minzoom": 11,
+      "minzoom": 12,
       "layout": {
-        "text-field": ["coalesce", ["get", "name_ga"], ["get", "name"], ["get", "name_en"]],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
         "text-font": ["Open Sans Regular"],
-        "text-size": 12,
+        "text-size": 10,
         "text-allow-overlap": false
       },
       "paint": {
-        "text-color": "#397da5",
-        "text-halo-color": "#e9f3f8",
+        "text-color": "#985b55",
+        "text-halo-color": "#f5eeea",
         "text-halo-width": 1
       }
     },
@@ -648,7 +648,7 @@
       "filter": ["in", "class", "peak", "volcano", "saddle"],
       "minzoom": 9,
       "layout": {
-        "text-field": ["coalesce", ["get", "name_ga"], ["get", "name"], ["get", "name_en"]],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
         "text-font": ["Open Sans Semibold"],
         "text-size": 11,
         "text-offset": [0, 0.8],
@@ -667,7 +667,7 @@
       "source-layer": "hiking",
       "minzoom": 10,
       "filter": ["all", ["has", "name"], ["match", ["get", "class"], ["hut", "shelter", "trailhead", "rescue"], true, false]],
-      "paint": {"circle-radius": 1.7, "circle-color": "#596957", "circle-stroke-color": "#f3efe6", "circle-stroke-width": 0.75, "circle-opacity": 0.9}
+      "paint": {"circle-radius": 1.36, "circle-color": "#596957", "circle-stroke-color": "#f3efe6", "circle-stroke-width": 0.75, "circle-opacity": 0.9}
     },
     {
       "id": "hiking-access-points",
@@ -676,7 +676,7 @@
       "source-layer": "hiking",
       "minzoom": 12,
       "filter": ["all", ["has", "name"], ["match", ["get", "class"], ["viewpoint", "campsite", "parking"], true, false]],
-      "paint": {"circle-radius": 1.7, "circle-color": "#596957", "circle-stroke-color": "#f3efe6", "circle-stroke-width": 0.75, "circle-opacity": 0.9}
+      "paint": {"circle-radius": 1.36, "circle-color": "#596957", "circle-stroke-color": "#f3efe6", "circle-stroke-width": 0.75, "circle-opacity": 0.9}
     },
     {
       "id": "hiking-amenity-points",
@@ -685,7 +685,7 @@
       "source-layer": "hiking",
       "minzoom": 14,
       "filter": ["all", ["has", "name"], ["match", ["get", "class"], ["drinking_water", "toilets"], true, false]],
-      "paint": {"circle-radius": 1.7, "circle-color": "#596957", "circle-stroke-color": "#f3efe6", "circle-stroke-width": 0.75, "circle-opacity": 0.9}
+      "paint": {"circle-radius": 1.36, "circle-color": "#596957", "circle-stroke-color": "#f3efe6", "circle-stroke-width": 0.75, "circle-opacity": 0.9}
     },
     {
       "id": "hiking-viewpoint-labels",
@@ -694,7 +694,7 @@
       "source-layer": "hiking",
       "minzoom": 12,
       "filter": ["all", ["has", "name"], ["==", ["get", "class"], "viewpoint"]],
-      "layout": {"text-field": "Viewpoint", "text-font": ["Open Sans Semibold"], "text-size": 7, "text-offset": [0, 0.85], "text-anchor": "top", "text-optional": true},
+      "layout": {"text-field": ["get", "name"], "text-font": ["Open Sans Semibold"], "text-size": 7, "text-offset": [0, 0.85], "text-anchor": "top", "text-optional": true},
       "paint": {"text-color": "#394a39", "text-halo-color": "#f3efe6", "text-halo-width": 0.82}
     },
     {
@@ -704,7 +704,7 @@
       "source-layer": "hiking",
       "minzoom": 11,
       "filter": ["all", ["has", "name"], ["==", ["get", "class"], "trailhead"]],
-      "layout": {"text-field": "Trailhead", "text-font": ["Open Sans Semibold"], "text-size": 7, "text-offset": [0, 0.85], "text-anchor": "top", "text-optional": true},
+      "layout": {"text-field": ["get", "name"], "text-font": ["Open Sans Semibold"], "text-size": 7, "text-offset": [0, 0.85], "text-anchor": "top", "text-optional": true},
       "paint": {"text-color": "#36332f", "text-halo-color": "#f3efe6", "text-halo-width": 0.85}
     },
     {
@@ -715,7 +715,7 @@
       "minzoom": 11,
       "filter": ["all", ["has", "name"], ["match", ["get", "class"], ["hut", "shelter", "rescue"], true, false]],
       "layout": {
-        "text-field": ["match", ["get", "class"], "hut", "Hut", "shelter", "Shelter", "rescue", "Mountain rescue", "POI"],
+        "text-field": ["get", "name"],
         "text-font": ["Open Sans Semibold"], "text-size": 7, "text-offset": [0, 0.85], "text-anchor": "top", "text-optional": true
       },
       "paint": {"text-color": "#36332f", "text-halo-color": "#f3efe6", "text-halo-width": 0.85}
@@ -728,7 +728,7 @@
       "minzoom": 14,
       "filter": ["all", ["has", "name"], ["match", ["get", "class"], ["campsite", "parking", "drinking_water", "toilets"], true, false]],
       "layout": {
-        "text-field": ["match", ["get", "class"], "campsite", "Campsite", "parking", "Parking", "drinking_water", "Drinking water", "toilets", "Toilets", "POI"],
+        "text-field": ["get", "name"],
         "text-font": ["Open Sans Regular"], "text-size": 7, "text-offset": [0, 0.85], "text-anchor": "top", "text-optional": true
       },
       "paint": {"text-color": "#49453e", "text-halo-color": "#f3efe6", "text-halo-width": 0.65}
@@ -760,7 +760,7 @@
       "source-layer": "station",
       "minzoom": 10,
       "layout": {
-        "text-field": ["coalesce", ["get", "name_ga"], ["get", "name"], ["get", "name_en"]],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
         "text-font": ["Open Sans Regular"],
         "text-size": 11,
         "text-allow-overlap": false
@@ -772,28 +772,66 @@
       }
     },
     {
-      "id": "place-labels",
+      "id": "city-labels",
       "type": "symbol",
       "source": "ireland",
       "source-layer": "place",
       "minzoom": 4,
       "filter": [
         "all",
-        ["!in", "class", "island", "islet", "village", "hamlet"],
+        ["==", "class", "city"],
         ["!in", "name", "Éire / Ireland", "Ireland / Éire", "Ireland", "Éire"]
       ],
       "layout": {
-        "text-field": ["coalesce", ["get", "name:latin"], ["get", "name"]],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
         "text-font": ["Open Sans Semibold"],
-        "text-size": [
-          "match",
-          ["get", "class"],
-          "city", 21.6,
-          "town", 16.8,
-          "village", 14.4,
-          "hamlet", 12,
-          13.2
-        ],
+        "text-size": 16,
+        "text-allow-overlap": false
+      },
+      "paint": {
+        "text-color": "#2f2a22",
+        "text-halo-color": "#f3efe6",
+        "text-halo-width": 1.4
+      }
+    },
+    {
+      "id": "town-labels",
+      "type": "symbol",
+      "source": "ireland",
+      "source-layer": "place",
+      "minzoom": 6,
+      "filter": [
+        "all",
+        ["==", "class", "town"],
+        ["!in", "name", "Éire / Ireland", "Ireland / Éire", "Ireland", "Éire"]
+      ],
+      "layout": {
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
+        "text-font": ["Open Sans Semibold"],
+        "text-size": 13,
+        "text-allow-overlap": false
+      },
+      "paint": {
+        "text-color": "#2f2a22",
+        "text-halo-color": "#f3efe6",
+        "text-halo-width": 1.4
+      }
+    },
+    {
+      "id": "place-labels",
+      "type": "symbol",
+      "source": "ireland",
+      "source-layer": "place",
+      "minzoom": 7,
+      "filter": [
+        "all",
+        ["!in", "class", "city", "town", "island", "islet", "village", "hamlet"],
+        ["!in", "name", "Éire / Ireland", "Ireland / Éire", "Ireland", "Éire"]
+      ],
+      "layout": {
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
+        "text-font": ["Open Sans Semibold"],
+        "text-size": 11,
         "text-allow-overlap": false
       },
       "paint": {
@@ -807,12 +845,12 @@
       "type": "symbol",
       "source": "ireland",
       "source-layer": "place",
-      "minzoom": 10,
+      "minzoom": 7,
       "filter": ["==", "class", "village"],
       "layout": {
-        "text-field": ["coalesce", ["get", "name:latin"], ["get", "name"]],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
         "text-font": ["Open Sans Semibold"],
-        "text-size": 14.4,
+        "text-size": 10,
         "text-allow-overlap": false
       },
       "paint": {
@@ -826,12 +864,12 @@
       "type": "symbol",
       "source": "ireland",
       "source-layer": "place",
-      "minzoom": 11,
+      "minzoom": 8,
       "filter": ["==", "class", "hamlet"],
       "layout": {
-        "text-field": ["coalesce", ["get", "name:latin"], ["get", "name"]],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
         "text-font": ["Open Sans Semibold"],
-        "text-size": 12,
+        "text-size": 9,
         "text-allow-overlap": false
       },
       "paint": {
@@ -847,7 +885,7 @@
       "source-layer": "poi",
       "minzoom": 12,
       "layout": {
-        "text-field": ["coalesce", ["get", "name:latin"], ["get", "name"]],
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"], ["get", "name_ga"]],
         "text-font": ["Open Sans Regular"],
         "text-size": 13.2,
         "icon-image": ["coalesce", ["get", "class"], "marker-15"],
