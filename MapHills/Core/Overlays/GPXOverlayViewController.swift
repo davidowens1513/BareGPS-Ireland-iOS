@@ -219,7 +219,7 @@ final class GPXOverlayViewController: UIViewController {
         }, for: .touchUpInside)
 
         metricsGridView.axis = .vertical
-        metricsGridView.spacing = 8
+        metricsGridView.spacing = 0
         metricsGridView.addArrangedSubview(
             metricsRow(
                 leftTitle: "Distance",
@@ -246,6 +246,7 @@ final class GPXOverlayViewController: UIViewController {
         )
 
         statsStack.axis = .vertical
+        statsStack.alignment = .center
         statsStack.spacing = 8
         statsStack.translatesAutoresizingMaskIntoConstraints = false
         let statsHeaderLabel = UILabel()
@@ -255,6 +256,8 @@ final class GPXOverlayViewController: UIViewController {
         statsHeaderLabel.textAlignment = .left
         statsStack.addArrangedSubview(statsHeaderLabel)
         statsStack.addArrangedSubview(metricsGridView)
+        statsHeaderLabel.widthAnchor.constraint(equalTo: statsStack.widthAnchor).isActive = true
+        metricsGridView.widthAnchor.constraint(equalToConstant: 220).isActive = true
 
         recordingButtonRow.axis = .horizontal
         recordingButtonRow.alignment = .fill
@@ -584,7 +587,7 @@ final class GPXOverlayViewController: UIViewController {
             metricCell(title: rightTitle, valueLabel: rightValueLabel)
         ])
         row.axis = .horizontal
-        row.spacing = 8
+        row.spacing = 0
         row.distribution = .fillEqually
         return row
     }
@@ -601,21 +604,23 @@ final class GPXOverlayViewController: UIViewController {
 
     private func metricCell(title: String, valueLabel: UILabel) -> UIView {
         let container = UIView()
-        container.backgroundColor = UIColor.systemGray6
-        container.layer.cornerRadius = 10
-        container.layer.borderWidth = 0.5
-        container.layer.borderColor = UIColor.separator.cgColor
+        container.backgroundColor = .systemBackground
+        container.layer.cornerRadius = 0
+        container.layer.borderWidth = 1
+        container.layer.borderColor = UIColor.black.cgColor
 
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: 12, weight: .semibold)
         titleLabel.textColor = .secondaryLabel
+        titleLabel.textAlignment = .right
         titleLabel.numberOfLines = 1
 
         valueLabel.translatesAutoresizingMaskIntoConstraints = false
         valueLabel.font = .systemFont(ofSize: 15, weight: .bold)
         valueLabel.textColor = .label
+        valueLabel.textAlignment = .right
         valueLabel.numberOfLines = 1
 
         let cellStack = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
@@ -625,11 +630,11 @@ final class GPXOverlayViewController: UIViewController {
         container.addSubview(cellStack)
 
         NSLayoutConstraint.activate([
-            cellStack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 10),
-            cellStack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -10),
-            cellStack.topAnchor.constraint(equalTo: container.topAnchor, constant: 10),
-            cellStack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -10),
-            container.heightAnchor.constraint(greaterThanOrEqualToConstant: 68)
+            cellStack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+            cellStack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8),
+            cellStack.topAnchor.constraint(equalTo: container.topAnchor, constant: 6),
+            cellStack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -6),
+            container.heightAnchor.constraint(equalToConstant: 52)
         ])
 
         return container
