@@ -420,13 +420,30 @@ final class SettingsOverlayViewController: UIViewController {
             ])
         }
 
-        let mapDetailSection = makeSectionView(
-            title: "Map Detail",
-            description: "Control optional map detail overlays. Search, filters, and records remain available when hill markers are hidden."
+        let hillMarkersSection = makeSectionView(
+            title: "Hill Markers",
+            description: "Show or hide hill markers across all map types. Search, filters, and records remain available when markers are hidden."
         ) { container in
             hillMarkerSwitch.accessibilityIdentifier = "hillMarkerSwitch"
             hillMarkerSwitch.isOn = showsHillMarkers
             hillMarkerSwitch.addTarget(self, action: #selector(hillMarkerSwitchChanged(_:)), for: .valueChanged)
+
+            let row = self.makeSwitchRow(title: "Show Hill Markers", toggle: hillMarkerSwitch)
+            row.translatesAutoresizingMaskIntoConstraints = false
+            container.addSubview(row)
+
+            NSLayoutConstraint.activate([
+                row.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 14),
+                row.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -14),
+                row.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
+                row.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -14)
+            ])
+        }
+
+        let openBareMapSection = makeSectionView(
+            title: "OpenBareMap",
+            description: "Control detail shown on OpenBareMap. These settings do not affect OpenTopo, OpenStreetMap, or Satellite."
+        ) { container in
 
             gridLineSwitch.accessibilityIdentifier = "gridLineSwitch"
             gridLineSwitch.isOn = showsGridLines
@@ -446,9 +463,8 @@ final class SettingsOverlayViewController: UIViewController {
             }
 
             let stack = UIStackView(arrangedSubviews: [
-                self.makeSwitchRow(title: "Show Hill Markers", toggle: hillMarkerSwitch),
-                self.makeSwitchRow(title: "Display Grid Lines", toggle: gridLineSwitch),
-                self.makeSwitchRow(title: "Display Townlands", toggle: townlandSwitch)
+                self.makeSwitchRow(title: "Grid Lines", toggle: gridLineSwitch),
+                self.makeSwitchRow(title: "Townlands", toggle: townlandSwitch)
             ] + openBareMapDetailRows)
             stack.axis = .vertical
             stack.spacing = 10
@@ -573,7 +589,8 @@ final class SettingsOverlayViewController: UIViewController {
             titleRow,
             orientationSection,
             mapInteractionSection,
-            mapDetailSection,
+            hillMarkersSection,
+            openBareMapSection,
             displayStartPointsSection,
             recordingSection,
             snailTrailSection,

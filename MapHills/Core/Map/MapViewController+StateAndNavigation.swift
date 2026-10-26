@@ -713,6 +713,10 @@ extension ViewController {
             for layerIdentifier in detail.layerIdentifiers {
                 style.layer(withIdentifier: layerIdentifier)?.isVisible = isVisible
             }
+
+            for layer in style.layers where detail.layerIdentifierPrefixes.contains(where: layer.identifier.hasPrefix) {
+                layer.isVisible = isVisible
+            }
         }
     }
 

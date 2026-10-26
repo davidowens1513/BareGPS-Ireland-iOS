@@ -73,12 +73,7 @@ enum OpenBareMapDetail: String, CaseIterable {
     case islandNames
     case waterFeatureNames
 
-    static let defaultVisibleDetails = Set(allCases).subtracting([
-        .boundaries,
-        .roadNames,
-        .railwaysAndStations,
-        .ferryRoutes
-    ])
+    static let defaultVisibleDetails = Set(allCases)
 
     var title: String {
         switch self {
@@ -101,7 +96,14 @@ enum OpenBareMapDetail: String, CaseIterable {
         case .hillshade:
             return ["terrain-hillshade"]
         case .landCover:
-            return ["landcover"]
+            return [
+                "landcover",
+                "bog-texture",
+                "bare-rock",
+                "scree-and-shingle",
+                "bare-rock-stipple",
+                "scree-stipple"
+            ]
         case .boundaries:
             return ["administrative-boundaries", "county-boundaries", "local-boundaries"]
         case .minorRoads:
@@ -120,6 +122,17 @@ enum OpenBareMapDetail: String, CaseIterable {
             return ["island-labels"]
         case .waterFeatureNames:
             return ["water-labels"]
+        }
+    }
+
+    var layerIdentifierPrefixes: [String] {
+        switch self {
+        case .minorRoads:
+            return ["roads-casing-minor", "roads-minor"]
+        case .railwaysAndStations:
+            return ["railways"]
+        default:
+            return []
         }
     }
 }
