@@ -229,6 +229,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     }
     var pendingPeakCalloutSelectionToken = 0
     var selectedStartPlaceKey: String?
+    var annotationZoomPresentation: MapAnnotationImages.ZoomPresentation?
     var pendingStartPlaceCalloutPlacementMode: StartPlaceCalloutView.PlacementMode?
     var pendingStartPlaceCalloutSelectionToken = 0
     var pendingIrelandPlaceHaloRemovalToken = 0

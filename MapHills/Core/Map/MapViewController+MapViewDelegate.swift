@@ -61,6 +61,7 @@ extension ViewController: MLNMapViewDelegate {
     }
 
     func mapView(_ mapView: MLNMapView, regionDidChangeAnimated animated: Bool) {
+        refreshZoomDependentAnnotationImages()
         updateCachingIndicatorAppearance()
         updatePositionIndicator()
         updateCurrentGridRefOverlay()

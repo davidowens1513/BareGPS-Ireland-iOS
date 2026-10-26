@@ -964,29 +964,67 @@ extension ViewController {
         topmostPresentingViewController().present(overlay, animated: true)
     }
 
-    func annotationImage(for peak: Peak, isLogged: Bool, isSelected: Bool) -> UIImage {
-        MapAnnotationImages.hillMarkerImage(
-            markerColor: markerColor(for: peak, isLogged: isLogged),
+    func annotationImage(
+        for peak: Peak,
+        isLogged: Bool,
+        isSelected: Bool,
+        zoomPresentation: MapAnnotationImages.ZoomPresentation
+    ) -> UIImage {
+        let markerColor = markerColor(for: peak, isLogged: isLogged)
+        if let dotDiameter = zoomPresentation.dotDiameter {
+            return MapAnnotationImages.markerDotImage(
+                markerColor: markerColor,
+                diameter: dotDiameter,
+                isSelected: isSelected
+            )
+        }
+
+        return MapAnnotationImages.hillMarkerImage(
+            markerColor: markerColor,
             isLogged: isLogged,
             isSelected: isSelected
         )
     }
 
-    func startPlaceAnnotationImage(for startPlace: StartPlace, isSelected: Bool) -> UIImage {
+    func startPlaceAnnotationImage(
+        for startPlace: StartPlace,
+        isSelected: Bool,
+        zoomPresentation: MapAnnotationImages.ZoomPresentation
+    ) -> UIImage {
         let markerColor = markerColor(for: startPlace)
         let selectionStateKey = isSelected ? "selected" : "normal"
-        let cacheKey = "\(startPlace.provider.rawValue)-\(colorCacheKey(for: markerColor))-\(selectionStateKey)"
+        let cacheKey = "\(startPlace.provider.rawValue)-\(colorCacheKey(for: markerColor))-\(selectionStateKey)-\(zoomPresentation.rawValue)"
         if let cachedImage = startPlaceMarkerImageCache[cacheKey] {
             return cachedImage
         }
 
-        let image = MapAnnotationImages.startPlaceMarkerImage(
+        let image = zoomDependentStartPlaceImage(
+            markerColor: markerColor,
+            isSelected: isSelected,
+            zoomPresentation: zoomPresentation
+        )
+        startPlaceMarkerImageCache[cacheKey] = image
+        return image
+    }
+
+    func zoomDependentStartPlaceImage(
+        markerColor: UIColor,
+        isSelected: Bool,
+        zoomPresentation: MapAnnotationImages.ZoomPresentation
+    ) -> UIImage {
+        if let dotDiameter = zoomPresentation.dotDiameter {
+            return MapAnnotationImages.markerDotImage(
+                markerColor: markerColor,
+                diameter: dotDiameter,
+                isSelected: isSelected
+            )
+        }
+
+        return MapAnnotationImages.startPlaceMarkerImage(
             markerColor: markerColor,
             title: "",
             isSelected: isSelected
         )
-        startPlaceMarkerImageCache[cacheKey] = image
-        return image
     }
 
     func goToTargetAnnotationImage() -> UIImage {

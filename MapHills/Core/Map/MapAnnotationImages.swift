@@ -1,6 +1,39 @@
 import UIKit
 
 enum MapAnnotationImages {
+    enum ZoomPresentation: String {
+        case full
+        case mediumDot
+        case smallDot
+        case tinyDot
+
+        init(zoomLevel: Double) {
+            switch zoomLevel {
+            case 11...:
+                self = .full
+            case 9..<11:
+                self = .mediumDot
+            case 7..<9:
+                self = .smallDot
+            default:
+                self = .tinyDot
+            }
+        }
+
+        var dotDiameter: CGFloat? {
+            switch self {
+            case .full:
+                nil
+            case .mediumDot:
+                12
+            case .smallDot:
+                9
+            case .tinyDot:
+                6
+            }
+        }
+    }
+
     static func colorCacheKey(for color: UIColor) -> String {
         guard let components = color.cgColor.components else { return "" }
         let normalizedComponents: [CGFloat]
@@ -59,6 +92,30 @@ enum MapAnnotationImages {
                 mountainPath.close()
                 UIColor.white.withAlphaComponent(0.95).setFill()
                 mountainPath.fill()
+            }
+        }
+    }
+
+    static func markerDotImage(markerColor: UIColor, diameter: CGFloat, isSelected: Bool) -> UIImage {
+        let selectionInset: CGFloat = isSelected ? 3 : 1
+        let imageSize = diameter + selectionInset * 2
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: imageSize, height: imageSize))
+
+        return renderer.image { _ in
+            let dotBounds = CGRect(
+                x: selectionInset,
+                y: selectionInset,
+                width: diameter,
+                height: diameter
+            )
+            let dotPath = UIBezierPath(ovalIn: dotBounds)
+            markerColor.setFill()
+            dotPath.fill()
+
+            if isSelected {
+                UIColor.systemYellow.setStroke()
+                dotPath.lineWidth = 2
+                dotPath.stroke()
             }
         }
     }

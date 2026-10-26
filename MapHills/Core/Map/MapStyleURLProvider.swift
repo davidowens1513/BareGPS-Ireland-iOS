@@ -28,87 +28,9 @@ struct MapStyleURLProvider {
     }
 
     func openBareMapStyleURL() -> URL? {
-        guard let bundleResourceURL = bundle.resourceURL else {
-            print("Missing bundle resource directory for OpenBareMap")
-            return nil
-        }
-
-        let bundleURL = bundleResourceURL.appendingPathComponent("OpenBareMap.bundle", isDirectory: true)
-        let styleSourceURL = bundleURL.appendingPathComponent("baregps-style.json")
-
-        guard fileManager.fileExists(atPath: styleSourceURL.path) else {
-            print("Missing OpenBareMap style bundle at \(styleSourceURL.path)")
-            return nil
-        }
-
         do {
-            var styleJSON = try String(contentsOf: styleSourceURL, encoding: .utf8)
-            let fontsURL = bundleURL.appendingPathComponent("fonts", isDirectory: true)
-            let spritesURL = bundleURL.appendingPathComponent("sprites", isDirectory: true)
-            let glyphTemplate = "file://\(fontsURL.path)/{fontstack}/{range}.pbf"
-            let sourceNames = [
-                "ireland.mbtiles",
-                "contours.mbtiles",
-                "environment.mbtiles",
-                "hillshade.mbtiles",
-                "hiking.mbtiles",
-                "grid.mbtiles",
-                "islands.mbtiles"
-            ]
-            let sourcePlaceholders = [
-                "PASTE_YOUR_LOCAL_TILE_SOURCE_HERE": "ireland.mbtiles",
-                "PASTE_YOUR_LOCAL_CONTOUR_SOURCE_HERE": "contours.mbtiles",
-                "PASTE_YOUR_LOCAL_ENVIRONMENT_SOURCE_HERE": "environment.mbtiles",
-                "PASTE_YOUR_LOCAL_HILLSHADE_SOURCE_HERE": "hillshade.mbtiles",
-                "PASTE_YOUR_LOCAL_HIKING_SOURCE_HERE": "hiking.mbtiles",
-                "PASTE_YOUR_LOCAL_GRID_SOURCE_HERE": "grid.mbtiles",
-                "PASTE_YOUR_LOCAL_ISLAND_SOURCE_HERE": "islands.mbtiles"
-            ]
-
-            for sourceName in sourceNames {
-                let absoluteSourceURL = "mbtiles://\(bundleURL.path)/\(sourceName)"
-                styleJSON = styleJSON.replacingOccurrences(
-                    of: "mbtiles://\(sourceName)",
-                    with: absoluteSourceURL
-                )
-            }
-
-            for (placeholder, sourceName) in sourcePlaceholders {
-                let absoluteSourceURL = "mbtiles://\(bundleURL.path)/\(sourceName)"
-                styleJSON = styleJSON.replacingOccurrences(
-                    of: placeholder,
-                    with: absoluteSourceURL
-                )
-            }
-
-            styleJSON = styleJSON.replacingOccurrences(
-                of: "\"glyphs\": \"./fonts/{fontstack}/{range}.pbf\"",
-                with: "\"glyphs\": \"\(glyphTemplate)\""
-            )
-            styleJSON = styleJSON.replacingOccurrences(
-                of: "\"glyphs\": \"../{fontstack}-{range}.pbf\"",
-                with: "\"glyphs\": \"\(glyphTemplate)\""
-            )
-            styleJSON = styleJSON.replacingOccurrences(
-                of: #""sprite":\s*"\./sprites/([^"]+)""#,
-                with: "\"sprite\": \"file://\(spritesURL.path)/$1\"",
-                options: .regularExpression
-            )
-            styleJSON = styleJSON.replacingOccurrences(
-                of: #""data":\s*"\./([^"]+\.geojson)""#,
-                with: "\"data\": \"file://\(bundleURL.path)/$1\"",
-                options: .regularExpression
-            )
-
-            styleJSON = styleJSON.replacingOccurrences(
-                of: "file://\(bundleURL.path)/townlands.geojson",
-                with: "file://\(bundleURL.path)/style/townlands.geojson"
-            )
-
-            let resolvedStyleURL = fileManager.temporaryDirectory
-                .appendingPathComponent("OpenBareMap-resolved-style.json")
-            try styleJSON.write(to: resolvedStyleURL, atomically: true, encoding: .utf8)
-            return resolvedStyleURL
+            let resources = try OpenBareMapResources.bundled(in: bundle)
+            return try OpenBareMapResources.prepareStyle(in: resources, fileManager: fileManager)
         } catch {
             print("Failed to prepare OpenBareMap style: \(error.localizedDescription)")
             return nil

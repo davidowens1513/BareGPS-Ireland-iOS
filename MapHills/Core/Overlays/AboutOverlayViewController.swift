@@ -447,8 +447,8 @@ final class AboutOverlayViewController: UIViewController {
 
         let imageURL = bundleResourceURL
             .appendingPathComponent("OpenBareMap.bundle", isDirectory: true)
-            .appendingPathComponent("documentation", isDirectory: true)
-            .appendingPathComponent("OpenBareMap-Legend.png")
+            .appendingPathComponent("legend", isDirectory: true)
+            .appendingPathComponent("openbaremap-legend.png")
 
         guard let image = UIImage(contentsOfFile: imageURL.path) else {
             return NSAttributedString(string: "")

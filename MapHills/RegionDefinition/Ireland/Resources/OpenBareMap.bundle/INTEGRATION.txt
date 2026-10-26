@@ -1,50 +1,29 @@
-BAREGPS IRELAND 2.0 INTEGRATION CONTRACT
+OpenBareMap — MapLibre Native iOS resource integration
 
-1. Copy this directory into the app's map-package location without renaming or
-   flattening its subdirectories.
+1. Add the entire OpenBareMap.bundle to the Xcode application target's Copy Bundle Resources. Preserve its directory structure; do not flatten files.
+2. Add the supplied OpenBareMapResources.swift to the application target.
+3. Resolve the runtime paths and load the prepared style:
 
-2. Load baregps-style.json as the MapLibre style document.
+   import MapLibre
 
-3. Resolve these style URLs against the package root:
+   let resources = try OpenBareMapResources.bundled()
+   let styleURL = try OpenBareMapResources.prepareStyle(in: resources)
+   mapView.styleURL = styleURL
 
-   mbtiles://ireland.mbtiles      vector
-   mbtiles://contours.mbtiles     vector
-   mbtiles://environment.mbtiles  vector
-   mbtiles://hillshade.mbtiles    raster PNG tiles
-   mbtiles://hiking.mbtiles       vector
-   mbtiles://grid.mbtiles         vector
-   mbtiles://islands.mbtiles      vector
+   Retain the generated style file for as long as the map may reload it. The helper creates one temporary style per call; remove obsolete temporary style directories only after the associated map is released. Do not copy the MBTiles to temporary storage.
 
-   The host's MBTiles protocol handler must use TMS row addressing when reading
-   the tiles table. Do not send these URLs to the network.
+4. Start around longitude -8.15, latitude 53.4, zoom 7. The map is designed for full-island coverage.
+5. Include an accessible attribution/credits view using ATTRIBUTION.txt and terrain-attribution.html. The app supplies its own controls and legend UI; legend/ contains PNG/SVG assets.
 
-4. Resolve relative style resources against the package root:
+The style.json inside the bundle is a template. Do not assign it directly to mapView.styleURL: sandbox paths contain a runtime application identifier. The Swift helper substitutes absolute mbtiles:///... URLs and absolute local file URLs for glyphs, sprites and townlands. It does not require a web tile service or localhost server. The bundle contains no executable code and no GPS/location permission request.
 
-   ./fonts/{fontstack}/{range}.pbf
-   ./sprites/baregps-bog27
-   ./style/townlands.geojson
+The dedicated coast archive includes unchanged low-zoom terrain tile payloads capped at zoom 12. The coast style only renders its land layer, allowing overzoom without dropping land polygons. Contours use the complete topography archive through zoom 14. Grid maxzoom is 13; hillshade maxzoom is 12. Normal renderer overzoom applies.
 
-   Both 1x and 2x sprite JSON/PNG pairs are supplied. Glyph ranges included are
-   0-255, 256-511 and 8192-8447 for the bundled Open Sans faces.
+Verify SHA256SUMS.txt before distribution. Sources and renderer integration are deliberately separate. MapLibre Native's local MBTiles feature and styleURL loading are required; confirm support in the SDK version used by the app. Do not treat this resource bundle as a MapLibre offline-pack database or a Mapbox SDK package.
 
-5. Preserve the complete package. The environmental, hiking, grid and island
-   databases are not optional extensions: the style references them directly.
+Validation supplied with this package verifies file/database integrity, resources and the Foundation Swift loader. Rendering, performance and memory use on an iOS simulator/device must still be checked in the consuming app. In particular, the style has generated crossing-level drawing passes; verify them with the selected Native SDK. No iOS rendering test is claimed.
 
-6. Show the required OpenStreetMap contributor attribution in the map UI or in
-   an immediately accessible attribution screen. See ATTRIBUTION.txt and
-   NOTICE.txt.
-
-7. Before accepting an installed package, verify SHA256SUMS.txt and require:
-
-   manifest.json packageFormat = baregps-ireland-map-package-v1
-   manifest.json targetApplication.version = 2.0
-   manifest.json map.version = 1.1.0
-
-Recommended start view
-  Centre: longitude -8.15412, latitude 53.4
-  Zoom:   7
-
-The style contains the finalized 1.1 cartography, including hillshade,
-progressive contours, terrain and crag detail, subdued Irish Grid lines,
-English-first feature names, island labels, named hiking POIs, and the bundled
-OpenBareMap 1.1 legend.
+MapLibre references:
+https://maplibre.org/maplibre-native/ios/latest/documentation/maplibre/
+https://github.com/maplibre/maplibre-native/issues/739
+https://github.com/maplibre/maplibre-native/discussions/393

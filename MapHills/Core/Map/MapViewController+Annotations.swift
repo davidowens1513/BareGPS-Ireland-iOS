@@ -141,17 +141,19 @@ extension ViewController {
     }
 
     func mapView(_ mapView: MLNMapView, imageFor annotation: MLNAnnotation) -> MLNAnnotationImage? {
+        let zoomPresentation = MapAnnotationImages.ZoomPresentation(zoomLevel: mapView.zoomLevel)
+
         if let haloAnnotation = annotation as? StartPlaceSelectionAnnotation {
-            let reuseIdentifier = "start-place-selection-\(colorCacheKey(for: haloAnnotation.markerColor))"
+            let reuseIdentifier = "start-place-selection-\(colorCacheKey(for: haloAnnotation.markerColor))-\(zoomPresentation.rawValue)"
             if let existingImage = mapView.dequeueReusableAnnotationImage(withIdentifier: reuseIdentifier) {
                 return existingImage
             }
 
             return MLNAnnotationImage(
-                image: MapAnnotationImages.startPlaceMarkerImage(
+                image: zoomDependentStartPlaceImage(
                     markerColor: haloAnnotation.markerColor,
-                    title: "",
-                    isSelected: true
+                    isSelected: true,
+                    zoomPresentation: zoomPresentation
                 ),
                 reuseIdentifier: reuseIdentifier
             )
@@ -163,13 +165,17 @@ extension ViewController {
             let isSelected = startPlaceSelectionKey == selectedStartPlaceKey
             let startPlaceMarkerColor = markerColor(for: startPlace)
             let selectionStateKey = isSelected ? "selected" : "normal"
-            let reuseIdentifier = "start-place-\(startPlace.provider.rawValue)-\(colorCacheKey(for: startPlaceMarkerColor))-\(selectionStateKey)"
+            let reuseIdentifier = "start-place-\(startPlace.provider.rawValue)-\(colorCacheKey(for: startPlaceMarkerColor))-\(selectionStateKey)-\(zoomPresentation.rawValue)"
             if let existingImage = mapView.dequeueReusableAnnotationImage(withIdentifier: reuseIdentifier) {
                 return existingImage
             }
 
             return MLNAnnotationImage(
-                image: startPlaceAnnotationImage(for: startPlace, isSelected: isSelected),
+                image: startPlaceAnnotationImage(
+                    for: startPlace,
+                    isSelected: isSelected,
+                    zoomPresentation: zoomPresentation
+                ),
                 reuseIdentifier: reuseIdentifier
             )
         }
@@ -222,14 +228,19 @@ extension ViewController {
         let optionID = markerColorOptionID(for: peak, isLogged: isLogged)
         let colorKey = colorCacheKey(for: resolvedMarkerColor(for: optionID, defaultColor: defaultMarkerColor(for: optionID)))
         let selectionKey = isSelected ? "selected" : "normal"
-        let reuseIdentifier = "\(optionID)-peak-annotation-\(colorKey)-\(selectionKey)"
+        let reuseIdentifier = "\(optionID)-peak-annotation-\(colorKey)-\(selectionKey)-\(zoomPresentation.rawValue)"
 
         if let existingImage = mapView.dequeueReusableAnnotationImage(withIdentifier: reuseIdentifier) {
             return existingImage
         }
 
         return MLNAnnotationImage(
-            image: annotationImage(for: peak, isLogged: isLogged, isSelected: isSelected),
+            image: annotationImage(
+                for: peak,
+                isLogged: isLogged,
+                isSelected: isSelected,
+                zoomPresentation: zoomPresentation
+            ),
             reuseIdentifier: reuseIdentifier
         )
     }
@@ -478,6 +489,31 @@ extension ViewController {
     func reloadStartPlaceAnnotationsPreservingSelection() {
         isRefreshingStartPlaceSelectionState = true
         reloadStartPlaceAnnotations()
+        isRefreshingStartPlaceSelectionState = false
+    }
+
+    func refreshZoomDependentAnnotationImages() {
+        let presentation = MapAnnotationImages.ZoomPresentation(zoomLevel: mapView.zoomLevel)
+        guard presentation != annotationZoomPresentation else { return }
+
+        let previousPresentation = annotationZoomPresentation
+        annotationZoomPresentation = presentation
+        guard previousPresentation != nil else { return }
+
+        let peakID = selectedPeakID
+        let startPlaceKey = selectedStartPlaceKey
+
+        isRefreshingSelectionState = true
+        reloadPeakAnnotations(selecting: peakID)
+        isRefreshingSelectionState = false
+
+        isRefreshingStartPlaceSelectionState = true
+        reloadStartPlaceAnnotations()
+        if let startPlaceKey,
+           let annotation = startPlaceAnnotation(forSelectionKey: startPlaceKey) {
+            mapView.selectAnnotation(annotation, animated: false, completionHandler: nil)
+            showSelectedStartPlaceHalo(for: annotation)
+        }
         isRefreshingStartPlaceSelectionState = false
     }
 
