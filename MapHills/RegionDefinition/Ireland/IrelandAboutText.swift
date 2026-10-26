@@ -81,11 +81,11 @@ Sport Ireland provides 1,466 start points and 1,013 route records in the current
 Outdoor Recreation NI / Outscape provides 129 start points and 129 route records in the current app data. This is a curated subset of Northern Ireland off-road trail data, reduced from a larger source inventory to avoid showing large numbers of short fragments, rights of way and utility paths that are less useful as walking-route markers.
 
 OpenBareMap
-OpenBareMap is an hiking-focused offline-safe map, which is bundled with the app and thus can function in areas without cellular coverage. It includes local MBTiles, local Open Sans glyphs, and a custom cartographic style. The Map was built with OpenStreetMap, Tilemaker, QGIS, GDAL and SQLite.
+OpenBareMap is a hiking-focused offline-safe map, which is bundled with the app and thus can function in areas without cellular coverage. It includes local MBTiles, local Open Sans glyphs, and a custom cartographic style. The map was built with OpenStreetMap, Tilemaker, QGIS, GDAL and SQLite.
 
 [[openbaremap-legend]]
 
-OpenBareMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
+OpenBareMap data sources: © OpenStreetMap contributors, using the Geofabrik Ireland and Northern Ireland extract dated 2026-10-24, and osmdata.openstreetmap.de land polygons. Elevation data is derived from the Mapzen Terrain Tiles composite, including Copernicus EU-DEM, USGS and NOAA data.
 
 Safety
 Note that, for your own safety, you should not rely solely on this app, or any app, for your navigation and safety in the hills.  Possession of a map and compass and/or a dedicated GPS unit, and the ability to use them correctly, is an essential precaution. While phones have improved immeasurably in recent years, shortcomings in battery life, waterproofing and signal mean they are not yet suitable as a sole navigation device in the hills. 
@@ -107,7 +107,10 @@ Sport Ireland Start Points & Trail Data: Get Ireland Active - Sport Ireland 2023
 Outdoor Recreation NI / Outscape Trail Data: NI Off Road Trails Layer from the GreenspaceNI Map, created by Outscape for DAERA and DFI on behalf of the Strategic Outdoor Recreation Group (SORG), using data harmonised, combined and enhanced from Ordnance Survey of Northern Ireland, Northern Ireland Environment Agency, Outdoor Recreation Northern Ireland, DAERA, councils and other providers. Product currency stated by source: June 2024, annual update cycle. Attribution: © Crown copyright and database right Land & Property Services (2024) NIMA MOU577.2.
 Weather Data: Met Éireann
 Map Rendering: MapLibre
-OpenBareMap data sources: OpenStreetMap contributors, Geofabrik Ireland and Northern Ireland extract dated 2026-08-25, osmdata.openstreetmap.de land polygons, and SRTM 1 Arc-Second Global Version 3.
+OpenBareMap map data: © OpenStreetMap contributors. OSM-derived databases are distributed under ODbL 1.0. The map uses the Geofabrik Ireland and Northern Ireland extract dated 2026-10-24 and osmdata.openstreetmap.de land polygons.
+OpenBareMap elevation: Mapzen Terrain Tiles composite, including Copernicus EU-DEM, USGS and NOAA data. This rebuild is not a pure SRTM product.
+OpenBareMap fonts: Open Sans glyphs, licensed under the Apache License 2.0.
+OpenBareMap cartography: Map colours and custom pattern assets are OpenBareMap. Townland label points and the fixed Irish Grid are inherited from OpenBareMap 1.1.
 Basemap data: © OpenStreetMap contributors
 Topographic map data: © OpenStreetMap contributors, SRTM
 Topographic map style: © OpenTopoMap (CC-BY-SA)
