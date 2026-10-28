@@ -7,7 +7,7 @@ The app combines live mapping, Irish hill classification data, GPX workflows, of
 ## Features
 
 - View Irish hills on live MapLibre maps.
-- Switch between topographic, standard, and satellite map styles.
+- Switch between bundled offline OpenBareMap, topographic, standard, and satellite map styles.
 - Show live position, heading, elevation, accuracy, and Irish grid reference.
 - Record GPX tracks, including background recording while a recording is active.
 - Import, save, reopen, rename, delete, export, and share GPX files.
@@ -44,6 +44,7 @@ The app combines live mapping, Irish hill classification data, GPX workflows, of
 - iOS 18.2 or later deployment target.
 - Swift 5 project settings.
 - MapLibre Native package dependency.
+- Git LFS for the bundled OpenBareMap databases and image assets.
 
 The app target bundle identifier is currently:
 
@@ -53,11 +54,12 @@ com.DavidOwens1513.BareGPSIreland.MapHills
 
 ## Getting Started
 
-1. Clone the repository.
-2. Open `Maphills.xcodeproj` in Xcode.
-3. Let Xcode resolve the MapLibre Native package dependency.
-4. Select the `MapHills` scheme.
-5. Build and run on a simulator or device.
+1. Install Git LFS and run `git lfs install` if it is not already configured.
+2. Clone the repository and allow Git LFS to download the map resources.
+3. Open `Maphills.xcodeproj` in Xcode.
+4. Let Xcode resolve the MapLibre Native package dependency.
+5. Select the `MapHills` scheme.
+6. Build and run on a simulator or device.
 
 For device testing, configure signing to use your own Apple Developer team if needed.
 
@@ -82,6 +84,23 @@ Additional reference data notes are in:
 ```text
 Data/Ireland/Canonical/README.md
 MapHills/RegionDefinition/Ireland/REFERENCE_DATA_SETUP.md
+```
+
+### OpenBareMap
+
+OpenBareMap is the app's bundled offline map layer for full-island coverage. Its resource bundle is approximately 962 MB and contains the prepared MapLibre style, vector and raster MBTiles databases, fonts, sprites, townlands, legend assets, attribution, and provenance metadata.
+
+The bundle lives at:
+
+```text
+MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle/
+```
+
+The large databases and image assets are stored with Git LFS. Before distributing a build, verify the installed bundle against its packaged checksum list:
+
+```sh
+cd MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle
+shasum -a 256 -c SHA256SUMS.txt
 ```
 
 ## Build And Test
@@ -141,8 +160,9 @@ The app includes or references Irish hill, trail, placename, map, and OpenBareMa
 Relevant bundled notices include:
 
 ```text
-MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle/LICENSE-APACHE-2.0.txt
-MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle/NOTICE.txt
+MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle/ATTRIBUTION.txt
+MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle/terrain-attribution.html
+MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle/fonts/LICENSE-APACHE-2.0.txt
 ```
 
 ## Status
