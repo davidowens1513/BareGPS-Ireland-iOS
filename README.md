@@ -103,6 +103,14 @@ cd MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
+### Map interaction performance
+
+Start-place overlap grouping is independent of the current zoom and must not run synchronously from MapLibre camera callbacks. The app builds that layout on a background queue using five-metre spatial buckets, applies only the changed annotation keys on the main thread, and discards results from superseded layout generations.
+
+Zoom-band changes refresh marker artwork only for visible annotations whose presentation is stale. MapLibre and UIKit mutations remain on the main thread; the bundled map databases are not queried there.
+
+This behaviour was verified on a physical iOS 27.0.1 device with both the reduced diagnostic style and the full production OpenBareMap style. The previous start-place regroup/rebuild path caused repeated 2.5–8 second stalls. After the change, the diagnostic zoom sequence recorded no in-window Animation Hitches or Time Profiler hangs. With the production style, the multi-second stalls remained eliminated; remaining missed frames were short CPU-side app updates, with GPU work staying within the 16.67 ms frame budget.
+
 ## Build And Test
 
 From Xcode, use:

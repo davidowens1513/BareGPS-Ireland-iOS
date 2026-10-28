@@ -236,6 +236,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     var selectedStartPlaceHaloAnnotation: StartPlaceSelectionAnnotation?
     var selectedIrelandPlaceHaloAnnotation: IrelandPlaceSelectionAnnotation?
     var isRefreshingStartPlaceSelectionState = false
+    var startPlaceAnnotationLayoutGeneration = 0
+    var startPlaceAnnotationLayoutWorkItem: DispatchWorkItem?
     var isRefreshingSelectionState: Bool {
         get { peakSelectionStore.isRefreshingSelectionState }
         set { peakSelectionStore.isRefreshingSelectionState = newValue }

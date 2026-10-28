@@ -329,10 +329,12 @@ func irishGridEastingNorthing(for coordinate: CLLocationCoordinate2D) -> (eastin
 
 final class PeakAnnotation: MLNPointAnnotation {
     var peak: Peak?
+    var zoomPresentationRawValue: String?
 }
 
 final class StartPlaceAnnotation: MLNPointAnnotation {
     var startPlace: StartPlace?
+    var zoomPresentationRawValue: String?
 }
 
 final class IrelandPlaceSelectionAnnotation: MLNPointAnnotation {

@@ -153,7 +153,7 @@ extension ViewController {
                 guard let self else { return }
                 self.saveMarkerColor(color, for: id)
                 self.reloadPeakAnnotations()
-                self.reloadStartPlaceAnnotations()
+                self.reloadStartPlaceAnnotations(forceImageRefresh: true)
                 self.reloadSavedWaypointAnnotations()
             },
             hillMarkerVisibilityChangeHandler: { [weak self] showsHillMarkers in
@@ -278,7 +278,7 @@ extension ViewController {
                 guard let self else { return }
                 self.saveMarkerColor(color, for: id)
                 self.reloadPeakAnnotations()
-                self.reloadStartPlaceAnnotations()
+                self.reloadStartPlaceAnnotations(forceImageRefresh: true)
                 self.reloadSavedWaypointAnnotations()
             },
             markerColorSchemaChangeHandler: { [weak self] schema in

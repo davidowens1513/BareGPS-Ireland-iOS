@@ -93,12 +93,12 @@
     {
       "path": "manifest.json",
       "bytes": 2190,
-      "sha256": "0f3b97b77dc6cfc0c6278196bc88a90b5bf32e0e2f7fe26192df04e61e814925"
+      "sha256": "eac92b1c287c1fccbbd95d1fb87940ea00fb47b9382304aead4b481ba88ba869"
     },
     {
       "path": "maps/basemap.mbtiles",
-      "bytes": 679026688,
-      "sha256": "cb2e6ec1ebe474563422e44db2c5d30c2efa7c73ebb55a262b85508710943431"
+      "bytes": 646307840,
+      "sha256": "ac77d1c04c92368b0e0b70df7bc1eb012c2639e3bb3d2b3c25efa05aeef94577"
     },
     {
       "path": "maps/coast.mbtiles",
@@ -122,8 +122,8 @@
     },
     {
       "path": "provenance/active-map.json",
-      "bytes": 896,
-      "sha256": "4f33222c2df3c16e5f9b91bfc458394f98b6b9c3227650aa8bbb65ee1e5816c3"
+      "bytes": 942,
+      "sha256": "cc93a2d8e34db75dbcf0095d13511dddb1e76c3b3c710cecadb6f7a945bb1abc"
     },
     {
       "path": "provenance/coast-sources.lock.json",

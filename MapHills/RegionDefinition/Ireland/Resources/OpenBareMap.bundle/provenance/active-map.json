@@ -2,8 +2,8 @@
   "format": "openbaremap-development-viewer-v1",
   "datasets": {
     "basemap": {
-      "path": "build/detail-2.0/basemap.mbtiles",
-      "sha256": "cb2e6ec1ebe474563422e44db2c5d30c2efa7c73ebb55a262b85508710943431"
+      "path": "build/overview-2.0/basemap.mbtiles",
+      "sha256": "ac77d1c04c92368b0e0b70df7bc1eb012c2639e3bb3d2b3c25efa05aeef94577"
     },
     "topography": {
       "path": "build/padding-2.0/topography.mbtiles",
@@ -19,9 +19,10 @@
     }
   },
   "mapVersion": "2.0.0",
-  "storageRevision": "2.0.0-storage-r3",
+  "storageRevision": "2.0.0-storage-r4",
   "detailRevision": "2.0.0-20m",
   "contourIntervalMetres": 20,
   "localBorders": false,
-  "spriteRevision": "2.0.0-cliffs-r1"
+  "spriteRevision": "2.0.0-cliffs-r1",
+  "overviewRevision": "2.0.0-overviews-r1"
 }
