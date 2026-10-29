@@ -44,7 +44,7 @@ The app combines live mapping, Irish hill classification data, GPX workflows, of
 - iOS 18.2 or later deployment target.
 - Swift 5 project settings.
 - MapLibre Native package dependency.
-- Git LFS for the bundled OpenBareMap databases and image assets.
+- Git LFS for the bundled OpenBareMap MBTiles databases.
 
 The app target bundle identifier is currently:
 
@@ -88,7 +88,17 @@ MapHills/RegionDefinition/Ireland/REFERENCE_DATA_SETUP.md
 
 ### OpenBareMap
 
-OpenBareMap is the app's bundled offline map layer for full-island coverage. Its resource bundle is approximately 962 MB and contains the prepared MapLibre style, vector and raster MBTiles databases, fonts, sprites, townlands, legend assets, attribution, and provenance metadata.
+OpenBareMap is the app's bundled offline map layer for full-island coverage. The current package is OpenBareMap 2.0 (`2.0.0-storage-r3`), built from the 24 October 2026 OpenStreetMap snapshot with 20-metre contours.
+
+The resource bundle is 1,008,356,910 bytes (approximately 962 MiB) and contains 43 files. Its five MBTiles databases are:
+
+- `maps/basemap.mbtiles`
+- `maps/topography.mbtiles`
+- `maps/hillshade.mbtiles`
+- `maps/grid.mbtiles`
+- `maps/coast.mbtiles`
+
+The same bundle contains the prepared MapLibre style, font glyphs, sprites, townlands, attribution, provenance metadata, and the current OpenBareMap legend in PNG, high-resolution PNG, and SVG formats.
 
 The bundle lives at:
 
@@ -96,7 +106,7 @@ The bundle lives at:
 MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle/
 ```
 
-The large databases and image assets are stored with Git LFS. Before distributing a build, verify the installed bundle against its packaged checksum list:
+The five MBTiles databases are stored with Git LFS. Before distributing a build, verify the installed bundle against its packaged checksum list:
 
 ```sh
 cd MapHills/RegionDefinition/Ireland/Resources/OpenBareMap.bundle
