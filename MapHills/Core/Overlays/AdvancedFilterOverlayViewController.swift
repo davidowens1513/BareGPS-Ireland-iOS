@@ -378,6 +378,7 @@ final class AdvancedFilterOverlayViewController: UIViewController {
         textField.borderStyle = .roundedRect
         textField.keyboardType = .decimalPad
         textField.placeholder = placeholder
+        addKeyboardDismissAccessory(to: textField)
         textField.addTarget(self, action: #selector(minimumHeightChanged(_:)), for: .editingChanged)
         if placeholder == "Max" {
             textField.removeTarget(self, action: #selector(minimumHeightChanged(_:)), for: .editingChanged)

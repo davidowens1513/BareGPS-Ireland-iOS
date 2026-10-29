@@ -442,16 +442,36 @@ final class SettingsOverlayViewController: UIViewController {
 
         let openBareMapSection = makeSectionView(
             title: "OpenBareMap",
-            description: "Control detail shown on OpenBareMap. These settings do not affect OpenTopo, OpenStreetMap, or Satellite."
+            description: nil
         ) { container in
             let offlineMapButton = UIButton(type: .system)
-            offlineMapButton.configuration = .borderedProminent()
-            offlineMapButton.configuration?.title = "Manage Offline Map"
+            offlineMapButton.configuration = .gray()
+            offlineMapButton.configuration?.title = "Manage OpenBareMap"
+            offlineMapButton.configuration?.baseForegroundColor = .systemBlue
+            offlineMapButton.configuration?.attributedTitle = AttributedString(
+                "Manage OpenBareMap",
+                attributes: AttributeContainer([
+                    .font: OverlayChromeStyle.sectionTitleFont,
+                    .foregroundColor: UIColor.systemBlue
+                ])
+            )
             offlineMapButton.accessibilityIdentifier = "manageOfflineMapButton"
             offlineMapButton.addTarget(
                 self,
                 action: #selector(showOfflineMapSettings),
                 for: .touchUpInside
+            )
+
+            let downloadDescriptionLabel = makeOverlayBodyLabel(
+                "Manage downloads, installation and updates of OpenBareMap, to allow use of the app while out of cellular or Wi-Fi coverage.",
+                alignment: .left,
+                color: .secondaryLabel
+            )
+
+            let detailDescriptionLabel = makeOverlayBodyLabel(
+                "Control detail shown on OpenBareMap. These settings do not affect OpenTopo, OpenStreetMap, or Satellite.",
+                alignment: .left,
+                color: .secondaryLabel
             )
 
             gridLineSwitch.accessibilityIdentifier = "gridLineSwitch"
@@ -473,6 +493,9 @@ final class SettingsOverlayViewController: UIViewController {
 
             let stack = UIStackView(arrangedSubviews: [
                 offlineMapButton,
+                downloadDescriptionLabel,
+                makeDividerView(),
+                detailDescriptionLabel,
                 self.makeSwitchRow(title: "Grid Lines", toggle: gridLineSwitch),
                 self.makeSwitchRow(title: "Townlands", toggle: townlandSwitch)
             ] + openBareMapDetailRows)
@@ -504,6 +527,7 @@ final class SettingsOverlayViewController: UIViewController {
         nearestHundredGridReferenceField.autocapitalizationType = .allCharacters
         nearestHundredGridReferenceField.autocorrectionType = .no
         nearestHundredGridReferenceField.clearButtonMode = .whileEditing
+        addKeyboardDismissAccessory(to: nearestHundredGridReferenceField)
         nearestHundredGridReferenceField.text = nearestHundredConfiguration?.source == .gridReference
             ? nearestHundredConfiguration?.gridReference
             : nil
@@ -520,7 +544,7 @@ final class SettingsOverlayViewController: UIViewController {
             "Set from Current Position",
             attributes: AttributeContainer([
                 .font: OverlayChromeStyle.supportingFont,
-                .foregroundColor: UIColor.white
+                .foregroundColor: UIColor.systemBlue
             ])
         )
         useCurrentPositionButton.addTarget(self, action: #selector(setNearestHundredFromCurrentPosition), for: .touchUpInside)
@@ -661,7 +685,7 @@ final class SettingsOverlayViewController: UIViewController {
 
     private func makeSectionView(
         title: String,
-        description: String,
+        description: String?,
         contentBuilder: (UIView) -> Void
     ) -> UIView {
         let titleLabel = UILabel()
@@ -669,16 +693,21 @@ final class SettingsOverlayViewController: UIViewController {
         titleLabel.font = OverlayChromeStyle.sectionTitleFont
         titleLabel.textColor = .label
 
-        let descriptionLabel = UILabel()
-        descriptionLabel.text = description
-        descriptionLabel.font = OverlayChromeStyle.bodyFont
-        descriptionLabel.textColor = .secondaryLabel
-        descriptionLabel.numberOfLines = 0
-
         let contentContainer = UIView()
         contentContainer.translatesAutoresizingMaskIntoConstraints = false
 
-        let stack = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel, contentContainer])
+        var arrangedSubviews: [UIView] = [titleLabel]
+        if let description, !description.isEmpty {
+            let descriptionLabel = UILabel()
+            descriptionLabel.text = description
+            descriptionLabel.font = OverlayChromeStyle.bodyFont
+            descriptionLabel.textColor = .secondaryLabel
+            descriptionLabel.numberOfLines = 0
+            arrangedSubviews.append(descriptionLabel)
+        }
+        arrangedSubviews.append(contentContainer)
+
+        let stack = UIStackView(arrangedSubviews: arrangedSubviews)
         stack.axis = .vertical
         stack.spacing = 8
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -923,16 +952,15 @@ final class SettingsOverlayViewController: UIViewController {
     }
 
     private func compactChromeButtonConfiguration(title: String, color: UIColor) -> UIButton.Configuration {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseBackgroundColor = color
-        configuration.baseForegroundColor = .white
+        var configuration = UIButton.Configuration.gray()
+        configuration.baseForegroundColor = color
         configuration.cornerStyle = .medium
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
         configuration.attributedTitle = AttributedString(
             title,
             attributes: AttributeContainer([
                 .font: OverlayChromeStyle.supportingFont,
-                .foregroundColor: UIColor.white
+                .foregroundColor: color
             ])
         )
         return configuration
@@ -946,7 +974,7 @@ final class SettingsOverlayViewController: UIViewController {
                 "Nearest 100 active via \(sourceTitle)\nReference: \(nearestHundredConfiguration.gridReference)",
                 attributes: AttributeContainer([
                     .font: OverlayChromeStyle.supportingFont,
-                    .foregroundColor: UIColor.white
+                    .foregroundColor: UIColor.systemGreen
                 ])
             )
             nearestHundredStatusButton.configuration = configuration
@@ -956,7 +984,7 @@ final class SettingsOverlayViewController: UIViewController {
                 "Current setup: Not set",
                 attributes: AttributeContainer([
                     .font: OverlayChromeStyle.supportingFont,
-                    .foregroundColor: UIColor.white
+                    .foregroundColor: UIColor.systemRed
                 ])
             )
             nearestHundredStatusButton.configuration = configuration

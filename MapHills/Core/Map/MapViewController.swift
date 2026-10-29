@@ -717,6 +717,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         hillSearchField.autocorrectionType = .no
         hillSearchField.spellCheckingType = .no
         hillSearchField.clearButtonMode = .whileEditing
+        addKeyboardDismissAccessory(to: hillSearchField)
         hillSearchField.borderStyle = .none
         hillSearchField.background = UIImage()
         hillSearchField.backgroundColor = .systemBackground

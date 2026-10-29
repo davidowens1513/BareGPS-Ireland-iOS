@@ -85,6 +85,33 @@ func configureOverlayCardChrome(_ view: UIView) {
     view.layer.cornerRadius = OverlayChromeStyle.cardCornerRadius
 }
 
+func addKeyboardDismissAccessory(to textField: UITextField) {
+    let dismissButton = UIButton(type: .system)
+    let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 17, weight: .regular)
+    let image = (UIImage(systemName: "keyboard.chevron.compact.down") ?? UIImage(systemName: "chevron.down"))?
+        .applyingSymbolConfiguration(symbolConfiguration)
+    dismissButton.setImage(image, for: .normal)
+    dismissButton.accessibilityLabel = "Dismiss Keyboard"
+    dismissButton.addAction(
+        UIAction { [weak textField] _ in
+            textField?.resignFirstResponder()
+        },
+        for: .touchUpInside
+    )
+    NSLayoutConstraint.activate([
+        dismissButton.widthAnchor.constraint(equalToConstant: 44),
+        dismissButton.heightAnchor.constraint(equalToConstant: 36)
+    ])
+
+    let toolbar = UIToolbar()
+    toolbar.items = [
+        UIBarButtonItem(customView: dismissButton),
+        UIBarButtonItem(systemItem: .flexibleSpace)
+    ]
+    toolbar.sizeToFit()
+    textField.inputAccessoryView = toolbar
+}
+
 func makeOverlayTitleLabel(_ text: String, alignment: NSTextAlignment = .center) -> UILabel {
     let label = UILabel()
     label.text = text

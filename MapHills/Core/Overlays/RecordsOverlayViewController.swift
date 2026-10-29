@@ -120,6 +120,7 @@ final class RecordsOverlayViewController: UIViewController {
         searchTextField.placeholder = displayMode == .search ? "Search hills, start places, or Ireland places" : "Search hills"
         searchTextField.clearButtonMode = .whileEditing
         searchTextField.returnKeyType = .done
+        addKeyboardDismissAccessory(to: searchTextField)
         searchTextField.delegate = self
         searchTextField.addTarget(self, action: #selector(searchQueryChanged(_:)), for: .editingChanged)
 

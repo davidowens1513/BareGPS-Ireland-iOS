@@ -4,7 +4,7 @@ enum IrelandAboutText {
 Overview
 \(AppBranding.displayName) helps you explore and log hills across Ireland. The app uses hill data and hill lists provided by MountainViews.ie, with start-place and trail information from MountainViews.ie, Coillte, Sport Ireland and Outdoor Recreation NI / Outscape.
 
-The app provides full GPX recording, importing, Go-To and saving and exporting/sharing facilities. It provides a bespoke bundled hiking-focused layer (OpenBareMap) to ensure coverage in areas of reduced cellular signal, as well as providing caching to allow offline access to OpenTopo Map or Satellite layers.
+The app provides full GPX recording, importing, Go-To and saving and exporting/sharing facilities. It provides an optional bespoke hiking-focused layer (OpenBareMap) to ensure coverage in areas of reduced cellular signal, as well as providing caching to allow offline access to OpenTopo Map or Satellite layers.
 
 This is free software. Comments and requests are welcome.
 
@@ -81,11 +81,17 @@ Sport Ireland provides 1,466 start points and 1,013 route records in the current
 Outdoor Recreation NI / Outscape provides 129 start points and 129 route records in the current app data. This is a curated subset of Northern Ireland off-road trail data, reduced from a larger source inventory to avoid showing large numbers of short fragments, rights of way and utility paths that are less useful as walking-route markers.
 
 OpenBareMap
-OpenBareMap is a hiking-focused offline-safe map, which is bundled with the app and thus can function in areas without cellular coverage. It includes local MBTiles, local Open Sans glyphs, and a custom cartographic style. The map was built with OpenStreetMap, Tilemaker, QGIS, GDAL and SQLite.
+OpenBareMap is a hiking-focused offline map made for BareGPS Ireland. It is available as an optional 1 GB download. Once installed, its map tiles, terrain, hillshade, labels, fonts and cartographic style are stored on the device, allowing the map to work without cellular or Wi-Fi coverage.
+
+OpenBareMap was built from OpenStreetMap and terrain data using Tilemaker, Python, SQLite, and GDAL and GEOS tools supplied with QGIS.
 
 [[openbaremap-legend]]
 
-OpenBareMap data sources: © OpenStreetMap contributors, using the Geofabrik Ireland and Northern Ireland extract dated 2026-10-24, and osmdata.openstreetmap.de land polygons. Elevation data is derived from the Mapzen Terrain Tiles composite, including Copernicus EU-DEM, USGS and NOAA data.
+OpenBareMap data sources: © OpenStreetMap contributors. OSM-derived databases are distributed under ODbL 1.0. The map uses the Geofabrik Ireland and Northern Ireland extract dated 2026-10-24 and osmdata.openstreetmap.de land polygons.
+
+OpenBareMap elevation is derived from the Mapzen Terrain Tiles composite. Europe terrain data was produced using Copernicus data and information funded by the European Union – EU-DEM layers. Global terrain data is courtesy of the U.S. Geological Survey; ETOPO1 terrain data is from the U.S. National Oceanic and Atmospheric Administration. United Kingdom terrain data: © Environment Agency copyright and/or database right 2015. All rights reserved. This rebuild is not a pure SRTM product.
+
+OpenBareMap uses Open Sans glyphs licensed under the Apache License 2.0. Map colours and custom pattern assets are OpenBareMap. Townland label points and the fixed Irish Grid are inherited from OpenBareMap 1.1.
 
 Safety
 Note that, for your own safety, you should not rely solely on this app, or any app, for your navigation and safety in the hills.  Possession of a map and compass and/or a dedicated GPS unit, and the ability to use them correctly, is an essential precaution. While phones have improved immeasurably in recent years, shortcomings in battery life, waterproofing and signal mean they are not yet suitable as a sole navigation device in the hills. 
@@ -108,7 +114,7 @@ Outdoor Recreation NI / Outscape Trail Data: NI Off Road Trails Layer from the G
 Weather Data: Met Éireann
 Map Rendering: MapLibre
 OpenBareMap map data: © OpenStreetMap contributors. OSM-derived databases are distributed under ODbL 1.0. The map uses the Geofabrik Ireland and Northern Ireland extract dated 2026-10-24 and osmdata.openstreetmap.de land polygons.
-OpenBareMap elevation: Mapzen Terrain Tiles composite, including Copernicus EU-DEM, USGS and NOAA data. This rebuild is not a pure SRTM product.
+OpenBareMap elevation: Mapzen Terrain Tiles composite. Europe terrain data was produced using Copernicus data and information funded by the European Union – EU-DEM layers. Global terrain data is courtesy of the U.S. Geological Survey; ETOPO1 terrain data is from the U.S. National Oceanic and Atmospheric Administration. United Kingdom terrain data: © Environment Agency copyright and/or database right 2015. All rights reserved. This rebuild is not a pure SRTM product.
 OpenBareMap fonts: Open Sans glyphs, licensed under the Apache License 2.0.
 OpenBareMap cartography: Map colours and custom pattern assets are OpenBareMap. Townland label points and the fixed Irish Grid are inherited from OpenBareMap 1.1.
 Basemap data: © OpenStreetMap contributors

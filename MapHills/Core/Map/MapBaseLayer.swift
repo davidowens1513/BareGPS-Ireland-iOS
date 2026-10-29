@@ -24,7 +24,7 @@ enum MapBaseLayer: String {
         case .topographic:
             return "Map data: © OpenStreetMap contributors, SRTM | Map style: © OpenTopoMap (CC-BY-SA)"
         case .openBareMap:
-            return "© OpenStreetMap contributors | Terrain: Mapzen, Copernicus EU-DEM, USGS, NOAA | OpenBareMap"
+            return "© OpenStreetMap contributors (ODbL) | Terrain: Mapzen, Copernicus EU-DEM, USGS, NOAA, Environment Agency | Full credits: About"
         case .standard:
             return "© OpenStreetMap contributors"
         case .satellite:

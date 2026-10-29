@@ -20,7 +20,7 @@ final class OfflineMapSettingsViewController: UITableViewController {
     init(manager: OfflineMapDownloadManager) {
         self.manager = manager
         super.init(style: .insetGrouped)
-        title = "Offline Map"
+        title = "OpenBareMap"
     }
 
     required init?(coder: NSCoder) {
@@ -35,6 +35,22 @@ final class OfflineMapSettingsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if let logo = overlayLogoImage() {
+            let size = CGSize(width: 18, height: 18)
+            let renderedLogo = UIGraphicsImageRenderer(size: size).image { _ in
+                UIBezierPath(roundedRect: CGRect(origin: .zero, size: size), cornerRadius: 4).addClip()
+                logo.draw(in: CGRect(origin: .zero, size: size))
+            }.withRenderingMode(.alwaysOriginal)
+            let logoView = UIImageView(frame: CGRect(origin: .zero, size: size))
+            logoView.image = renderedLogo
+            logoView.contentMode = .scaleAspectFit
+            logoView.isUserInteractionEnabled = false
+            let logoItem = UIBarButtonItem(customView: logoView)
+            if #available(iOS 26.0, *) {
+                logoItem.hidesSharedBackground = true
+            }
+            navigationItem.leftBarButtonItem = logoItem
+        }
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             systemItem: .done,
             primaryAction: UIAction { [weak self] _ in self?.dismiss(animated: true) }
@@ -206,7 +222,7 @@ final class OfflineMapSettingsViewController: UITableViewController {
 
     private func statusText(_ phase: OfflineMapPersistentState.Phase) -> String {
         switch phase {
-        case .notInstalled: return "Not on this phone"
+        case .notInstalled: return "Not Installed"
         case .checkingManifest, .checkingForUpdate, .verifying: return "Checking"
         case .availableToDownload: return "Ready to download"
         case .waitingForNetwork: return "Waiting for Wi-Fi"

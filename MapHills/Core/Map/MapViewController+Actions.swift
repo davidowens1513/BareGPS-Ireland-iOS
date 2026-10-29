@@ -10,6 +10,9 @@ import MapLibre
 import UIKit
 
 extension ViewController {
+    private static let offlineMapLaunchOfferCountKey = "offlineMapLaunchOfferCount"
+    private static let maximumOfflineMapLaunchOffers = 2
+
 
     @objc func recenterTapped() {
         cancelMapInactivityRecenter()
@@ -125,24 +128,30 @@ extension ViewController {
     }
 
     func offerOfflineMapDownloadIfNeeded() {
+        let defaults = UserDefaults.standard
+        let previousOfferCount = defaults.integer(forKey: Self.offlineMapLaunchOfferCountKey)
         guard !hasOfferedOfflineMapDownload,
               openBareMapStyleURL == nil,
+              previousOfferCount < Self.maximumOfflineMapLaunchOffers,
               let manager = OfflineMapDownloadManager.shared else { return }
         hasOfferedOfflineMapDownload = true
+        defaults.set(previousOfferCount + 1, forKey: Self.offlineMapLaunchOfferCountKey)
 
-        let alert = UIAlertController(
-            title: "Get the Ireland Offline Map?",
-            message: "The map is a large download. You can get it now or later in Settings.",
-            preferredStyle: .alert
+        let overlay = ActionOverlayViewController(
+            title: "OpenBareMap",
+            message: "OpenBareMap is a companion map for BareGPS Ireland which is available as a 1 GB download. It provides fully featured, hiking-focused mapping without needing cellular or network access. If you choose not to download it now, it will remain available in Settings.",
+            showsLogo: true,
+            actions: [
+                .init(title: "Download Now", style: .normal) { [weak self] in
+                    manager.checkForUpdate()
+                    let controller = OfflineMapSettingsViewController(manager: manager)
+                    let navigationController = UINavigationController(rootViewController: controller)
+                    self?.topmostPresentingViewController().present(navigationController, animated: true)
+                },
+                .init(title: "Later", style: .cancel) {}
+            ]
         )
-        alert.addAction(UIAlertAction(title: "Later", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Get Map", style: .default) { [weak self] _ in
-            manager.checkForUpdate()
-            let controller = OfflineMapSettingsViewController(manager: manager)
-            let navigationController = UINavigationController(rootViewController: controller)
-            self?.topmostPresentingViewController().present(navigationController, animated: true)
-        })
-        topmostPresentingViewController().present(alert, animated: true)
+        topmostPresentingViewController().present(overlay, animated: true)
     }
 
     func selectOpenBareMapLayer() {

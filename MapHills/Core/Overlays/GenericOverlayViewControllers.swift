@@ -307,15 +307,23 @@ final class ActionOverlayViewController: UIViewController {
     private let messageText: String?
     private let actions: [Action]
     private let preferredActionTitle: String?
+    private let showsLogo: Bool
 
     private let dimmingView = UIView()
     private let cardView = UIView()
 
-    init(title: String, message: String? = nil, preferredActionTitle: String? = nil, actions: [Action]) {
+    init(
+        title: String,
+        message: String? = nil,
+        preferredActionTitle: String? = nil,
+        showsLogo: Bool = false,
+        actions: [Action]
+    ) {
         self.dialogTitle = title
         self.messageText = message
         self.actions = actions
         self.preferredActionTitle = preferredActionTitle
+        self.showsLogo = showsLogo
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
@@ -348,7 +356,7 @@ final class ActionOverlayViewController: UIViewController {
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         cardView.addSubview(contentStack)
 
-        contentStack.addArrangedSubview(titleLabel)
+        contentStack.addArrangedSubview(showsLogo ? makeOverlayTitleRow(with: titleLabel) : titleLabel)
 
         if let messageText, !messageText.isEmpty {
             let messageLabel = makeOverlayBodyLabel(messageText, color: .secondaryLabel)
@@ -496,6 +504,7 @@ final class TextInputOverlayViewController: UIViewController {
         textField.placeholder = placeholderText
         textField.text = initialText
         textField.clearButtonMode = .whileEditing
+        addKeyboardDismissAccessory(to: textField)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.accessibilityIdentifier = "textInputField"
         contentStack.addArrangedSubview(textField)
