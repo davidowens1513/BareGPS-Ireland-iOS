@@ -118,6 +118,7 @@ final class OfflineMapSettingsViewController: UITableViewController {
         if row == .wiFiOnly {
             let toggle = UISwitch()
             toggle.isOn = manager.wiFiOnly
+            toggle.isEnabled = !manager.state.isNetworkTransferActive
             toggle.addTarget(self, action: #selector(wiFiOnlyChanged(_:)), for: .valueChanged)
             toggle.accessibilityIdentifier = "offlineMapWiFiOnlySwitch"
             cell.accessoryView = toggle
@@ -223,9 +224,11 @@ final class OfflineMapSettingsViewController: UITableViewController {
     private func statusText(_ phase: OfflineMapPersistentState.Phase) -> String {
         switch phase {
         case .notInstalled: return "Not Installed"
-        case .checkingManifest, .checkingForUpdate, .verifying: return "Checking"
+        case .checkingManifest: return "Checking for Download"
+        case .checkingForUpdate: return "Checking for Update"
+        case .verifying: return "Verifying Download"
         case .availableToDownload: return "Ready to download"
-        case .waitingForNetwork: return "Waiting for Wi-Fi"
+        case .waitingForNetwork: return manager.wiFiOnly ? "Waiting for Wi-Fi" : "Waiting for Network"
         case .downloading: return "Downloading"
         case .installing: return "Installing"
         case .ready: return "Ready"

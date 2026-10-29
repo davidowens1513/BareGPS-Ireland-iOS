@@ -33,6 +33,20 @@ struct OfflineMapPersistentState: Codable, Equatable, Sendable {
     var lastError: String?
     var lastUpdateCheck: Date?
 
+    var isNetworkTransferActive: Bool {
+        phase == .downloading || phase == .waitingForNetwork
+    }
+
+    mutating func markWaitingForNetwork() {
+        guard phase == .downloading else { return }
+        phase = .waitingForNetwork
+    }
+
+    mutating func markDownloadingAfterNetworkResumes() {
+        guard phase == .waitingForNetwork else { return }
+        phase = .downloading
+    }
+
     static let initial = OfflineMapPersistentState(
         phase: .notInstalled,
         activeMap: nil,

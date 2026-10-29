@@ -58,6 +58,7 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
     var wiFiOnly: Bool {
         get { defaults.object(forKey: "offlineMapWiFiOnly") as? Bool ?? true }
         set {
+            guard !state.isNetworkTransferActive else { return }
             defaults.set(newValue, forKey: "offlineMapWiFiOnly")
             sessionStorage?.invalidateAndCancel()
             sessionStorage = nil
@@ -204,7 +205,7 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
             guard let self else { return }
             let activeIDs = Set(tasks.compactMap(\.taskDescription))
             let savedIDs = Set(self.state.completedSourceIDs)
-            if self.state.phase == .downloading && activeIDs.isEmpty && savedIDs.count < 5 {
+            if self.state.isNetworkTransferActive && activeIDs.isEmpty && savedIDs.count < 5 {
                 self.recordFailure(DownloadError.noSavedTransfer)
             }
         }
@@ -275,8 +276,15 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
             let received = tasks.reduce(Int64(0)) { $0 + max($1.countOfBytesReceived, 0) }
             let finishedBytes = self.completedByteCount()
             self.mutateState { state in
+                state.markDownloadingAfterNetworkResumes()
                 state.bytesReceived = min(finishedBytes + received, state.bytesExpected)
             }
+        }
+    }
+
+    func urlSession(_ session: URLSession, taskIsWaitingForConnectivity task: URLSessionTask) {
+        mutateState { state in
+            state.markWaitingForNetwork()
         }
     }
 
@@ -352,7 +360,7 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
         let active = store.activeMap()
         mutateState { state in
             state.activeMap = active
-            if active != nil && state.phase != .downloading && state.phase != .verifying {
+            if active != nil && state.phase != .downloading && state.phase != .waitingForNetwork && state.phase != .verifying {
                 state.phase = .ready
             }
         }

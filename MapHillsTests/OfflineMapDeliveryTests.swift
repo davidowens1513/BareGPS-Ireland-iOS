@@ -81,6 +81,34 @@ struct OfflineMapDeliveryTests {
         #expect(store.loadState().phase == .notInstalled)
     }
 
+    @Test("A download moves into and out of the waiting-for-network state")
+    func tracksWaitingForNetwork() {
+        var state = OfflineMapPersistentState.initial
+        state.phase = .downloading
+
+        state.markWaitingForNetwork()
+        #expect(state.phase == .waitingForNetwork)
+        #expect(state.isNetworkTransferActive)
+
+        state.markDownloadingAfterNetworkResumes()
+        #expect(state.phase == .downloading)
+        #expect(state.isNetworkTransferActive)
+    }
+
+    @Test("Unrelated phases ignore network-transfer callbacks")
+    func ignoresNetworkCallbacksOutsideDownload() {
+        var state = OfflineMapPersistentState.initial
+
+        state.markWaitingForNetwork()
+        #expect(state.phase == .notInstalled)
+        #expect(!state.isNetworkTransferActive)
+
+        state.phase = .ready
+        state.markDownloadingAfterNetworkResumes()
+        #expect(state.phase == .ready)
+        #expect(!state.isNetworkTransferActive)
+    }
+
     private func makeManifest(
         minimumAppVersion: String = "2.0.0",
         totalBytes: Int64? = nil,

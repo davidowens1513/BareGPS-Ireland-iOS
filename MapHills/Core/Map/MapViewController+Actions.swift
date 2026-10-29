@@ -114,10 +114,18 @@ extension ViewController {
         }
         let state = manager.state
         switch state.phase {
+        case .checkingManifest:
+            return "OpenBareMap — Checking for Download"
         case .downloading:
             guard state.bytesExpected > 0 else { return "OpenBareMap — Downloading" }
             let percent = Int(Double(state.bytesReceived) / Double(state.bytesExpected) * 100)
             return "OpenBareMap — \(min(max(percent, 0), 100))%"
+        case .waitingForNetwork:
+            return manager.wiFiOnly ? "OpenBareMap — Waiting for Wi-Fi" : "OpenBareMap — Waiting for Network"
+        case .verifying:
+            return "OpenBareMap — Verifying Download"
+        case .installing:
+            return "OpenBareMap — Installing"
         case .updateAvailable:
             return "OpenBareMap — Update ready"
         case .failed:

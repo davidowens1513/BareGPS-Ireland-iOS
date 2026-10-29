@@ -21,6 +21,8 @@ Until the work is approved, all app changes can be inspected with `git diff` and
 - Added exact-byte, streaming SHA-256, and SQLite `quick_check` verification before activation.
 - Added a persistent transfer context, fixed background-session identifier, task/file matching, aggregate progress, relaunch reconciliation, and the AppDelegate background completion hook.
 - Added HTTP status, final URL, host, content-type, network, storage, and verification failure handling. The prior active pack is retained on update failure.
+- Connected URL-session waiting callbacks to persistent Waiting for Wi-Fi/Network state and return to Downloading when transfer progress resumes.
+- Prevented Wi-Fi-only policy changes during an active network transfer so changing the switch cannot cancel or invalidate an in-progress background download.
 - Added a small local download log containing time, file ID, pack events, and error text only.
 
 ### App integration
@@ -34,14 +36,14 @@ Until the work is approved, all app changes can be inspected with `git diff` and
 
 ### Automated coverage
 
-- Added tests for a valid manifest, rejected host, rejected minimum app version, wrong byte total, atomic store activation, and removal scope.
+- Added tests for a valid manifest, rejected host, rejected minimum app version, wrong byte total, atomic store activation, removal scope, waiting/resume transitions, and ignored network callbacks outside a download.
 
 ## Verification Record
 
 - Baseline `MapHills` build before this implementation: passed.
 - App build: passed after implementation.
 - Build for testing: passed.
-- Offline-map unit tests: 6 passed, 0 failed.
+- Offline-map unit tests: 8 passed, 0 failed after connectivity-state hardening.
 - Full active plan: 55 passed, 2 unrelated existing resource-data tests failed, and 16 UI tests were not run after those failures. The failures were `provinceTopFiftyUsesHighestProminentHillsPerProvince` and missing `OutscapeTrails.geojson`; neither area was changed by this work.
 - Device-interaction check: blocked before launch because the available Xcode destinations do not include the iOS 27+ simulator required by the interaction tool. No runtime UI failure was observed.
 - Before live-R2 approval, the OpenBareMap bundle diff was empty. The final packaging step now records exactly five deliberate MBTiles deletions and no other OpenBareMap changes.
