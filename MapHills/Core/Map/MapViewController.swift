@@ -153,6 +153,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     var cachedAreaBorders: [CachedAreaBorderPolyline] = []
     var selectedCacheDetailLevel: CachedAreaDetailLevel = .standard
     var selectedMapBaseLayer: MapBaseLayer = .openBareMap
+    var hasOfferedOfflineMapDownload = false
     var selectedFilterSchema: MenuFilterSchema = .classification
     var selectedHillFilterMode: HillFilterMode = .simple
     var selectedDisplayUnitSystem: DisplayUnitSystem = .metric
@@ -352,7 +353,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     lazy var mapStyleURLProvider = MapStyleURLProvider(regionDefinition: regionDefinition)
     lazy var topographicStyleURL = mapStyleURLProvider.topographicStyleURL()
-    lazy var openBareMapStyleURL = mapStyleURLProvider.openBareMapStyleURL()
+    var openBareMapStyleURL: URL? { mapStyleURLProvider.openBareMapStyleURL() }
     lazy var satelliteStyleURL = mapStyleURLProvider.satelliteStyleURL()
     lazy var standardStyleURL = mapStyleURLProvider.standardStyleURL()
 
@@ -369,12 +370,16 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if selectedMapBaseLayer == .openBareMap && openBareMapStyleURL == nil {
+            selectedMapBaseLayer = .topographic
+        }
         view.backgroundColor = .systemBackground
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         scheduleInitialBootstrapIfNeeded()
+        offerOfflineMapDownloadIfNeeded()
     }
 
     func scheduleInitialBootstrapIfNeeded() {

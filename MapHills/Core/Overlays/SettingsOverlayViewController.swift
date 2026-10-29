@@ -444,6 +444,15 @@ final class SettingsOverlayViewController: UIViewController {
             title: "OpenBareMap",
             description: "Control detail shown on OpenBareMap. These settings do not affect OpenTopo, OpenStreetMap, or Satellite."
         ) { container in
+            let offlineMapButton = UIButton(type: .system)
+            offlineMapButton.configuration = .borderedProminent()
+            offlineMapButton.configuration?.title = "Manage Offline Map"
+            offlineMapButton.accessibilityIdentifier = "manageOfflineMapButton"
+            offlineMapButton.addTarget(
+                self,
+                action: #selector(showOfflineMapSettings),
+                for: .touchUpInside
+            )
 
             gridLineSwitch.accessibilityIdentifier = "gridLineSwitch"
             gridLineSwitch.isOn = showsGridLines
@@ -463,6 +472,7 @@ final class SettingsOverlayViewController: UIViewController {
             }
 
             let stack = UIStackView(arrangedSubviews: [
+                offlineMapButton,
                 self.makeSwitchRow(title: "Grid Lines", toggle: gridLineSwitch),
                 self.makeSwitchRow(title: "Townlands", toggle: townlandSwitch)
             ] + openBareMapDetailRows)
@@ -1058,6 +1068,14 @@ final class SettingsOverlayViewController: UIViewController {
     @objc private func townlandSwitchChanged(_ sender: UISwitch) {
         showsTownlands = sender.isOn
         townlandVisibilityChangeHandler(sender.isOn)
+    }
+
+    @objc private func showOfflineMapSettings() {
+        guard let manager = OfflineMapDownloadManager.shared else { return }
+        let controller = OfflineMapSettingsViewController(manager: manager)
+        let navigationController = UINavigationController(rootViewController: controller)
+        navigationController.modalPresentationStyle = .pageSheet
+        present(navigationController, animated: true)
     }
 
     @objc private func openBareMapDetailSwitchChanged(_ sender: UISwitch) {

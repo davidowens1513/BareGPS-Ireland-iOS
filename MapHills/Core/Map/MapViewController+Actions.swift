@@ -91,8 +91,8 @@ extension ViewController {
                 .init(title: "OpenTopo", isSelected: selectedMapBaseLayer == .topographic) { [weak self] in
                     self?.setMapBaseLayer(.topographic)
                 },
-                .init(title: "OpenBareMap", isSelected: selectedMapBaseLayer == .openBareMap) { [weak self] in
-                    self?.setMapBaseLayer(.openBareMap)
+                .init(title: openBareMapLayerTitle, isSelected: selectedMapBaseLayer == .openBareMap) { [weak self] in
+                    self?.selectOpenBareMapLayer()
                 },
                 .init(title: "OpenStreetMap", isSelected: selectedMapBaseLayer == .standard) { [weak self] in
                     self?.setMapBaseLayer(.standard)
@@ -103,6 +103,57 @@ extension ViewController {
             ]
         )
         topmostPresentingViewController().present(overlay, animated: true)
+    }
+
+    var openBareMapLayerTitle: String {
+        guard openBareMapStyleURL == nil, let manager = OfflineMapDownloadManager.shared else {
+            return "OpenBareMap"
+        }
+        let state = manager.state
+        switch state.phase {
+        case .downloading:
+            guard state.bytesExpected > 0 else { return "OpenBareMap — Downloading" }
+            let percent = Int(Double(state.bytesReceived) / Double(state.bytesExpected) * 100)
+            return "OpenBareMap — \(min(max(percent, 0), 100))%"
+        case .updateAvailable:
+            return "OpenBareMap — Update ready"
+        case .failed:
+            return "OpenBareMap — Fix needed"
+        default:
+            return "OpenBareMap — Download needed"
+        }
+    }
+
+    func offerOfflineMapDownloadIfNeeded() {
+        guard !hasOfferedOfflineMapDownload,
+              openBareMapStyleURL == nil,
+              let manager = OfflineMapDownloadManager.shared else { return }
+        hasOfferedOfflineMapDownload = true
+
+        let alert = UIAlertController(
+            title: "Get the Ireland Offline Map?",
+            message: "The map is a large download. You can get it now or later in Settings.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Later", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Get Map", style: .default) { [weak self] _ in
+            manager.checkForUpdate()
+            let controller = OfflineMapSettingsViewController(manager: manager)
+            let navigationController = UINavigationController(rootViewController: controller)
+            self?.topmostPresentingViewController().present(navigationController, animated: true)
+        })
+        topmostPresentingViewController().present(alert, animated: true)
+    }
+
+    func selectOpenBareMapLayer() {
+        guard openBareMapStyleURL != nil else {
+            guard let manager = OfflineMapDownloadManager.shared else { return }
+            let controller = OfflineMapSettingsViewController(manager: manager)
+            let navigationController = UINavigationController(rootViewController: controller)
+            topmostPresentingViewController().present(navigationController, animated: true)
+            return
+        }
+        setMapBaseLayer(.openBareMap)
     }
 
     func setMapBaseLayer(_ layer: MapBaseLayer) {

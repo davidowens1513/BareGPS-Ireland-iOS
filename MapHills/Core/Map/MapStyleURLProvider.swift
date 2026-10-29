@@ -30,6 +30,16 @@ struct MapStyleURLProvider {
     func openBareMapStyleURL() -> URL? {
         do {
             let resources = try OpenBareMapResources.bundled(in: bundle)
+            if let store = try? OfflineMapStore(),
+               let installedMapsRoot = try store.activeMapsRoot() {
+                return try OpenBareMapResources.prepareStyle(
+                    in: resources,
+                    mapsRootURL: installedMapsRoot,
+                    fileManager: fileManager
+                )
+            }
+
+            // Keep the packaged map as a development fallback until the R2 pack is live.
             return try OpenBareMapResources.prepareStyle(in: resources, fileManager: fileManager)
         } catch {
             print("Failed to prepare OpenBareMap style: \(error.localizedDescription)")

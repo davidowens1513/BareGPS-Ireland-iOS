@@ -282,7 +282,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 104;
+				CURRENT_PROJECT_VERSION = 105;
 				DEVELOPMENT_TEAM = 6B9FH8ZKN3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MapHills/Packaging/Info.plist;
@@ -301,7 +301,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.02.1;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.DavidOwens1513.BareGPSIreland.MapHills;
 				PRODUCT_NAME = "BareGPS Ireland";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -321,7 +321,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 104;
+				CURRENT_PROJECT_VERSION = 105;
 				DEVELOPMENT_TEAM = 6B9FH8ZKN3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MapHills/Packaging/Info.plist;
@@ -340,7 +340,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.02.1;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.DavidOwens1513.BareGPSIreland.MapHills;
 				PRODUCT_NAME = "BareGPS Ireland";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

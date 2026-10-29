@@ -17,7 +17,11 @@ enum OpenBareMapResources {
         return bundle
     }
 
-    static func prepareStyle(in bundle: Bundle, fileManager: FileManager = .default) throws -> URL {
+    static func prepareStyle(
+        in bundle: Bundle,
+        mapsRootURL: URL? = nil,
+        fileManager: FileManager = .default
+    ) throws -> URL {
         let root = bundle.bundleURL
         let manifestURL = root.appendingPathComponent("manifest.json")
         guard let manifest = try JSONSerialization.jsonObject(
@@ -36,7 +40,9 @@ enum OpenBareMapResources {
         }
 
         for (name, relativePath) in sourceFiles {
-            let fileURL = root.appendingPathComponent(relativePath)
+            let fileURL = mapsRootURL.map {
+                $0.appendingPathComponent((relativePath as NSString).lastPathComponent)
+            } ?? root.appendingPathComponent(relativePath)
             guard fileManager.fileExists(atPath: fileURL.path),
                   var source = sources[name] else {
                 throw ResourceError.missingResource(relativePath)
