@@ -1202,7 +1202,7 @@ struct MapHillsTests {
     func bundledProviderTrailGeoJSONContainsUsableFeatures() throws {
         let coillteFeatures = try bundledGeoJSONFeatures(resourceName: "CoillteTrails")
         let sportIrelandFeatures = try bundledGeoJSONFeatures(resourceName: "SportIrelandTrails")
-        let outscapeFeatures = try bundledGeoJSONFeatures(resourceName: "OutscapeTrails")
+        let outscapeFeatures = try bundledGeoJSONFeatures(resourceName: "OutscapeOffRoadTrails")
 
         #expect(!coillteFeatures.isEmpty)
         #expect(!sportIrelandFeatures.isEmpty)
@@ -1398,4 +1398,3 @@ private final class MapHillsTestBundleToken {}
 private enum TestResourceError: Error {
     case missingResource(String)
 }
-

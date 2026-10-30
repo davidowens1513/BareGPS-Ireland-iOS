@@ -76,6 +76,21 @@ final class MapHillsUITests: XCTestCase {
     }
 
     @MainActor
+    private func selectOpenTopo(app: XCUIApplication) {
+        let layerButton = app.buttons["layerButton"]
+        XCTAssertTrue(layerButton.waitForExistence(timeout: 5))
+        layerButton.tap()
+
+        let openTopoButton = app.buttons["OpenTopo"]
+        XCTAssertTrue(openTopoButton.waitForExistence(timeout: 5))
+        openTopoButton.tap()
+
+        let cachingButton = app.buttons["cachingButton"]
+        XCTAssertTrue(cachingButton.waitForExistence(timeout: 5))
+        XCTAssertTrue(cachingButton.isEnabled)
+    }
+
+    @MainActor
     private func encodedWaypointJSON(_ waypoints: [UITestSavedWaypointFixture]) throws -> String {
         let data = try JSONEncoder().encode(waypoints)
         return try XCTUnwrap(String(data: data, encoding: .utf8))
@@ -125,8 +140,8 @@ final class MapHillsUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["Map Orientation"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Map Interaction"].exists)
-        XCTAssertTrue(app.staticTexts["Map Detail"].exists)
-        XCTAssertTrue(app.staticTexts["Display Grid Lines"].exists)
+        XCTAssertTrue(app.staticTexts["OpenBareMap"].exists)
+        XCTAssertTrue(app.staticTexts["Grid Lines"].exists)
         XCTAssertTrue(app.staticTexts["Nearest 100"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Track Recording"].exists)
         XCTAssertTrue(app.staticTexts["Snail Trail"].exists)
@@ -199,12 +214,14 @@ final class MapHillsUITests: XCTestCase {
     @MainActor
     func testCachingOverlayOpensAndCloses() throws {
         let app = launchApp()
+        selectOpenTopo(app: app)
         assertOverlayOpensAndCloses(app: app, buttonIdentifier: "cachingButton", title: "Caching")
     }
 
     @MainActor
     func testCachingDetailLevelSelectionPersistsWhenReopened() throws {
         let app = launchApp()
+        selectOpenTopo(app: app)
 
         let cachingButton = app.buttons["cachingButton"]
         XCTAssertTrue(cachingButton.waitForExistence(timeout: 5))

@@ -1391,6 +1391,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         let layerImage = UIImage(systemName: "square.2.layers.3d.top.filled", withConfiguration: symbolConfiguration)
         layerButton.setImage(layerImage, for: .normal)
         applyRightRailButtonStyle(layerButton, tintColor: .systemBlue)
+        layerButton.accessibilityIdentifier = "layerButton"
+        layerButton.accessibilityLabel = "Map Layer"
         layerButton.addTarget(self, action: #selector(showMapLayerChooser), for: .touchUpInside)
 
         view.addSubview(layerButton)

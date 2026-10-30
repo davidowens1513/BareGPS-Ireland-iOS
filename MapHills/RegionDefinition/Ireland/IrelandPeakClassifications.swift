@@ -42,7 +42,7 @@ extension IrelandRegionDefinition {
         )
 
         let provincePeakGroups = Dictionary(grouping: peaks) { peak in
-            peak.province.trimmingCharacters(in: .whitespacesAndNewlines)
+            peak.regionGroup.trimmingCharacters(in: .whitespacesAndNewlines)
         }
 
         var provinceTopFiftyPeakIDsByCode: [String: Set<String>] = [:]
