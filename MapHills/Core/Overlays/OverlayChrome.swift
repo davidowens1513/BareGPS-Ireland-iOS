@@ -9,11 +9,35 @@ enum OverlayChromeStyle {
     static let verticalSpacing: CGFloat = 14
     static let buttonHeight: CGFloat = 42
 
-    static let titleFont = UIFont.systemFont(ofSize: 20, weight: .semibold)
-    static let sectionTitleFont = UIFont.systemFont(ofSize: 15, weight: .semibold)
-    static let bodyFont = UIFont.systemFont(ofSize: 13, weight: .regular)
-    static let supportingFont = UIFont.systemFont(ofSize: 12, weight: .regular)
-    static let actionFont = UIFont.systemFont(ofSize: 16, weight: .semibold)
+    static var titleFont: UIFont {
+        scaledFont(size: 20, weight: .semibold, textStyle: .title3)
+    }
+
+    static var sectionTitleFont: UIFont {
+        scaledFont(size: 15, weight: .semibold, textStyle: .headline)
+    }
+
+    static var bodyFont: UIFont {
+        scaledFont(size: 13, weight: .regular, textStyle: .body)
+    }
+
+    static var supportingFont: UIFont {
+        scaledFont(size: 12, weight: .regular, textStyle: .footnote)
+    }
+
+    static var actionFont: UIFont {
+        scaledFont(size: 16, weight: .semibold, textStyle: .headline)
+    }
+
+    private static func scaledFont(
+        size: CGFloat,
+        weight: UIFont.Weight,
+        textStyle: UIFont.TextStyle
+    ) -> UIFont {
+        UIFontMetrics(forTextStyle: textStyle).scaledFont(
+            for: UIFont.systemFont(ofSize: size, weight: weight)
+        )
+    }
 }
 
 func overlayLogoImage() -> UIImage? {
@@ -116,6 +140,7 @@ func makeOverlayTitleLabel(_ text: String, alignment: NSTextAlignment = .center)
     let label = UILabel()
     label.text = text
     label.font = OverlayChromeStyle.titleFont
+    label.adjustsFontForContentSizeCategory = true
     label.textColor = .label
     label.textAlignment = alignment
     label.numberOfLines = 0
@@ -126,6 +151,7 @@ func makeOverlaySectionTitleLabel(_ text: String, alignment: NSTextAlignment = .
     let label = UILabel()
     label.text = text
     label.font = OverlayChromeStyle.sectionTitleFont
+    label.adjustsFontForContentSizeCategory = true
     label.textColor = .label
     label.textAlignment = alignment
     label.numberOfLines = 0
@@ -140,6 +166,7 @@ func makeOverlayBodyLabel(
     let label = UILabel()
     label.text = text
     label.font = OverlayChromeStyle.bodyFont
+    label.adjustsFontForContentSizeCategory = true
     label.textColor = color
     label.textAlignment = alignment
     label.numberOfLines = 0
@@ -154,6 +181,7 @@ func makeOverlaySupportingLabel(
     let label = UILabel()
     label.text = text
     label.font = OverlayChromeStyle.supportingFont
+    label.adjustsFontForContentSizeCategory = true
     label.textColor = color
     label.textAlignment = alignment
     label.numberOfLines = 0

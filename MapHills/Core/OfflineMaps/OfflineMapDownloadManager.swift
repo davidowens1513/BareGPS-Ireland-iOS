@@ -101,22 +101,23 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
     }
 
     init(
-        store: OfflineMapStore = try! OfflineMapStore(),
+        store: OfflineMapStore? = nil,
         verifier: OfflineMapPackVerifier = OfflineMapPackVerifier(),
         fileManager: FileManager = .default,
         defaults: UserDefaults = .standard,
         activationValidator: @escaping (URL) throws -> Void = OfflineMapDownloadManager.validatePreparedStyle
     ) throws {
-        self.store = store
+        let resolvedStore = try store ?? OfflineMapStore()
+        self.store = resolvedStore
         self.verifier = verifier
         self.fileManager = fileManager
         self.defaults = defaults
         self.activationValidator = activationValidator
-        self.contextURL = store.rootURL.appendingPathComponent("transfer.json")
-        self.logURL = store.rootURL.appendingPathComponent("download.log")
-        self._state = store.loadState()
+        self.contextURL = resolvedStore.rootURL.appendingPathComponent("transfer.json")
+        self.logURL = resolvedStore.rootURL.appendingPathComponent("download.log")
+        self._state = resolvedStore.loadState()
         super.init()
-        try store.prepareDirectories()
+        try resolvedStore.prepareDirectories()
         reconcileStoredState()
         reconnectToBackgroundTasks()
     }

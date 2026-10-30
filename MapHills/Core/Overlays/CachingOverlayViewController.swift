@@ -380,7 +380,13 @@ extension CachingOverlayViewController: UITableViewDataSource, UITableViewDelega
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CachedAreaCell", for: indexPath) as! CachedAreaTableViewCell
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: "CachedAreaCell",
+            for: indexPath
+        ) as? CachedAreaTableViewCell else {
+            assertionFailure("CachedAreaCell is not a CachedAreaTableViewCell")
+            return UITableViewCell(style: .default, reuseIdentifier: nil)
+        }
         let area = cachedAreas[indexPath.row]
         cell.configure(
             area: area,

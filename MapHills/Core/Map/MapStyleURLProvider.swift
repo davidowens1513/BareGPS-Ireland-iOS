@@ -38,9 +38,7 @@ struct MapStyleURLProvider {
                     fileManager: fileManager
                 )
             }
-
-            // Keep the packaged map as a development fallback until the R2 pack is live.
-            return try OpenBareMapResources.prepareStyle(in: resources, fileManager: fileManager)
+            return nil
         } catch {
             print("Failed to prepare OpenBareMap style: \(error.localizedDescription)")
             return nil

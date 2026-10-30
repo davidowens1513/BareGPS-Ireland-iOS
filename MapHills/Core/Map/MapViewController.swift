@@ -2280,7 +2280,11 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                     title: candidate.startPlace.fullDisplayName,
                     tintColor: markerColor(for: candidate.startPlace),
                     handler: { [weak self] in
-                        self?.focusOnStartPlace(candidate.startPlace, invocationSource: .other)
+                        self?.focusOnStartPlace(
+                            candidate.startPlace,
+                            invocationSource: .other,
+                            animated: false
+                        )
                     }
                 )
             }
@@ -2325,7 +2329,8 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                     peak,
                     placementMode: .belowAnchor,
                     positionsPeakForCallout: true,
-                    invocationSource: .other
+                    invocationSource: .other,
+                    animated: false
                 )
             }
         ).actions(for: startPlace)
