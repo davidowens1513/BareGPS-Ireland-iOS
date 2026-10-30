@@ -263,7 +263,16 @@ final class MapHillsUITests: XCTestCase {
         let gridReferenceField = app.textFields["nearestHundredGridReferenceField"]
         XCTAssertTrue(gridReferenceField.waitForExistence(timeout: 5))
         gridReferenceField.tap()
+        if let existingText = gridReferenceField.value as? String,
+           existingText != "Grid Reference",
+           !existingText.isEmpty {
+            gridReferenceField.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: existingText.count))
+        }
         gridReferenceField.typeText("V 83643 84450")
+        XCTAssertEqual(gridReferenceField.value as? String, "V 83643 84450")
+        let dismissKeyboardButton = app.buttons["Dismiss Keyboard"]
+        XCTAssertTrue(dismissKeyboardButton.waitForExistence(timeout: 2))
+        dismissKeyboardButton.tap()
 
         let setButton = app.buttons["setNearestHundredGridReferenceButton"]
         XCTAssertTrue(setButton.waitForExistence(timeout: 5))
@@ -277,8 +286,8 @@ final class MapHillsUITests: XCTestCase {
 
         let statusButton = app.buttons["nearestHundredStatusButton"]
         XCTAssertTrue(statusButton.waitForExistence(timeout: 5))
-        XCTAssertTrue(statusButton.label.contains("Grid Ref"))
-        XCTAssertTrue(statusButton.label.contains("V 83643 84450"))
+        XCTAssertTrue(statusButton.label.contains("Grid Ref"), "Unexpected status: \(statusButton.label)")
+        XCTAssertTrue(statusButton.label.contains("V 83643 84450"), "Unexpected status: \(statusButton.label)")
 
         let doneButton = app.buttons["Done"]
         XCTAssertTrue(doneButton.waitForExistence(timeout: 5))
