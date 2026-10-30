@@ -1,5 +1,19 @@
 import UIKit
 
+enum OfflineMapUpdateOfferDecision {
+    case update
+    case later
+
+    var startsDownload: Bool {
+        self == .update
+    }
+
+    func performDownload(_ download: () -> Void) {
+        guard startsDownload else { return }
+        download()
+    }
+}
+
 final class OfflineMapSettingsViewController: UITableViewController {
     private enum Row: Hashable {
         case status
@@ -8,6 +22,7 @@ final class OfflineMapSettingsViewController: UITableViewController {
         case space
         case wiFiOnly
         case primaryAction
+        case cancelDownload
         case checkForUpdate
         case remove
         case error
@@ -16,6 +31,8 @@ final class OfflineMapSettingsViewController: UITableViewController {
     private let manager: OfflineMapDownloadManager
     private var rows: [Row] = []
     private var observer: NSObjectProtocol?
+    private var hasStartedAutomaticCheck = false
+    private var presentedUpdatePackVersion: String?
 
     init(manager: OfflineMapDownloadManager) {
         self.manager = manager
@@ -66,6 +83,17 @@ final class OfflineMapSettingsViewController: UITableViewController {
         reload()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        presentUpdateOfferIfNeeded()
+        guard !hasStartedAutomaticCheck else { return }
+        hasStartedAutomaticCheck = true
+        let phase = manager.state.phase
+        if phase == .notInstalled || phase == .ready || phase == .failed {
+            manager.checkForUpdate()
+        }
+    }
+
     private func reload() {
         let state = manager.state
         rows = [.status]
@@ -80,7 +108,9 @@ final class OfflineMapSettingsViewController: UITableViewController {
             rows.append(.primaryAction)
         case .downloading, .waitingForNetwork, .checkingManifest, .checkingForUpdate,
              .verifying, .installing:
-            break
+            if state.isNetworkTransferActive {
+                rows.append(.cancelDownload)
+            }
         case .ready:
             rows.append(.checkForUpdate)
         case .updateAvailable:
@@ -94,6 +124,7 @@ final class OfflineMapSettingsViewController: UITableViewController {
             rows.append(.error)
         }
         tableView.reloadData()
+        presentUpdateOfferIfNeeded()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -121,6 +152,9 @@ final class OfflineMapSettingsViewController: UITableViewController {
             toggle.isEnabled = !manager.state.isNetworkTransferActive
             toggle.addTarget(self, action: #selector(wiFiOnlyChanged(_:)), for: .valueChanged)
             toggle.accessibilityIdentifier = "offlineMapWiFiOnlySwitch"
+            toggle.accessibilityHint = toggle.isEnabled
+                ? "Turn off to allow map downloads on cellular data."
+                : "This setting cannot be changed while a map download is active."
             cell.accessoryView = toggle
         }
         cell.accessibilityIdentifier = "offlineMap.\(String(describing: row))"
@@ -140,6 +174,8 @@ final class OfflineMapSettingsViewController: UITableViewController {
             }
         case .checkForUpdate:
             manager.checkForUpdate()
+        case .cancelDownload:
+            confirmCancellation()
         case .remove:
             confirmRemoval()
         default:
@@ -168,6 +204,52 @@ final class OfflineMapSettingsViewController: UITableViewController {
         present(alert, animated: true)
     }
 
+    private func confirmCancellation() {
+        let state = manager.state
+        let isNearlyComplete = state.bytesExpected > 0 &&
+            Double(state.bytesReceived) / Double(state.bytesExpected) >= 0.8
+        let message = isNearlyComplete
+            ? "This download is nearly complete. Cancel it and delete the downloaded work files?"
+            : "Cancel this download and delete the downloaded work files?"
+        let alert = UIAlertController(
+            title: "Cancel Download?",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Keep Downloading", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Cancel Download", style: .destructive) { [weak self] _ in
+            self?.manager.cancelDownload()
+        })
+        present(alert, animated: true)
+    }
+
+    private func presentUpdateOfferIfNeeded() {
+        guard viewIfLoaded?.window != nil,
+              manager.state.phase == .updateAvailable,
+              let manifest = manager.offeredManifest,
+              presentedUpdatePackVersion != manifest.packVersion,
+              presentedViewController == nil else { return }
+        presentedUpdatePackVersion = manifest.packVersion
+
+        let size = ByteCountFormatter.string(fromByteCount: manifest.totalBytes, countStyle: .file)
+        let date = manifest.publishedAt.map {
+            DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none)
+        } ?? "Date not supplied"
+        let message = "Version \(manifest.mapVersion) • \(size) • \(date)\n\nYour current map will remain ready to use if you choose Later."
+        let alert = UIAlertController(title: "OpenBareMap Update", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Later", style: .cancel) { [weak self] _ in
+            OfflineMapUpdateOfferDecision.later.performDownload {
+                self?.manager.downloadOfferedMap()
+            }
+        })
+        alert.addAction(UIAlertAction(title: "Update Map", style: .default) { [weak self] _ in
+            OfflineMapUpdateOfferDecision.update.performDownload {
+                self?.manager.downloadOfferedMap()
+            }
+        })
+        present(alert, animated: true)
+    }
+
     private func showError(_ message: String) {
         let alert = UIAlertController(title: "Map Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -182,6 +264,7 @@ final class OfflineMapSettingsViewController: UITableViewController {
         case .space: return "Space Used"
         case .wiFiOnly: return "Wi-Fi Only"
         case .checkForUpdate: return "Check for Update"
+        case .cancelDownload: return "Cancel Download"
         case .remove: return "Remove Map"
         case .error: return "Last Error"
         case .primaryAction:
@@ -215,7 +298,9 @@ final class OfflineMapSettingsViewController: UITableViewController {
         case .error:
             return state.lastError
         case .wiFiOnly:
-            return "Use mobile data only when this is off."
+            return state.isNetworkTransferActive
+                ? "This cannot be changed while a map download is active."
+                : "Turn this off to allow map downloads on cellular data. The change applies to the next download."
         default:
             return nil
         }
@@ -238,6 +323,6 @@ final class OfflineMapSettingsViewController: UITableViewController {
     }
 
     private func isAction(_ row: Row) -> Bool {
-        row == .primaryAction || row == .checkForUpdate || row == .remove
+        row == .primaryAction || row == .cancelDownload || row == .checkForUpdate || row == .remove
     }
 }

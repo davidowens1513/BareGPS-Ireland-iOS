@@ -9,11 +9,44 @@ import Foundation
 import MapLibre
 import UIKit
 
+enum OfflineMapLaunchOfferDecision {
+    case downloadNow
+    case later
+
+    var startsNetworkRequest: Bool {
+        self == .downloadNow
+    }
+
+    func performNetworkRequest(_ request: () -> Void) {
+        guard startsNetworkRequest else { return }
+        request()
+    }
+}
+
+struct OfflineMapLaunchOfferPolicy {
+    static let defaultCountKey = "offlineMapLaunchOfferCount"
+    static let maximumOffers = 2
+
+    let defaults: UserDefaults
+    let countKey: String
+
+    init(defaults: UserDefaults = .standard, countKey: String = defaultCountKey) {
+        self.defaults = defaults
+        self.countKey = countKey
+    }
+
+    func shouldOffer(isMapInstalled: Bool, hasOfferedThisLaunch: Bool) -> Bool {
+        !isMapInstalled &&
+            !hasOfferedThisLaunch &&
+            defaults.integer(forKey: countKey) < Self.maximumOffers
+    }
+
+    func recordOffer() {
+        defaults.set(defaults.integer(forKey: countKey) + 1, forKey: countKey)
+    }
+}
+
 extension ViewController {
-    private static let offlineMapLaunchOfferCountKey = "offlineMapLaunchOfferCount"
-    private static let maximumOfflineMapLaunchOffers = 2
-
-
     @objc func recenterTapped() {
         cancelMapInactivityRecenter()
         if isUITestBypassingLocationPrompts {
@@ -136,14 +169,14 @@ extension ViewController {
     }
 
     func offerOfflineMapDownloadIfNeeded() {
-        let defaults = UserDefaults.standard
-        let previousOfferCount = defaults.integer(forKey: Self.offlineMapLaunchOfferCountKey)
-        guard !hasOfferedOfflineMapDownload,
-              openBareMapStyleURL == nil,
-              previousOfferCount < Self.maximumOfflineMapLaunchOffers,
-              let manager = OfflineMapDownloadManager.shared else { return }
+        let policy = OfflineMapLaunchOfferPolicy()
+        guard let manager = OfflineMapDownloadManager.shared else { return }
+        guard policy.shouldOffer(
+                isMapInstalled: manager.state.activeMap != nil,
+                hasOfferedThisLaunch: hasOfferedOfflineMapDownload
+              ) else { return }
         hasOfferedOfflineMapDownload = true
-        defaults.set(previousOfferCount + 1, forKey: Self.offlineMapLaunchOfferCountKey)
+        policy.recordOffer()
 
         let overlay = ActionOverlayViewController(
             title: "OpenBareMap",
@@ -151,12 +184,18 @@ extension ViewController {
             showsLogo: true,
             actions: [
                 .init(title: "Download Now", style: .normal) { [weak self] in
-                    manager.checkForUpdate()
-                    let controller = OfflineMapSettingsViewController(manager: manager)
-                    let navigationController = UINavigationController(rootViewController: controller)
-                    self?.topmostPresentingViewController().present(navigationController, animated: true)
+                    OfflineMapLaunchOfferDecision.downloadNow.performNetworkRequest {
+                        manager.checkForUpdate()
+                        let controller = OfflineMapSettingsViewController(manager: manager)
+                        let navigationController = UINavigationController(rootViewController: controller)
+                        self?.topmostPresentingViewController().present(navigationController, animated: true)
+                    }
                 },
-                .init(title: "Later", style: .cancel) {}
+                .init(title: "Later", style: .cancel) {
+                    OfflineMapLaunchOfferDecision.later.performNetworkRequest {
+                        manager.checkForUpdate()
+                    }
+                }
             ]
         )
         topmostPresentingViewController().present(overlay, animated: true)

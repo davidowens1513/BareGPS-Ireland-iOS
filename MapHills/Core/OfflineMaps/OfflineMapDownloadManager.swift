@@ -6,6 +6,16 @@ struct OfflineMapTransferContext: Codable, Sendable {
     let stagingURL: URL
 }
 
+struct OfflineMapNetworkPolicy: Equatable, Sendable {
+    let wiFiOnly: Bool
+
+    func apply(to configuration: URLSessionConfiguration) {
+        configuration.allowsCellularAccess = !wiFiOnly
+        configuration.allowsExpensiveNetworkAccess = !wiFiOnly
+        configuration.allowsConstrainedNetworkAccess = false
+    }
+}
+
 extension Notification.Name {
     static let offlineMapStateDidChange = Notification.Name("OfflineMapStateDidChange")
 }
@@ -44,6 +54,7 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
     private let validator = OfflineMapManifestValidator()
     private let fileManager: FileManager
     private let defaults: UserDefaults
+    private let activationValidator: (URL) throws -> Void
     private let contextURL: URL
     private let logURL: URL
     private let lock = NSLock()
@@ -53,6 +64,10 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
 
     var state: OfflineMapPersistentState {
         lock.withLock { _state }
+    }
+
+    var offeredManifest: OfflineMapManifest? {
+        try? loadContext().manifest
     }
 
     var wiFiOnly: Bool {
@@ -75,9 +90,7 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
         )
         configuration.sessionSendsLaunchEvents = true
         configuration.isDiscretionary = false
-        configuration.allowsCellularAccess = !wiFiOnly
-        configuration.allowsExpensiveNetworkAccess = !wiFiOnly
-        configuration.allowsConstrainedNetworkAccess = false
+        OfflineMapNetworkPolicy(wiFiOnly: wiFiOnly).apply(to: configuration)
 
         let queue = OperationQueue()
         queue.name = "ie.appsbyonzy.baregps.offline-map-delegate"
@@ -91,12 +104,14 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
         store: OfflineMapStore = try! OfflineMapStore(),
         verifier: OfflineMapPackVerifier = OfflineMapPackVerifier(),
         fileManager: FileManager = .default,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard,
+        activationValidator: @escaping (URL) throws -> Void = OfflineMapDownloadManager.validatePreparedStyle
     ) throws {
         self.store = store
         self.verifier = verifier
         self.fileManager = fileManager
         self.defaults = defaults
+        self.activationValidator = activationValidator
         self.contextURL = store.rootURL.appendingPathComponent("transfer.json")
         self.logURL = store.rootURL.appendingPathComponent("download.log")
         self._state = store.loadState()
@@ -186,6 +201,24 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
         }
     }
 
+    func cancelDownload() {
+        guard state.isNetworkTransferActive else { return }
+        let context = try? loadContext()
+
+        // Change state first so late URLSession callbacks become harmless no-ops.
+        mutateState { state in
+            state.cancelTransfer()
+        }
+        session.getAllTasks { tasks in
+            tasks.forEach { $0.cancel() }
+        }
+        if let context, context.stagingURL.path != "/" {
+            try? store.removeStagingDirectory(context.stagingURL)
+        }
+        try? fileManager.removeItem(at: contextURL)
+        appendLog("Cancelled map download.")
+    }
+
     func removeMap() throws {
         session.getAllTasks { tasks in
             tasks.forEach { $0.cancel() }
@@ -223,6 +256,7 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
         downloadTask: URLSessionDownloadTask,
         didFinishDownloadingTo location: URL
     ) {
+        guard state.isNetworkTransferActive else { return }
         do {
             guard let response = downloadTask.response as? HTTPURLResponse else {
                 throw DownloadError.noHTTPResponse
@@ -260,7 +294,9 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
             appendLog("Saved \(sourceID).")
             finishInstallIfComplete(context: context)
         } catch {
-            recordFailure(error)
+            if state.isNetworkTransferActive {
+                recordFailure(error)
+            }
         }
     }
 
@@ -271,6 +307,7 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
         totalBytesWritten: Int64,
         totalBytesExpectedToWrite: Int64
     ) {
+        guard state.isNetworkTransferActive else { return }
         session.getAllTasks { [weak self] tasks in
             guard let self else { return }
             let received = tasks.reduce(Int64(0)) { $0 + max($1.countOfBytesReceived, 0) }
@@ -283,6 +320,7 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
     }
 
     func urlSession(_ session: URLSession, taskIsWaitingForConnectivity task: URLSessionTask) {
+        guard state.isNetworkTransferActive else { return }
         mutateState { state in
             state.markWaitingForNetwork()
         }
@@ -319,7 +357,8 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
                 mutateState { $0.phase = .installing }
                 let installed = try store.activate(
                     stagingURL: context.stagingURL,
-                    manifest: context.manifest
+                    manifest: context.manifest,
+                    validate: activationValidator
                 )
                 try? fileManager.removeItem(at: contextURL)
                 mutateState { state in
@@ -441,6 +480,20 @@ final class OfflineMapDownloadManager: NSObject, URLSessionDownloadDelegate, URL
 
     private static var appVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+    }
+
+    private static func validatePreparedStyle(mapsRootURL: URL) throws {
+        let resources = try OpenBareMapResources.bundled()
+        let styleURL = try OpenBareMapResources.prepareStyle(
+            in: resources,
+            mapsRootURL: mapsRootURL
+        )
+        defer { try? FileManager.default.removeItem(at: styleURL.deletingLastPathComponent()) }
+        guard let style = try JSONSerialization.jsonObject(with: Data(contentsOf: styleURL)) as? [String: Any],
+              style["sources"] != nil,
+              style["layers"] != nil else {
+            throw OpenBareMapResources.ResourceError.invalidStyle
+        }
     }
 }
 

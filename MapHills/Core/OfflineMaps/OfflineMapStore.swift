@@ -47,6 +47,17 @@ struct OfflineMapPersistentState: Codable, Equatable, Sendable {
         phase = .downloading
     }
 
+    mutating func cancelTransfer() {
+        guard isNetworkTransferActive else { return }
+        phase = activeMap == nil ? .notInstalled : .ready
+        offeredPackVersion = nil
+        targetPackVersion = nil
+        completedSourceIDs = []
+        bytesReceived = activeMap?.totalBytes ?? 0
+        bytesExpected = activeMap?.totalBytes ?? 0
+        lastError = nil
+    }
+
     static let initial = OfflineMapPersistentState(
         phase: .notInstalled,
         activeMap: nil,
@@ -194,7 +205,8 @@ struct OfflineMapStore {
     func activate(
         stagingURL: URL,
         manifest: OfflineMapManifest,
-        installedAt: Date = Date()
+        installedAt: Date = Date(),
+        validate: (URL) throws -> Void = { _ in }
     ) throws -> InstalledOfflineMap {
         try prepareDirectories()
         guard fileManager.fileExists(atPath: stagingURL.path) else {
@@ -216,16 +228,34 @@ struct OfflineMapStore {
         )
 
         do {
+            try validate(finalURL.appendingPathComponent("maps", isDirectory: true))
             let data = try JSONEncoder.offlineMapEncoder.encode(installedMap)
             try data.write(
                 to: activeMapURL,
                 options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication]
             )
         } catch {
-            try? fileManager.moveItem(at: finalURL, to: stagingURL)
+            if fileManager.fileExists(atPath: finalURL.path) {
+                try? fileManager.moveItem(at: finalURL, to: stagingURL)
+            }
             throw error
         }
+        try? removeObsoletePacks(keeping: manifest.packVersion)
         return installedMap
+    }
+
+    func removeObsoletePacks(keeping packVersion: String) throws {
+        let entries = try fileManager.contentsOfDirectory(
+            at: packsRootURL,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        )
+        for entry in entries where entry.lastPathComponent != packVersion {
+            guard (try entry.resourceValues(forKeys: [.isDirectoryKey])).isDirectory == true else {
+                continue
+            }
+            try fileManager.removeItem(at: entry)
+        }
     }
 
     func activeMap() -> InstalledOfflineMap? {

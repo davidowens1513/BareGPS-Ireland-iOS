@@ -38,6 +38,16 @@ Until the work is approved, all app changes can be inspected with `git diff` and
 
 - Added tests for a valid manifest, rejected host, rejected minimum app version, wrong byte total, atomic store activation, removal scope, waiting/resume transitions, and ignored network callbacks outside a download.
 
+### Remaining-work implementation — 30 October 2026
+
+- Section 1.1: added an in-progress Cancel Download action for Downloading and Waiting for Wi-Fi/Network. It confirms cancellation, calls cancel on every background task, deletes only the current staging folder and transfer record, preserves any prior active map, returns to Ready or Not Installed as appropriate, and ignores late cancelled-task callbacks. Cancellation is idempotent.
+- Section 1.4: chose update discovery when the OpenBareMap management screen opens, while retaining the manual Check for Update action. A newer manifest now produces an opt-in alert showing map version, download size, and publication date, with Update Map and Later actions and a clear statement that the current map remains usable.
+- Section 1.5: activation now moves the candidate pack into place while retaining the prior active record, prepares and validates the candidate style through the same OpenBareMap/MapLibre style integration used by the app, commits the new active record only after that succeeds, rolls the candidate back on failure, and removes obsolete pack directories only after successful activation.
+- Section 1.7: the Wi-Fi-only control now explains that it is locked during an active transfer and that changes apply to the next download. The disabled switch has an explicit accessibility hint. Network policy tests confirm that Wi-Fi-only blocks cellular, expensive, and constrained paths; disabling Wi-Fi-only permits cellular and expensive paths while Low Data Mode/constrained paths remain blocked.
+- Section 1.8: extracted the first-launch offer rule into a tested policy. The offer appears at most twice, never when an installed map is recorded, and the Later path cannot invoke the network request.
+- Per owner direction, sections 1.2, 1.3, and 1.6 were dropped. Section 1.9 remains deferred for owner review.
+- No OpenBareMap map, style, legend, font, sprite, townland, attribution, or bundle resource was changed in this pass.
+
 ## Verification Record
 
 - Baseline `MapHills` build before this implementation: passed.
@@ -50,6 +60,9 @@ Until the work is approved, all app changes can be inspected with `git diff` and
 - Post-removal app build: passed. Built app scan found no `.mbtiles` files; Debug device app size is approximately 127 MB.
 - Post-removal phone test: passed. The smaller build was installed over the existing app, and OpenBareMap continued to work from the previously downloaded R2 pack with the bundled MBTiles absent.
 - Clean-install phone test: passed. With no prior app data and no bundled MBTiles, the app offered the map download, installed the live R2 pack to Ready, loaded OpenBareMap offline, and reopened successfully in Airplane Mode.
+- Remaining-work build for testing: passed after sections 1.1, 1.4, 1.5, 1.7, and 1.8 were implemented.
+- Offline-map delivery tests: 16 passed, 0 failed, including cancellation with and without a prior map, activation rollback, obsolete-pack cleanup, Wi-Fi/cellular/constrained policy, two-launch limit, installed-map suppression, and passive Later actions.
+- Full active plan after this pass: 77 passed and 6 failed. The two existing resource/classification failures remained (`PT50` classification data and missing `OutscapeTrails.geojson`), and four unrelated UI flows failed. No offline-map delivery test failed.
 
 ## External Work Deliberately Deferred
 
