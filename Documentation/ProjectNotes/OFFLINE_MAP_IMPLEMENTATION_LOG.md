@@ -40,6 +40,15 @@ Until the work is approved, all app changes can be inspected with `git diff` and
 - Added deterministic UI coverage for both first-launch choices, Settings and map-layer routes into OpenBareMap management, and reachability at an accessibility text size. UI-only launch controls isolate these flows without changing normal app behavior or deleting an installed map.
 - Added a spoken accessibility label to the Wi-Fi-only download switch.
 
+### Cloudflare R2 production hardening — 30 October 2026
+
+- Removed the public placeholder and four verified byte-identical stray map objects outside the production `baregps-ireland/` prefix.
+- Applied `Cache-Control: public, max-age=31536000, immutable`, `Content-Disposition: attachment`, and the binary content type to all five versioned map objects.
+- Applied `Cache-Control: no-cache` and the JSON content type to the fixed manifest object.
+- Confirmed all six public objects return HTTP 200, exact planned content lengths, and byte-range support; a basemap range request returned HTTP 206 and exactly 1,024 bytes.
+- Downloaded all five public map objects through `downloads.appsbyonzy.dev`; all sizes and SHA-256 values matched the manifest. The repeatable live-verification tool checked the complete 995,463,168-byte pack in 1 minute 20 seconds on the development connection.
+- Added a deterministic manifest generator/local verifier/live verifier and an R2 release and rollback runbook.
+
 ### Remaining-work implementation — 30 October 2026
 
 - Section 1.1: added an in-progress Cancel Download action for Downloading and Waiting for Wi-Fi/Network. It confirms cancellation, calls cancel on every background task, deletes only the current staging folder and transfer record, preserves any prior active map, returns to Ready or Not Installed as appropriate, and ignores late cancelled-task callbacks. Cancellation is idempotent.
