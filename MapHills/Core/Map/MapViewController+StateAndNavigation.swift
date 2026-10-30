@@ -816,10 +816,10 @@ extension ViewController {
             return MarkerColorCategory.logged.defaultColor
         }
         if optionID == "hills" {
-            return .systemOrange
+            return .systemRed
         }
         if optionID == "waypoints" {
-            return .systemBlue
+            return .systemYellow
         }
         if optionID == "mvStartPoints" {
             return .systemGreen
@@ -831,7 +831,7 @@ extension ViewController {
             return .systemBrown
         }
         if optionID == "outscapeStartPoints" {
-            return .systemOrange
+            return .systemCyan
         }
         return .systemOrange
     }
@@ -867,7 +867,7 @@ extension ViewController {
         let hillsOption = MarkerColorOption(
             id: "hills",
             title: "Hills",
-            color: resolvedMarkerColor(for: "hills", defaultColor: .systemOrange)
+            color: resolvedMarkerColor(for: "hills", defaultColor: .systemRed)
         )
         let loggedOption = MarkerColorOption(
             id: "logged",
@@ -877,7 +877,7 @@ extension ViewController {
         let waypointsOption = MarkerColorOption(
             id: "waypoints",
             title: "Waypoints",
-            color: resolvedMarkerColor(for: "waypoints", defaultColor: .systemBlue)
+            color: resolvedMarkerColor(for: "waypoints", defaultColor: .systemYellow)
         )
         let mvStartPointsOption = MarkerColorOption(
             id: "mvStartPoints",
@@ -897,7 +897,7 @@ extension ViewController {
         let outscapeStartPointsOption = MarkerColorOption(
             id: "outscapeStartPoints",
             title: "Outscape NI",
-            color: resolvedMarkerColor(for: "outscapeStartPoints", defaultColor: .systemOrange)
+            color: resolvedMarkerColor(for: "outscapeStartPoints", defaultColor: .systemCyan)
         )
         return [
             hillsOption,
@@ -1037,7 +1037,7 @@ extension ViewController {
 
     func savedWaypointAnnotationImage() -> UIImage {
         MapAnnotationImages.savedWaypointMarkerImage(
-            color: resolvedMarkerColor(for: "waypoints", defaultColor: .systemBlue)
+            color: resolvedMarkerColor(for: "waypoints", defaultColor: .systemYellow)
         )
     }
 

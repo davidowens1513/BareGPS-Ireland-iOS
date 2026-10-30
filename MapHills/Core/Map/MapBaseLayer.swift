@@ -73,7 +73,14 @@ enum OpenBareMapDetail: String, CaseIterable {
     case islandNames
     case waterFeatureNames
 
-    static let defaultVisibleDetails = Set(allCases)
+    static let defaultVisibleDetails: Set<OpenBareMapDetail> = [
+        .hillshade,
+        .landCover,
+        .boundaries,
+        .minorRoads,
+        .railwaysAndStations,
+        .hikingRoutes
+    ]
 
     var title: String {
         switch self {

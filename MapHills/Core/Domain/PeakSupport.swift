@@ -775,7 +775,7 @@ final class AppPreferencesStore {
         userDefaults.removeObject(forKey: Key.showsCompactRecordingGrid)
         let showsCompactRecordingGrid = true
         let showsSnailTrail = userDefaults.object(forKey: Key.showsSnailTrail) as? Bool ?? true
-        let snailTrailColor = loadColor(forKey: Key.snailTrailColor) ?? UIColor.systemRed.withAlphaComponent(0.75)
+        let snailTrailColor = loadColor(forKey: Key.snailTrailColor) ?? UIColor.systemYellow.withAlphaComponent(0.75)
         let goToLineColor = loadColor(forKey: Key.goToLineColor) ?? .systemTeal
         let recordedTrackColor = loadColor(forKey: Key.recordedTrackColor) ?? .systemRed
         let importedTrackColor = loadColor(forKey: Key.importedTrackColor) ?? .systemTeal
