@@ -27,12 +27,17 @@ final class MapHillsUITests: XCTestCase {
     }
 
     @MainActor
-    private func launchApp(launchEnvironment: [String: String] = [:]) -> XCUIApplication {
+    private func launchApp(
+        launchEnvironment: [String: String] = [:],
+        launchArguments: [String] = []
+    ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment["UITEST_BYPASS_LOCATION_PROMPTS"] = "1"
+        app.launchEnvironment["UITEST_SUPPRESS_OFFLINE_MAP_OFFER"] = "1"
         launchEnvironment.forEach { key, value in
             app.launchEnvironment[key] = value
         }
+        app.launchArguments += launchArguments
         app.launch()
 
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
@@ -446,6 +451,7 @@ final class MapHillsUITests: XCTestCase {
     @MainActor
     func testGPXImportLaunchEnvironmentLoadsImportedTrack() throws {
         let app = XCUIApplication()
+        app.launchEnvironment["UITEST_SUPPRESS_OFFLINE_MAP_OFFER"] = "1"
         app.launchEnvironment["UITEST_GPX_IMPORT_XML"] = """
         <?xml version="1.0" encoding="UTF-8"?>
         <gpx version="1.1" creator="MapHills">
@@ -482,5 +488,72 @@ final class MapHillsUITests: XCTestCase {
         let doneButton = app.buttons["Done"]
         XCTAssertTrue(doneButton.waitForExistence(timeout: 5))
         doneButton.tap()
+    }
+
+    @MainActor
+    func testOfflineMapFirstOfferLaterAndDownloadRoutes() throws {
+        let laterApp = launchApp(launchEnvironment: [
+            "UITEST_SUPPRESS_OFFLINE_MAP_OFFER": "0",
+            "UITEST_FORCE_OFFLINE_MAP_OFFER": "1"
+        ])
+
+        XCTAssertTrue(laterApp.staticTexts["OpenBareMap"].waitForExistence(timeout: 5))
+        XCTAssertTrue(laterApp.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS %@", "available as a 1 GB download")
+        ).firstMatch.exists)
+        XCTAssertTrue(laterApp.buttons["Later"].exists)
+        XCTAssertTrue(laterApp.buttons["Download Now"].exists)
+        laterApp.buttons["Later"].tap()
+        XCTAssertFalse(laterApp.buttons["Download Now"].waitForExistence(timeout: 2))
+
+        laterApp.terminate()
+        let downloadApp = launchApp(launchEnvironment: [
+            "UITEST_SUPPRESS_OFFLINE_MAP_OFFER": "0",
+            "UITEST_FORCE_OFFLINE_MAP_OFFER": "1"
+        ])
+        XCTAssertTrue(downloadApp.buttons["Download Now"].waitForExistence(timeout: 5))
+        downloadApp.buttons["Download Now"].tap()
+        XCTAssertTrue(downloadApp.navigationBars["OpenBareMap"].waitForExistence(timeout: 5))
+        XCTAssertTrue(downloadApp.buttons["Done"].exists)
+    }
+
+    @MainActor
+    func testOfflineMapManagerOpensFromSettingsAndMapLayer() throws {
+        let settingsApp = launchApp()
+        openSettings(app: settingsApp)
+        let manageButton = settingsApp.buttons["manageOfflineMapButton"]
+        XCTAssertTrue(manageButton.waitForExistence(timeout: 5))
+        manageButton.tap()
+        XCTAssertTrue(settingsApp.navigationBars["OpenBareMap"].waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsApp.cells["offlineMap.status"].exists)
+
+        settingsApp.terminate()
+        let layerApp = launchApp(launchEnvironment: [
+            "UITEST_FORCE_OFFLINE_MAP_UNAVAILABLE": "1"
+        ])
+        let layerButton = layerApp.buttons["layerButton"]
+        XCTAssertTrue(layerButton.waitForExistence(timeout: 5))
+        layerButton.tap()
+        let openBareMapButton = layerApp.buttons.matching(
+            NSPredicate(format: "label BEGINSWITH %@", "OpenBareMap")
+        ).firstMatch
+        XCTAssertTrue(openBareMapButton.waitForExistence(timeout: 5))
+        openBareMapButton.tap()
+        XCTAssertTrue(layerApp.navigationBars["OpenBareMap"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testOfflineMapManagerRemainsReachableAtAccessibilityTextSize() throws {
+        let app = launchApp(launchArguments: [
+            "-UIPreferredContentSizeCategoryName",
+            "UICTContentSizeCategoryAccessibilityExtraExtraExtraLarge"
+        ])
+        openSettings(app: app)
+        let manageButton = app.buttons["manageOfflineMapButton"]
+        XCTAssertTrue(manageButton.waitForExistence(timeout: 5))
+        manageButton.tap()
+        XCTAssertTrue(app.navigationBars["OpenBareMap"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.cells["offlineMap.status"].exists)
+        XCTAssertTrue(app.switches["offlineMapWiFiOnlySwitch"].exists)
     }
 }

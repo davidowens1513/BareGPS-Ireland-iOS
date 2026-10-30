@@ -36,7 +36,9 @@ Until the work is approved, all app changes can be inspected with `git diff` and
 
 ### Automated coverage
 
-- Added tests for a valid manifest, rejected host, rejected minimum app version, wrong byte total, atomic store activation, removal scope, waiting/resume transitions, and ignored network callbacks outside a download.
+- Expanded the offline-map suite to cover malformed JSON; pack, schema, host, protocol, path, file-set, size, hash, and overflow rejection; missing or damaged files; invalid and incomplete SQLite databases; traversal resistance; active-record rollback; preservation of the old map; relaunch identity restoration; backup exclusion; free-space margin; cancellation; network policy; and launch-offer policy.
+- Added deterministic UI coverage for both first-launch choices, Settings and map-layer routes into OpenBareMap management, and reachability at an accessibility text size. UI-only launch controls isolate these flows without changing normal app behavior or deleting an installed map.
+- Added a spoken accessibility label to the Wi-Fi-only download switch.
 
 ### Remaining-work implementation — 30 October 2026
 
@@ -63,6 +65,9 @@ Until the work is approved, all app changes can be inspected with `git diff` and
 - Remaining-work build for testing: passed after sections 1.1, 1.4, 1.5, 1.7, and 1.8 were implemented.
 - Offline-map delivery tests: 16 passed, 0 failed, including cancellation with and without a prior map, activation rollback, obsolete-pack cleanup, Wi-Fi/cellular/constrained policy, two-launch limit, installed-map suppression, and passive Later actions.
 - Full active plan after this pass: 77 passed and 6 failed. The two existing resource/classification failures remained (`PT50` classification data and missing `OutscapeTrails.geojson`), and four unrelated UI flows failed. No offline-map delivery test failed.
+- Section 2 build for testing: passed with no compiler diagnostics in the changed app and UI-test files.
+- Section 2 offline-map delivery suite: 31 passed, 0 failed.
+- Section 2 focused UI suite: first-launch Later/Download routes, Settings/layer management routes, and accessibility-size reachability passed.
 
 ## External Work Deliberately Deferred
 

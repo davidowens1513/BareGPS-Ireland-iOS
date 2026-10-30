@@ -1705,10 +1705,12 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     func positionCoordinateForCallout(_ coordinate: CLLocationCoordinate2D) {
         let currentPoint = mapView.convert(coordinate, toPointTo: mapView)
-        let targetPoint = CGPoint(
-            x: mapView.bounds.midX,
-            y: mapView.bounds.minY + (mapView.bounds.height / 3.0)
+        let safeAreaFrameInView = view.safeAreaLayoutGuide.layoutFrame
+        let targetPointInView = CGPoint(
+            x: safeAreaFrameInView.midX,
+            y: safeAreaFrameInView.minY + (safeAreaFrameInView.height / 3.0)
         )
+        let targetPoint = view.convert(targetPointInView, to: mapView)
         let deltaX = targetPoint.x - currentPoint.x
         let deltaY = targetPoint.y - currentPoint.y
 
@@ -1720,7 +1722,9 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             y: currentCenterPoint.y - deltaY
         )
         let adjustedCenterCoordinate = mapView.convert(adjustedCenterPoint, toCoordinateFrom: mapView)
-        mapView.setCenter(adjustedCenterCoordinate, animated: true)
+        // Callouts are measured immediately after this method returns. Apply the
+        // offset synchronously so their anchor is never sampled mid-animation.
+        mapView.setCenter(adjustedCenterCoordinate, animated: false)
     }
 
     func clampedCalloutAnchorRect(
@@ -2231,13 +2235,15 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
             placementMode: placementMode
         )
 
-        let anchorRectInMapView: CGRect
-        if let annotationView = mapView.view(for: peakAnnotation) {
-            anchorRectInMapView = annotationView.frame
-        } else {
-            let anchorPoint = mapView.convert(peak.coordinate, toPointTo: mapView)
-            anchorRectInMapView = CGRect(x: anchorPoint.x - 22, y: anchorPoint.y - 22, width: 44, height: 44)
-        }
+        // The annotation view can still have its pre-camera frame for a render
+        // cycle. Coordinate conversion reflects the camera synchronously.
+        let anchorPoint = mapView.convert(peak.coordinate, toPointTo: mapView)
+        let anchorRectInMapView = CGRect(
+            x: anchorPoint.x - 22,
+            y: anchorPoint.y - 22,
+            width: 44,
+            height: 44
+        )
 
         let constrainedRect = view.safeAreaLayoutGuide.layoutFrame.insetBy(dx: 0, dy: 8)
         let anchorRect = clampedCalloutAnchorRect(

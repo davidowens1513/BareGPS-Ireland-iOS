@@ -500,8 +500,9 @@ final class HillCalloutView: UIView, MLNCalloutView {
         case .belowAnchor:
             let verticalGap: CGFloat = CalloutLayoutMetrics.belowAnchorGap
             let targetTop = constrainedRect.minY + (constrainedRect.height * 0.40)
-            let fixedTop = max(rect.maxY + verticalGap, targetTop)
-            let maximumAvailableHeight = max(180, constrainedRect.height * 0.55)
+            let proposedTop = max(rect.maxY + verticalGap, targetTop)
+            let fixedTop = min(proposedTop, constrainedRect.maxY - 188)
+            let maximumAvailableHeight = max(180, constrainedRect.maxY - fixedTop - 8)
             let fittedHeight = min(maximumAvailableHeight, fittedContentHeight + 24 + 2)
             let centeredClampedLeadingX = min(max(centeredLeadingX, minimumLeading), maximumLeading)
             let verticalConstraint = topAnchor.constraint(equalTo: view.topAnchor, constant: fixedTop)
@@ -510,7 +511,8 @@ final class HillCalloutView: UIView, MLNCalloutView {
                 widthAnchor.constraint(equalToConstant: preferredWidth),
                 heightAnchor.constraint(equalToConstant: fittedHeight),
                 leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: centeredClampedLeadingX),
-                verticalConstraint
+                verticalConstraint,
+                bottomAnchor.constraint(lessThanOrEqualTo: view.topAnchor, constant: constrainedRect.maxY - 8)
             ])
         }
 
@@ -582,6 +584,7 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
     private let containerView = UIView()
     private let scrollView = UIScrollView()
     private let contentStack = UIStackView()
+    private let directionsStack = UIStackView()
     private let directionsButton = UIButton(type: .system)
     private let googleDirectionsButton = UIButton(type: .system)
     private let mountainViewsStartPlaceButton = UIButton(type: .system)
@@ -834,13 +837,15 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
         )
         googleDirectionsButton.addTarget(self, action: #selector(googleDirectionsButtonTapped), for: .touchUpInside)
 
-        let directionsStack = UIStackView(arrangedSubviews: [directionsButton, googleDirectionsButton])
+        directionsStack.addArrangedSubview(directionsButton)
+        directionsStack.addArrangedSubview(googleDirectionsButton)
         directionsStack.axis = .vertical
         directionsStack.alignment = .fill
         directionsStack.distribution = .fill
         directionsStack.spacing = 8
-        contentStack.addArrangedSubview(directionsStack)
         scrollView.addSubview(contentStack)
+        directionsStack.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(directionsStack)
 
         NSLayoutConstraint.activate([
             containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -851,7 +856,11 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
             scrollView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
             scrollView.topAnchor.constraint(equalTo: containerView.topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: directionsStack.topAnchor, constant: -8),
+
+            directionsStack.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 14),
+            directionsStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -14),
+            directionsStack.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -12),
 
             contentStack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor, constant: 14),
             contentStack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor, constant: -14),
@@ -981,7 +990,14 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         ).height)
-        let verticalGap: CGFloat = CalloutLayoutMetrics.automaticVerticalGap
+        let fittedDirectionsHeight = ceil(directionsStack.systemLayoutSizeFitting(
+            CGSize(width: contentWidth, height: UIView.layoutFittingCompressedSize.height),
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        ).height)
+        let verticalGap: CGFloat = placementMode == .belowAnchor
+            ? CalloutLayoutMetrics.belowAnchorGap
+            : CalloutLayoutMetrics.automaticVerticalGap
         let minimumLeading = constrainedRect.minX + CalloutLayoutMetrics.leftRailReservedWidth
         let maximumLeading = constrainedRect.maxX - preferredWidth - CalloutLayoutMetrics.rightRailReservedWidth
         let sidePreferredLeadingX: CGFloat = rect.midX < constrainedRect.midX
@@ -992,16 +1008,22 @@ final class StartPlaceCalloutView: UIView, MLNCalloutView {
         let clampedCenteredLeadingX = min(max(centeredLeadingX, minimumLeading), maximumLeading)
         let leadingX = placementMode == .belowAnchor ? clampedCenteredLeadingX : clampedSideLeadingX
         let targetTop = constrainedRect.minY + (constrainedRect.height * 0.40)
-        let fixedTop = max(rect.maxY + verticalGap, targetTop)
-        let maximumAvailableHeight = max(180, constrainedRect.height * 0.55)
-        let fittedHeight = min(maximumAvailableHeight, fittedContentHeight + 24)
+        let proposedTop = max(rect.maxY + verticalGap, targetTop)
+        let minimumCardHeight = min(220, constrainedRect.height - 16)
+        let fixedTop = min(proposedTop, constrainedRect.maxY - minimumCardHeight - 8)
+        let maximumAvailableHeight = max(minimumCardHeight, constrainedRect.maxY - fixedTop - 8)
+        let fittedHeight = min(
+            maximumAvailableHeight,
+            fittedContentHeight + fittedDirectionsHeight + 44
+        )
         let verticalConstraint: NSLayoutConstraint = topAnchor.constraint(equalTo: view.topAnchor, constant: fixedTop)
 
         NSLayoutConstraint.activate([
             widthAnchor.constraint(equalToConstant: preferredWidth),
             heightAnchor.constraint(equalToConstant: fittedHeight),
             leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: leadingX),
-            verticalConstraint
+            verticalConstraint,
+            bottomAnchor.constraint(lessThanOrEqualTo: view.topAnchor, constant: constrainedRect.maxY - 8)
         ])
 
         view.layoutIfNeeded()

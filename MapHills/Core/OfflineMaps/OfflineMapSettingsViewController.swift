@@ -152,6 +152,7 @@ final class OfflineMapSettingsViewController: UITableViewController {
             toggle.isEnabled = !manager.state.isNetworkTransferActive
             toggle.addTarget(self, action: #selector(wiFiOnlyChanged(_:)), for: .valueChanged)
             toggle.accessibilityIdentifier = "offlineMapWiFiOnlySwitch"
+            toggle.accessibilityLabel = "Wi-Fi Only"
             toggle.accessibilityHint = toggle.isEnabled
                 ? "Turn off to allow map downloads on cellular data."
                 : "This setting cannot be changed while a map download is active."

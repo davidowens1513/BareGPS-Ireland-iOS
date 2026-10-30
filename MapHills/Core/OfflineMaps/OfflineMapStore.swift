@@ -106,6 +106,7 @@ struct OfflineMapStore {
 
     let rootURL: URL
     let fileManager: FileManager
+    private let availableCapacityProvider: (URL) throws -> Int64
 
     private var stagingRootURL: URL {
         rootURL.appendingPathComponent("staging", isDirectory: true)
@@ -123,8 +124,16 @@ struct OfflineMapStore {
         rootURL.appendingPathComponent("active.json")
     }
 
-    init(rootURL: URL? = nil, fileManager: FileManager = .default) throws {
+    init(
+        rootURL: URL? = nil,
+        fileManager: FileManager = .default,
+        availableCapacityProvider: @escaping (URL) throws -> Int64 = { url in
+            try url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+                .volumeAvailableCapacityForImportantUsage ?? 0
+        }
+    ) throws {
         self.fileManager = fileManager
+        self.availableCapacityProvider = availableCapacityProvider
         if let rootURL {
             self.rootURL = rootURL
         } else {
@@ -305,11 +314,13 @@ struct OfflineMapStore {
 
     func checkAvailableSpace(requiredBytes: Int64, safetyMarginBytes: Int64 = 300_000_000) throws {
         try prepareDirectories()
-        let values = try rootURL.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
-        let available = values.volumeAvailableCapacityForImportantUsage ?? 0
+        let available = try availableCapacityProvider(rootURL)
         let (required, overflow) = requiredBytes.addingReportingOverflow(safetyMarginBytes)
         guard !overflow, available >= required else {
-            throw StoreError.insufficientSpace(required: requiredBytes + safetyMarginBytes, available: available)
+            throw StoreError.insufficientSpace(
+                required: overflow ? Int64.max : required,
+                available: available
+            )
         }
     }
 

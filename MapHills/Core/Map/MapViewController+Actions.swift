@@ -169,10 +169,18 @@ extension ViewController {
     }
 
     func offerOfflineMapDownloadIfNeeded() {
+        let environment = ProcessInfo.processInfo.environment
+        if environment["UITEST_SUPPRESS_OFFLINE_MAP_OFFER"] == "1" {
+            return
+        }
         let policy = OfflineMapLaunchOfferPolicy()
         guard let manager = OfflineMapDownloadManager.shared else { return }
+        let isForcedUITestOffer = environment["UITEST_FORCE_OFFLINE_MAP_OFFER"] == "1"
+        if isForcedUITestOffer {
+            UserDefaults.standard.set(0, forKey: OfflineMapLaunchOfferPolicy.defaultCountKey)
+        }
         guard policy.shouldOffer(
-                isMapInstalled: manager.state.activeMap != nil,
+                isMapInstalled: isForcedUITestOffer ? false : manager.state.activeMap != nil,
                 hasOfferedThisLaunch: hasOfferedOfflineMapDownload
               ) else { return }
         hasOfferedOfflineMapDownload = true
@@ -202,7 +210,10 @@ extension ViewController {
     }
 
     func selectOpenBareMapLayer() {
-        guard openBareMapStyleURL != nil else {
+        let isForcedUnavailableForUITest = ProcessInfo.processInfo.environment[
+            "UITEST_FORCE_OFFLINE_MAP_UNAVAILABLE"
+        ] == "1"
+        guard openBareMapStyleURL != nil, !isForcedUnavailableForUITest else {
             guard let manager = OfflineMapDownloadManager.shared else { return }
             let controller = OfflineMapSettingsViewController(manager: manager)
             let navigationController = UINavigationController(rootViewController: controller)

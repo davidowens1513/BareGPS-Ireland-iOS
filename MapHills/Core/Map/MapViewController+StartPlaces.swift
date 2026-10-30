@@ -38,13 +38,15 @@ extension ViewController {
             placementMode: placementMode
         )
 
-        let anchorRectInMapView: CGRect
-        if let annotationView = mapView.view(for: startPlaceAnnotation) {
-            anchorRectInMapView = annotationView.frame
-        } else {
-            let anchorPoint = mapView.convert(startPlaceAnnotation.coordinate, toPointTo: mapView)
-            anchorRectInMapView = CGRect(x: anchorPoint.x - 22, y: anchorPoint.y - 22, width: 44, height: 44)
-        }
+        // The annotation view can still have its pre-camera frame for a render
+        // cycle. Coordinate conversion reflects the camera synchronously.
+        let anchorPoint = mapView.convert(startPlaceAnnotation.coordinate, toPointTo: mapView)
+        let anchorRectInMapView = CGRect(
+            x: anchorPoint.x - 22,
+            y: anchorPoint.y - 22,
+            width: 44,
+            height: 44
+        )
 
         let constrainedRect = view.safeAreaLayoutGuide.layoutFrame.insetBy(dx: 0, dy: 8)
         let anchorRect = clampedCalloutAnchorRect(
