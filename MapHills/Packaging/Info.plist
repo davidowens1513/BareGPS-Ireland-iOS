@@ -4,10 +4,6 @@
 <dict>
 	<key>LSHasLocalizedDisplayName</key>
 	<true/>
-	<key>CFBundleShortVersionString</key>
-	<string>2.0</string>
-	<key>CFBundleVersion</key>
-	<string>2</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -23,12 +19,6 @@
 	</dict>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-	</array>
-	<key>UIFileSharingEnabled</key>
-	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -46,5 +36,11 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 </dict>
 </plist>
